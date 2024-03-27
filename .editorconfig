@@ -1,0 +1,15 @@
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+# options for prettier
+end_of_line = lf
+max_line_length = 100
+indent_style = tab
+indent_size = 4
+
+[package.json]
+indent_style = tab
+indent_size = 2

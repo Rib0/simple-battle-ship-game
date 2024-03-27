@@ -1,0 +1,23 @@
+.table {
+	position: relative;
+	padding: 10px;
+	border-collapse: separate;
+	border-image: url('@/assets/table-border.png');
+	border-image-repeat: repeat;
+	border-image-slice: 7;
+	border-image-width: 10px;
+
+	.tr {
+		height: var(--table-cell-size);
+	}
+
+	.td {
+		width: var(--table-cell-size);
+		border: 1px solid var(--color-blue);
+		transition: background-color 0.2s linear;
+
+		&.hovered {
+			background-color: var(--color-green);
+		}
+	}
+}

@@ -1,0 +1,8 @@
+.dndDraggable {
+	cursor: pointer; /* TODO: поменять курсор на красивый и для разных случаев разный */
+	touch-action: none;
+}
+
+.withTransition {
+	transition: transform 0.3s linear;
+}

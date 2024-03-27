@@ -1,0 +1,12 @@
+.gameWindow {
+	display: flex;
+	margin-top: 100px;
+	margin-left: 300px; /* TODO: поправить */
+	gap: 20px;
+
+	.ships {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+}

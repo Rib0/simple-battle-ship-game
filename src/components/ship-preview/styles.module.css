@@ -1,0 +1,10 @@
+.shipPreview {
+	display: flex;
+	flex-direction: column;
+	gap: 70px;
+
+	.draggable {
+		display: flex;
+		align-self: flex-start;
+	}
+}
