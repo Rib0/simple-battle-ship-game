@@ -8,22 +8,19 @@ import {
 	useMemo,
 	useState,
 } from 'preact/compat';
-import cx from 'classnames';
 
 import { DEFAULT_DND_CONTEXT_OPTIONS, DEFAULT_DND_OPTIONS } from '../constants';
 import {
 	DndContextOptionsType,
 	DndOptions,
-	DragCallbackWithData,
-	OnDragEndCallback,
+	DragEventHandlerWithData,
+	OnDragEndHandler,
 } from '../types';
 
-import styles from './styles.module.css';
-
 type Props = {
-	onDragStart?: DragCallbackWithData;
-	onDragMove?: DragCallbackWithData;
-	onDragEnd?: OnDragEndCallback;
+	onDragStart?: DragEventHandlerWithData;
+	onDragMove?: DragEventHandlerWithData;
+	onDragEnd?: OnDragEndHandler;
 	className?: string;
 };
 
@@ -87,7 +84,7 @@ const DndProvider: FunctionComponent<PropsWithChildren<Props>> = memo(({ childre
 
 	return (
 		<DndContext.Provider value={dndContextValue}>
-			<div className={cx(styles.dndContext, className)}>{children}</div>
+			<div className={className}>{children}</div>
 		</DndContext.Provider>
 	);
 });

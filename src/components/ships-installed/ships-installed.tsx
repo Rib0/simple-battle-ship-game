@@ -10,13 +10,7 @@ export const ShipsInstalled: FunctionComponent = observer(() => {
 
 	const renderShips = () =>
 		Object.entries(gameFieldStore.ships).map(([coords, { size, rotation }]) => {
-			const { x, y } = getShipsStylesRelativeToTableWithRotation({ coords, size, rotation });
-
-			const style = {
-				position: 'absolute',
-				top: `${y}px`,
-				left: `${x}px`,
-			};
+			const style = getShipsStylesRelativeToTableWithRotation({ coords, size, rotation });
 
 			return <Ship size={size} rotation={rotation} style={style} />;
 		});

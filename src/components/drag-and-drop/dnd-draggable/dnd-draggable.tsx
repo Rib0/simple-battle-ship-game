@@ -60,9 +60,7 @@ export const DndDraggable: FunctionComponent<PropsWithChildren<Props>> = ({
 	const handlePointerDown = (event: PointerEvent) => {
 		onDragStart(getPointerEventData(event, droppableElement));
 		setIsDragStarted(true);
-		if (startDragPosition === INITIAL_COORDS) {
-			setStartDragPosition({ x: event.clientX, y: event.clientY });
-		}
+		setStartDragPosition({ x: event.clientX, y: event.clientY });
 	};
 
 	const handlePointerMove = (event: PointerEvent) => {

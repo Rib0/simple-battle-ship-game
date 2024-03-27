@@ -10,8 +10,8 @@ export type DndOptions = {
 
 type PointerEventData = ReturnType<typeof getPointerEventData>;
 
-export type DragCallbackWithData = (data: PointerEventData) => void;
-export type OnDragEndCallback = (
+export type DragEventHandlerWithData = (data: PointerEventData) => void;
+export type OnDragEndHandler = (
 	data: PointerEventData,
 	callbacks: {
 		setInitialOffset: VoidFunction;
@@ -20,8 +20,8 @@ export type OnDragEndCallback = (
 ) => void;
 
 export type DndContextOptionsType = DndOptions & {
-	onDragStart: DragCallbackWithData;
-	onDragMove: DragCallbackWithData;
-	onDragEnd: OnDragEndCallback;
+	onDragStart: DragEventHandlerWithData;
+	onDragMove: DragEventHandlerWithData;
+	onDragEnd: OnDragEndHandler;
 	onSetDroppableRef: (node: NullableHTMLDivElement) => void;
 };

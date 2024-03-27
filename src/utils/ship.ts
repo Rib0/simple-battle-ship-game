@@ -146,20 +146,24 @@ export const getShipsStylesRelativeToTableWithRotation = ({
 
 	const shipWidth = 38; // размер палубы корабля
 
+	const styles = {
+		position: 'absolute',
+		top: `${y}px`,
+		left: `${x}px`,
+	};
+
 	switch (rotation) {
 		case ShipRotation.TOP:
 		case ShipRotation.BOTTOM: {
 			const shipLength = size * shipWidth;
 			const diff = (shipLength - shipWidth) / 2;
-			return {
-				x: x - diff,
-				y: y + diff,
-			};
+			styles.top = `${y + diff}px`;
+			styles.left = `${x - diff}px`;
+			break;
 		}
 		default:
-			return {
-				x,
-				y,
-			};
+			break;
 	}
+
+	return styles;
 };
