@@ -1,5 +1,5 @@
 .dndDraggable {
-	cursor: pointer; /* TODO: поменять курсор на красивый и для разных случаев разный */
+	cursor: pointer;
 	touch-action: none;
 }
 

@@ -1,7 +1,7 @@
 .gameWindow {
 	display: flex;
 	margin-top: 100px;
-	margin-left: 300px; /* TODO: поправить */
+	margin-left: 300px;
 	gap: 20px;
 
 	.ships {

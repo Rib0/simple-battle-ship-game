@@ -1,20 +1,26 @@
 import { makeAutoObservable } from 'mobx';
+import { injectStores } from '@mobx-devtools/tools';
+
+import { GameFieldStore } from './game-field';
 import { ShipsStore } from './ships';
-import { GameField } from './game-field';
 
 class RootStore {
-	gameFieldStore: GameField;
+	gameFieldStore: GameFieldStore;
 
 	shipsStore: ShipsStore;
 
 	constructor() {
 		makeAutoObservable(this);
 
-		this.gameFieldStore = new GameField(this);
+		this.gameFieldStore = new GameFieldStore(this);
 		this.shipsStore = new ShipsStore();
 	}
 }
 
 const rootStore = new RootStore();
+
+injectStores({
+	rootStore,
+});
 
 export { rootStore, RootStore };

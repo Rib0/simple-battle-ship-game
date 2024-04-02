@@ -1,10 +1,12 @@
 import { NullableHTMLDivElement } from '@/components/drag-and-drop/types';
+import { TABLE_SIDE_SIZE } from '@/constants/table';
 import { ShipRotation, ShipSize } from '@/types/ship';
 import { arrayFromDigit } from './array-from-digit';
+import { formatCoords, parseCoords } from './table';
 
-export const getRotationStyles = (rotation: ShipRotation) => `rotate(${rotation}deg)`;
+export const getRotationStyles = (shipRotation: ShipRotation) => `rotate(${shipRotation}deg)`;
 
-const getShipCoords = ({
+export const getShipCoords = ({
 	xFirstCellPosition,
 	yFirstCellPosition,
 	shipSize,
@@ -31,7 +33,7 @@ const getShipCoords = ({
 			default:
 				break;
 		}
-		return `${x}-${y}`;
+		return formatCoords({ x, y });
 	});
 
 	return coords;
@@ -47,13 +49,12 @@ const isShipOutsideGameField = (draggableElement: DOMRect, droppableElement: DOM
 };
 
 const getTopLeftCellShipCenter = (rect: DOMRect) => ({
-	// Получает центр верхней левой палубы корабля
-	x: rect.x + 20 - 10, // + ширина ячейки минус ширина border
+	x: rect.x + 20 - 10,
 	y: rect.y + 20 - 10,
 });
 
 const getFirstCellShipPosition = (firstCellShipCoord: number, droppableCoord: number) =>
-	Math.trunc((firstCellShipCoord - droppableCoord) / 40); // 40 - ширина ячейки палубы, вынести в переменные мб
+	Math.trunc((firstCellShipCoord - droppableCoord) / 40); // 40 - ширина ячейки таблицы, вынести в переменные мб
 
 export const getShipDataByDataset = (draggableElement: HTMLDivElement) => ({
 	shipSize: Number(draggableElement.dataset.size),
@@ -91,15 +92,17 @@ export const getTableCoordsHoveredByShip = ({
 	return coords;
 };
 
-export const getShipsCoordsRelativeToTable = (coords: string) => {
-	const [x, y] = coords.split('-');
+const getShipsPositionRelativeToTable = (coords: string) => {
+	const [[x, y]] = parseCoords(coords);
 
-	const xShipCoord = Number(x) * 40 + 10 + 1; // сдвиг из-за разницы в ширине палубы и ячейки таблицы в 2 пикселя
-	const yShipCoord = Number(y) * 40 + 10 + 1;
+	const leftShipCoord = x * 40 + 10 + 1; // сдвиг из-за разницы в ширине палубы и ячейки таблицы в 2 пикселя
+	const rightShipCoord = (TABLE_SIDE_SIZE - 1 - x) * 40 + 10 + 1;
+	const topShipCoord = y * 40 + 10 + 1;
 
 	return {
-		x: xShipCoord,
-		y: yShipCoord,
+		left: leftShipCoord,
+		right: rightShipCoord,
+		top: topShipCoord,
 	};
 };
 
@@ -122,10 +125,10 @@ export const getShipPositionForInstall = ({
 		droppableElement,
 	})!;
 
-	const { x, y } = getShipsCoordsRelativeToTable(firstShipCellCoords);
+	const { left, top } = getShipsPositionRelativeToTable(firstShipCellCoords);
 
-	const xShipCoord = x + droppableRect!.left;
-	const yShipCoord = y + droppableRect!.top;
+	const xShipCoord = left + droppableRect!.left;
+	const yShipCoord = top + droppableRect!.top;
 
 	return {
 		x: draggableRect.left - xShipCoord,
@@ -133,32 +136,40 @@ export const getShipPositionForInstall = ({
 	};
 };
 
+export const isCantInstallShip = (shipCoords: string[], inactiveCoordsForInstall: Set<string>) =>
+	shipCoords.some((shipCoord) => inactiveCoordsForInstall.has(shipCoord));
+
 export const getShipsStylesRelativeToTableWithRotation = ({
 	coords,
-	size,
-	rotation,
+	shipSize,
+	shipRotation,
 }: {
 	coords: string;
-	size: ShipSize;
-	rotation: ShipRotation;
+	shipSize: ShipSize;
+	shipRotation: ShipRotation;
 }) => {
-	const { x, y } = getShipsCoordsRelativeToTable(coords);
+	const { left, right, top } = getShipsPositionRelativeToTable(coords);
+	const [[x]] = parseCoords(coords);
 
-	const shipWidth = 38; // размер палубы корабля
+	const isVerticalRotation = [ShipRotation.TOP, ShipRotation.BOTTOM].includes(shipRotation);
+	const targetHorizontalCoordKey = x > 4 && isVerticalRotation ? 'right' : 'left';
+	const targetHorizontalCoord = x > 4 && isVerticalRotation ? right : left;
+
+	const shipWidth = 38; // TODO: размер палубы корабля, вынести в переменные
 
 	const styles = {
 		position: 'absolute',
-		top: `${y}px`,
-		left: `${x}px`,
+		top: `${top}px`,
+		[targetHorizontalCoordKey]: `${targetHorizontalCoord}px`,
 	};
 
-	switch (rotation) {
+	switch (shipRotation) {
 		case ShipRotation.TOP:
 		case ShipRotation.BOTTOM: {
-			const shipLength = size * shipWidth;
+			const shipLength = shipSize * shipWidth;
 			const diff = (shipLength - shipWidth) / 2;
-			styles.top = `${y + diff}px`;
-			styles.left = `${x - diff}px`;
+			styles.top = `${top + diff}px`;
+			styles[targetHorizontalCoordKey] = `${targetHorizontalCoord - diff}px`;
 			break;
 		}
 		default:

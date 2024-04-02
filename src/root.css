@@ -5,9 +5,9 @@
 :root {
 	--table-cell-size: 40px;
 	--ship-cell-size: calc(var(--table-cell-size) - 2px);
-	--color-light-green: rgb(221 247 221);
+	--color-light-green: rgb(224 238 224);
 	--color-green: rgb(121 205 121);
-	--color-red: rgb(234 114 114);
+	--color-red: rgb(238 130 130);
 	--color-blue: rgb(183 229 239);
 	--color-deep-blue: #4017c2;
 }

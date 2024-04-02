@@ -6,14 +6,41 @@ import { useStoreContext } from '@/context/store-context';
 import { getShipsStylesRelativeToTableWithRotation } from '@/utils/ship';
 
 export const ShipsInstalled: FunctionComponent = observer(() => {
-	const { gameFieldStore } = useStoreContext();
+	const { gameFieldStore, shipsStore } = useStoreContext();
 
 	const renderShips = () =>
-		Object.entries(gameFieldStore.ships).map(([coords, { size, rotation }]) => {
-			const style = getShipsStylesRelativeToTableWithRotation({ coords, size, rotation });
+		Object.entries(gameFieldStore.ships).map(
+			([coords, { size: shipSize, rotation: shipRotation }]) => {
+				const style = getShipsStylesRelativeToTableWithRotation({
+					coords,
+					shipSize,
+					shipRotation,
+				});
 
-			return <Ship size={size} rotation={rotation} style={style} />;
-		});
+				const extendedStyle = {
+					...style,
+					...(shipsStore.activeSize
+						? {
+								opacity: '0.3',
+							}
+						: {}),
+				};
+
+				const handleClick = () => {
+					gameFieldStore.activeInstalledShip = coords;
+				};
+
+				return (
+					<Ship
+						key={coords}
+						size={shipSize}
+						rotation={shipRotation}
+						style={extendedStyle}
+						onClick={handleClick}
+					/>
+				);
+			},
+		);
 
 	return <>{renderShips()}</>;
 });

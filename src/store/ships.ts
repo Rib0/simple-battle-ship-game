@@ -2,18 +2,12 @@ import { makeAutoObservable } from 'mobx';
 
 import { ShipRotation, ShipSize } from '@/types/ship';
 import { Nullable } from '@/types/utils';
+import { ROTATION_MAP } from '@/constants';
 
 export class ShipsStore {
-	private activeSize: Nullable<ShipSize> = null;
+	activeSize: Nullable<ShipSize> = null;
 
-	private rotationMap = {
-		[ShipRotation.LEFT]: ShipRotation.TOP,
-		[ShipRotation.TOP]: ShipRotation.RIGHT,
-		[ShipRotation.RIGHT]: ShipRotation.BOTTOM,
-		[ShipRotation.BOTTOM]: ShipRotation.LEFT,
-	};
-
-	activeShipRotation = ShipRotation.LEFT;
+	activeSizeRotation = ShipRotation.LEFT;
 
 	shipsAmount: Record<ShipSize, number> = {
 		[ShipSize.ONE]: 4,
@@ -27,26 +21,20 @@ export class ShipsStore {
 	}
 
 	setActiveSize = (size: Nullable<ShipSize>) => {
-		if (size === null) {
-			this.activeShipRotation = ShipRotation.LEFT;
-		}
+		this.activeSizeRotation = ShipRotation.LEFT;
 
 		this.activeSize = size;
 	};
 
-	get getActiveSize() {
-		return this.activeSize;
-	}
-
 	decreaseShipAmount = (shipSize: ShipSize) => {
-		let result = this.shipsAmount[shipSize] - 1;
+		this.shipsAmount[shipSize] -= 1;
+	};
 
-		result = result >= 0 ? result : 0;
-
-		this.shipsAmount[shipSize] = result;
+	increaseShipAmount = (shipSize: ShipSize) => {
+		this.shipsAmount[shipSize] += 1;
 	};
 
 	rotateActiveShip = () => {
-		this.activeShipRotation = this.rotationMap[this.activeShipRotation];
+		this.activeSizeRotation = ROTATION_MAP[this.activeSizeRotation];
 	};
 }

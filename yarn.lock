@@ -468,6 +468,11 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@mobx-devtools/tools@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@mobx-devtools/tools/-/tools-0.0.4.tgz#4a9bb541a26b6123c8bfa399cade740308edd82a"
+  integrity sha512-zQq8JMMqaXwWmPSxUIFhaBe/RzHoY/FV8zNyt3l2ERWTS8DN53pHrmFp5mR5byIpARXt7eHZ2mW1OCjDQz3JcA==
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz"

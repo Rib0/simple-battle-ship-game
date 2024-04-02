@@ -31,6 +31,7 @@ module.exports = {
 		'import/extensions': 'off',
 		'no-shadow': 'off',
 		'global-require': 'off',
+		'no-plusplus': [1, { allowForLoopAfterthoughts: true }],
 	},
 	plugins: ['@typescript-eslint', 'import'],
 	ignorePatterns: ['vite.config.ts'],

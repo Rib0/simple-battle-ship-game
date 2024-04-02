@@ -28,6 +28,7 @@
 		]
 	},
 	"dependencies": {
+		"@mobx-devtools/tools": "^0.0.4",
 		"classnames": "^2.5.1",
 		"mobx": "^6.12.0",
 		"mobx-react-lite": "^4.0.6",
