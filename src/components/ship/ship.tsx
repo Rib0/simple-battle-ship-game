@@ -1,6 +1,6 @@
-import { FunctionComponent } from 'preact';
 import { CSSProperties } from 'preact/compat';
 import { useMemo } from 'preact/hooks';
+import { observer } from 'mobx-react-lite';
 import cx from 'classnames';
 
 import { ShipRotation, ShipSize } from '@/types/ship';
@@ -20,14 +20,7 @@ type Props = {
 
 /* eslint-disable jsx-a11y/control-has-associated-label */
 
-export const Ship: FunctionComponent<Props> = ({
-	size,
-	rotation,
-	amount,
-	onClick,
-	style,
-	className,
-}) => {
+export const Ship = observer<Props>(({ size, rotation, amount, onClick, style, className }) => {
 	const shipSizeArray = useMemo(() => arrayFromDigit(size), [size]);
 
 	const handleClick = () => {
@@ -56,4 +49,4 @@ export const Ship: FunctionComponent<Props> = ({
 			{amount !== undefined && <div className={styles.amount}>{amount}</div>}
 		</div>
 	);
-};
+});

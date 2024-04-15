@@ -1,4 +1,3 @@
-import { FunctionComponent } from 'preact';
 import { CSSProperties } from 'preact/compat';
 import { observer } from 'mobx-react-lite';
 
@@ -7,26 +6,26 @@ import { Button } from '@/components/button';
 import { DndDraggable } from '@/components/drag-and-drop';
 
 import { useStoreContext } from '@/context/store-context';
-import { getRotationStyles } from '@/utils/ship';
+import { getShipRotationStyles } from '@/utils/ship';
 
 import styles from './styles.module.css';
 
-export const ShipPreview: FunctionComponent = observer(() => {
+export const ShipPreview = observer(() => {
 	const { shipsStore, gameFieldStore } = useStoreContext();
 
 	const { activeSize, activeSizeRotation, rotateActiveShip, setActiveSize } = shipsStore;
-	const { activeInstalledShip, removeActiveInstalledShip } = gameFieldStore;
+	const { activeInstalledShipCoords, removeActiveInstalledShip } = gameFieldStore;
 
-	if (!activeSize && !activeInstalledShip) {
+	if (!activeSize && !activeInstalledShipCoords) {
 		return null;
 	}
 
 	const extendDraggableStyles = (style: CSSProperties): CSSProperties => ({
 		...style,
-		transform: `${style.transform || ''} ${getRotationStyles(activeSizeRotation)}`,
+		transform: `${style.transform || ''} ${getShipRotationStyles(activeSizeRotation)}`,
 	});
 
-	const handleClickReturnButton = () => {
+	const handleClickCancelButton = () => {
 		if (activeSize) {
 			setActiveSize(null);
 		} else {
@@ -50,7 +49,7 @@ export const ShipPreview: FunctionComponent = observer(() => {
 			)}
 			<div className={styles.buttons}>
 				{activeSize && <Button type="rotate_ship" onClick={rotateActiveShip} />}
-				<Button type="return" onClick={handleClickReturnButton} />
+				<Button type="cancel" onClick={handleClickCancelButton} />
 			</div>
 		</div>
 	);

@@ -1,4 +1,3 @@
-import { FunctionComponent } from 'preact';
 import { observer } from 'mobx-react-lite';
 
 import { Ship } from '@/components/ship';
@@ -12,7 +11,7 @@ const SHIPS_STRUCTURE = [
 	[ShipSize.TWO, ShipSize.THREE],
 ];
 
-export const ShipsForInstall: FunctionComponent = observer(() => {
+export const ShipsForInstall = observer(() => {
 	const { shipsStore } = useStoreContext();
 
 	const handleClick = (shipSize: ShipSize) => {

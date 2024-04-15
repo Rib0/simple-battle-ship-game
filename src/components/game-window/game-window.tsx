@@ -1,4 +1,3 @@
-import { FunctionComponent } from 'preact';
 import { useState } from 'preact/hooks';
 import { observer } from 'mobx-react-lite';
 
@@ -11,30 +10,42 @@ import type { DndContextOptionsType } from '@/components/drag-and-drop/types';
 import { useStoreContext } from '@/context/store-context';
 import {
 	getShipDataByDataset,
-	getShipPositionForInstall,
+	getShipInstallShiftRelativeToTable,
 	getTableCoordsHoveredByShip,
-	isCantInstallShip,
+	checkIfShipOverInactiveTableCoords,
 } from '@/utils/ship';
 import { Nullable } from '@/types/utils';
 
 import styles from './styles.module.css';
 
-export const GameWindow: FunctionComponent = observer(() => {
+export const GameWindow = observer(() => {
 	const { gameFieldStore } = useStoreContext();
+	const { getInactiveCoordsForInstall } = gameFieldStore;
 
 	const [hoveredCoords, setHoveredCoords] = useState<Nullable<string[]>>(null);
 
 	const handleDragMove: DndContextOptionsType['onDragMove'] = (data) => {
 		const { draggableElement, droppableElement } = data;
 
-		const coords = getTableCoordsHoveredByShip({ draggableElement, droppableElement });
+		const tableCoordsHoveredByShip = getTableCoordsHoveredByShip(
+			draggableElement,
+			droppableElement,
+		);
 
-		if (coords && isCantInstallShip(coords, gameFieldStore.getInactiveCoordsForInstall)) {
+		if (tableCoordsHoveredByShip) {
+			const isShipOverInactiveTableCoords = checkIfShipOverInactiveTableCoords(
+				tableCoordsHoveredByShip,
+				getInactiveCoordsForInstall,
+			);
+
+			if (isShipOverInactiveTableCoords) {
+				setHoveredCoords(null);
+			} else {
+				setHoveredCoords(tableCoordsHoveredByShip);
+			}
+		} else {
 			setHoveredCoords(null);
-			return;
 		}
-
-		setHoveredCoords(coords);
 	};
 
 	const handleDragEnd: DndContextOptionsType['onDragEnd'] = (
@@ -43,22 +54,34 @@ export const GameWindow: FunctionComponent = observer(() => {
 	) => {
 		const { draggableElement, droppableElement } = data;
 
-		const positionForInstall = getShipPositionForInstall({
+		const positionForInstall = getShipInstallShiftRelativeToTable(
 			draggableElement,
 			droppableElement,
-		});
+		);
 
 		if (positionForInstall) {
 			const { shipRotation, shipSize } = getShipDataByDataset(draggableElement);
-			const shipCoords = getTableCoordsHoveredByShip({ draggableElement, droppableElement })!;
+			const tableCoordsHoveredByShip = getTableCoordsHoveredByShip(
+				draggableElement,
+				droppableElement,
+			)!;
 
-			if (isCantInstallShip(shipCoords, gameFieldStore.getInactiveCoordsForInstall)) {
+			if (
+				checkIfShipOverInactiveTableCoords(
+					tableCoordsHoveredByShip,
+					getInactiveCoordsForInstall,
+				)
+			) {
 				setInitialOffset();
 				return;
 			}
 
 			const callback = () => {
-				gameFieldStore.installShip({ shipCoords, shipRotation, shipSize });
+				gameFieldStore.installShip({
+					shipCoords: tableCoordsHoveredByShip,
+					shipRotation,
+					shipSize,
+				});
 			};
 
 			updateOffset(positionForInstall, callback);

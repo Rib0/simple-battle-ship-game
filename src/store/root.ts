@@ -13,7 +13,7 @@ class RootStore {
 		makeAutoObservable(this);
 
 		this.gameFieldStore = new GameFieldStore(this);
-		this.shipsStore = new ShipsStore();
+		this.shipsStore = new ShipsStore(this);
 	}
 }
 

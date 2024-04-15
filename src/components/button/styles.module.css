@@ -12,8 +12,8 @@
 			background: url('@/assets/rotate-ship-icon.png') no-repeat 0 0 / cover;
 		}
 
-		&_return {
-			background: url('@/assets/123.png') no-repeat 0 0 / cover;
+		&_cancel {
+			background: url('@/assets/cancel.png') no-repeat 0 0 / cover;
 		}
 	}
 

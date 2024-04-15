@@ -1,1 +1,2 @@
 export const TABLE_SIDE_SIZE = 10;
+export const LAST_TABLE_SIDE_INDEX = TABLE_SIDE_SIZE - 1;

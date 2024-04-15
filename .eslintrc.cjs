@@ -8,6 +8,7 @@ module.exports = {
 		'airbnb', // 'eslint-plugin' in plugin name 'eslint-plutin-airbnb' can be omitted
 		'airbnb/hooks',
 		'plugin:@typescript-eslint/recommended-type-checked',
+		'plugin:mobx/recommended',
 		'prettier',
 	],
 	parser: '@typescript-eslint/parser',

@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { computed, makeAutoObservable } from 'mobx';
 
 import { ShipRotation, ShipSize } from '@/types/ship';
 import {
@@ -15,7 +15,7 @@ export class GameFieldStore {
 
 	ships: Record<string, { rotation: ShipRotation; size: ShipSize }> = {};
 
-	activeInstalledShip: Nullable<string> = null;
+	activeInstalledShipCoords: Nullable<string> = null;
 
 	coordsWithShips = new Set<string>();
 
@@ -24,7 +24,9 @@ export class GameFieldStore {
 	private inactiveCoordsForInstall = new Set<string>();
 
 	constructor(store: RootStore) {
-		makeAutoObservable(this);
+		makeAutoObservable(this, {
+			getInactiveCoordsForInstall: computed.struct, // пересчитывает значение и если оно равно предыдущему не перерендеривает observers где есть этот getter
+		});
 
 		this.store = store;
 	}
@@ -68,13 +70,17 @@ export class GameFieldStore {
 		this.store.shipsStore.setActiveSize(null);
 	}
 
+	setActiveInstalledShip = (shipCoords: Nullable<string>) => {
+		this.activeInstalledShipCoords = shipCoords;
+	};
+
 	removeActiveInstalledShip = () => {
-		const shipInitialCoords = this.activeInstalledShip!;
+		const shipInitialCoords = this.activeInstalledShipCoords!;
 		const { size: shipSize, rotation: shipRotation } = this.ships[shipInitialCoords];
-		const [[xFirstCellPosition, yFirstCellPosition]] = parseCoords(shipInitialCoords);
+		const [[xFirstCellCoord, yFirstCellCoord]] = parseCoords(shipInitialCoords);
 		const shipCoordsForDelete = getShipCoords({
-			xFirstCellPosition,
-			yFirstCellPosition,
+			xFirstCellCoord,
+			yFirstCellCoord,
 			shipSize,
 			shipRotation,
 		});
@@ -89,8 +95,8 @@ export class GameFieldStore {
 			this.inactiveCoordsForInstall.delete(coord),
 		);
 
-		delete this.ships[this.activeInstalledShip!];
-		this.activeInstalledShip = null;
+		delete this.ships[this.activeInstalledShipCoords!];
+		this.setActiveInstalledShip(null);
 		this.store.shipsStore.increaseShipAmount(shipSize);
 	};
 }

@@ -8,7 +8,7 @@ import {
 	DIFF_MIDDLE_INDEX,
 	DIFF_VERTICAL,
 } from '@/constants/diff-coords';
-import { TABLE_SIDE_SIZE } from '@/constants/table';
+import { LAST_TABLE_SIDE_INDEX, TABLE_SIDE_SIZE } from '@/constants/table';
 import { arrayFromDigit } from './array-from-digit';
 
 export const parseCoords = (coords: string | string[]) => {
@@ -113,8 +113,8 @@ export const getInactiveCellCoordsForInstallWithShipRotation = ({
 }) => {
 	const result = new Set([...inactiveCoordsForInstall]);
 	let activeCoordsStreak = 0;
-	const isNeedRotate = [ShipRotation.TOP, ShipRotation.BOTTOM].includes(shipRotation);
-	const tableCoords = getFormattedTableCoords(isNeedRotate).map((coord) =>
+	const isVerticalRotation = [ShipRotation.TOP, ShipRotation.BOTTOM].includes(shipRotation);
+	const tableCoords = getFormattedTableCoords(isVerticalRotation).map((coord) =>
 		inactiveCoordsForInstall.has(coord) ? null : coord,
 	);
 
@@ -125,10 +125,18 @@ export const getInactiveCellCoordsForInstallWithShipRotation = ({
 			activeCoordsStreak += 1;
 
 			const [[x, y]] = parseCoords(coords);
-			const isNewColumn = isNeedRotate && y === 9;
-			const isNewRow = !isNeedRotate && x === 9;
+			const isLastColCell = isVerticalRotation && y === LAST_TABLE_SIDE_INDEX;
+			const isLastRowCell = !isVerticalRotation && x === LAST_TABLE_SIDE_INDEX;
 
-			if (isNewColumn || isNewRow) {
+			if (isLastColCell || isLastRowCell) {
+				if (activeCoordsStreak < Number(shipSize) && activeCoordsStreak > 0) {
+					const startIndex = i - activeCoordsStreak;
+					const endIndex = i + 1;
+
+					const inactiveCoords = tableCoords.slice(startIndex, endIndex);
+					inactiveCoords.forEach((coord) => result.add(coord!));
+				}
+
 				activeCoordsStreak = 0;
 			}
 		} else {
@@ -137,7 +145,6 @@ export const getInactiveCellCoordsForInstallWithShipRotation = ({
 				const endIndex = i;
 
 				const inactiveCoords = tableCoords.slice(startIndex, endIndex);
-
 				inactiveCoords.forEach((coord) => result.add(coord!));
 			}
 

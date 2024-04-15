@@ -1,5 +1,4 @@
 import {
-	FunctionComponent,
 	PropsWithChildren,
 	createContext,
 	memo,
@@ -27,7 +26,7 @@ type Props = {
 const DndContext = createContext<DndContextOptionsType>(DEFAULT_DND_CONTEXT_OPTIONS);
 const useDndContext = () => useContext(DndContext);
 
-const DndProvider: FunctionComponent<PropsWithChildren<Props>> = memo(({ children, ...props }) => {
+const DndProvider = memo<PropsWithChildren<Props>>(({ children, ...props }) => {
 	const [dndOptions, changeDndOptions] = useState(DEFAULT_DND_OPTIONS);
 
 	const { onDragStart, onDragMove, onDragEnd, className } = props;
