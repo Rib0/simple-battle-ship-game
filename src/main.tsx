@@ -7,8 +7,4 @@ import { App } from '@/app';
 	2. Добавить разные звуки для действий
 */
 
-/* 
-	6. Придумать авторасставление кораблей
-*/
-
 render(<App />, document.getElementById('app')!);

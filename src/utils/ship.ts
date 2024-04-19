@@ -1,10 +1,32 @@
 import { NullableHTMLDivElement } from '@/components/drag-and-drop/types';
-import { TABLE_SIDE_SIZE } from '@/constants/table';
+import { LAST_TABLE_SIDE_INDEX, TABLE_SIDE_SIZE } from '@/constants/table';
 import { ShipRotation, ShipSize } from '@/types/ship';
 import { arrayFromDigit } from './array-from-digit';
-import { formatCoords, parseCoords } from './table';
+import {
+	formatCoords,
+	getCellsCoordsAroundShip,
+	getFormattedTableCoords,
+	parseCoords,
+} from './table';
+import { shuffle } from './shuffle';
 
 export const getShipRotationStyles = (shipRotation: ShipRotation) => `rotate(${shipRotation}deg)`;
+
+export const getShipsAmount = (): Record<ShipSize, number> => ({
+	[ShipSize.FOUR]: 1,
+	[ShipSize.THREE]: 2,
+	[ShipSize.TWO]: 3,
+	[ShipSize.ONE]: 4,
+});
+
+export const getArrayOfShipsAmount = (shipsAmount: Record<ShipSize, number>) =>
+	Object.entries(shipsAmount).reduce(
+		(acc, [shipSize, amount]) => [
+			...acc,
+			...new Array<ShipSize>(amount).fill(Number(shipSize) as unknown as ShipSize),
+		],
+		[] as ShipSize[],
+	);
 
 /*
 	Координаты - x, y координаты ячеек таблицы от 0 до 9
@@ -207,4 +229,71 @@ export const getShipsStylesRelativeToTableWithRotation = ({
 	}
 
 	return styles;
+};
+
+export const getRandomlyInstalledShips = () => {
+	const shuffledTableCoords = shuffle(getFormattedTableCoords());
+	const inactiveTableCoords = new Set();
+	const shipsForInstall = getArrayOfShipsAmount(getShipsAmount()).reverse();
+	const shipRotations = [ShipRotation.TOP, ShipRotation.LEFT];
+	const resultShipsInfo: Array<{
+		shipCoords: string[];
+		shipRotation: ShipRotation;
+		shipSize: ShipSize;
+	}> = [];
+	let goNextShip = false;
+
+	for (let i = 0; i < shipsForInstall.length; i++) {
+		const shipSize = shipsForInstall[i];
+
+		// eslint-disable-next-line no-restricted-syntax
+		for (const coords of shuffledTableCoords) {
+			if (goNextShip) {
+				goNextShip = false;
+				break;
+			}
+
+			const [[xFirstCellCoord, yFirstCellCoord]] = parseCoords(coords);
+
+			// eslint-disable-next-line no-restricted-syntax
+			for (const shipRotation of shipRotations) {
+				const shipCoords = getShipCoords({
+					xFirstCellCoord,
+					yFirstCellCoord,
+					shipSize,
+					shipRotation,
+				});
+
+				const hasInvalidCoords = shipCoords.some((c) => {
+					const [[x, y]] = parseCoords(c);
+
+					return (
+						x < 0 ||
+						x > LAST_TABLE_SIDE_INDEX ||
+						y < 0 ||
+						y > LAST_TABLE_SIDE_INDEX ||
+						inactiveTableCoords.has(c)
+					);
+				});
+
+				if (hasInvalidCoords) {
+					// eslint-disable-next-line no-continue
+					continue;
+				} else {
+					const cellsAroundShip = getCellsCoordsAroundShip({
+						shipCoords,
+						shipSize,
+						shipRotation,
+					});
+					cellsAroundShip.forEach((cell) => inactiveTableCoords.add(cell));
+
+					resultShipsInfo.push({ shipCoords, shipRotation, shipSize });
+					goNextShip = true;
+					break;
+				}
+			}
+		}
+	}
+
+	return resultShipsInfo;
 };

@@ -6,7 +6,7 @@ import styles from './styles.module.css';
 
 type Props = {
 	onClick: VoidFunction;
-	type: 'rotate_ship' | 'cancel';
+	type: 'rotate_ship' | 'shuffle_ships' | 'cancel';
 };
 
 export const Button = observer<PropsWithChildren<Props>>(({ children, onClick, type }) => (

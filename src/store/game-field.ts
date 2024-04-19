@@ -7,7 +7,7 @@ import {
 	parseCoords,
 } from '@/utils/table';
 import { Nullable } from '@/types/utils';
-import { getShipCoords } from '@/utils/ship';
+import { getRandomlyInstalledShips, getShipCoords } from '@/utils/ship';
 import { RootStore } from './root';
 
 export class GameFieldStore {
@@ -45,7 +45,7 @@ export class GameFieldStore {
 		});
 	}
 
-	installShip({
+	installShip = ({
 		shipCoords,
 		shipRotation,
 		shipSize,
@@ -53,7 +53,7 @@ export class GameFieldStore {
 		shipCoords: string[];
 		shipRotation: ShipRotation;
 		shipSize: ShipSize;
-	}) {
+	}) => {
 		const [initialCoords] = shipCoords;
 
 		this.ships[initialCoords] = {
@@ -68,7 +68,19 @@ export class GameFieldStore {
 
 		this.store.shipsStore.decreaseShipAmount(shipSize);
 		this.store.shipsStore.setActiveSize(null);
-	}
+	};
+
+	resetAllShips = () => {
+		this.ships = {};
+		this.coordsWithShips = new Set();
+		this.inactiveCoordsForInstall = new Set();
+		this.store.shipsStore.resetShipAmount();
+	};
+
+	randomlyInstallShips = () => {
+		this.resetAllShips();
+		getRandomlyInstalledShips().forEach((shipData) => this.installShip(shipData));
+	};
 
 	setActiveInstalledShip = (shipCoords: Nullable<string>) => {
 		this.activeInstalledShipCoords = shipCoords;
@@ -84,16 +96,14 @@ export class GameFieldStore {
 			shipSize,
 			shipRotation,
 		});
-		const cellsCoordsAroundShipForDelete = getCellsCoordsAroundShip({
+		const cellsCoordsAroundShip = getCellsCoordsAroundShip({
 			shipCoords: shipCoordsForDelete,
 			shipRotation,
 			shipSize,
 		});
 
 		shipCoordsForDelete.forEach((coord) => this.coordsWithShips.delete(coord));
-		cellsCoordsAroundShipForDelete.forEach((coord) =>
-			this.inactiveCoordsForInstall.delete(coord),
-		);
+		cellsCoordsAroundShip.forEach((coord) => this.inactiveCoordsForInstall.delete(coord));
 
 		delete this.ships[this.activeInstalledShipCoords!];
 		this.setActiveInstalledShip(null);

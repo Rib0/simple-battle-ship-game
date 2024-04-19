@@ -7,6 +7,7 @@ import { ShipRotation, ShipSize } from '@/types/ship';
 
 import { arrayFromDigit } from '@/utils/array-from-digit';
 
+import { getShipRotationStyles } from '@/utils/ship';
 import styles from './styles.module.css';
 
 type Props = {
@@ -20,33 +21,39 @@ type Props = {
 
 /* eslint-disable jsx-a11y/control-has-associated-label */
 
-export const Ship = observer<Props>(({ size, rotation, amount, onClick, style, className }) => {
-	const shipSizeArray = useMemo(() => arrayFromDigit(size), [size]);
+export const Ship = observer<Props>(
+	({ size, rotation, amount, onClick, style = {}, className }) => {
+		const shipSizeArray = useMemo(() => arrayFromDigit(size), [size]);
 
-	const handleClick = () => {
-		onClick?.(size);
-	};
+		const handleClick = () => {
+			onClick?.(size);
+		};
 
-	const rootClassName = cx(styles.shipContainer, styles[`rotation_${rotation}`], className);
+		const rootClassName = cx(styles.shipContainer, className);
+		const rootStyle = {
+			...style,
+			transform: `${style.transform || ''} ${rotation ? getShipRotationStyles(rotation) : ''}`,
+		};
 
-	return (
-		<div className={rootClassName} style={style}>
-			<button
-				type="button"
-				onClick={handleClick}
-				className={cx(styles.ship, styles[`size_${size}`])}
-			>
-				<table>
-					<tbody>
-						<tr className={styles.tr}>
-							{shipSizeArray.map(() => (
-								<td className={styles.td} />
-							))}
-						</tr>
-					</tbody>
-				</table>
-			</button>
-			{amount !== undefined && <div className={styles.amount}>{amount}</div>}
-		</div>
-	);
-});
+		return (
+			<div className={rootClassName} style={rootStyle}>
+				<button
+					type="button"
+					onClick={handleClick}
+					className={cx(styles.ship, styles[`size_${size}`])}
+				>
+					<table>
+						<tbody>
+							<tr className={styles.tr}>
+								{shipSizeArray.map(() => (
+									<td className={styles.td} />
+								))}
+							</tr>
+						</tbody>
+					</table>
+				</button>
+				{amount !== undefined && <div className={styles.amount}>{amount}</div>}
+			</div>
+		);
+	},
+);

@@ -94,7 +94,7 @@ export const getCellsCoordsAroundShip = ({
 	return allCoords;
 };
 
-const getFormattedTableCoords = (isNeedRotate?: boolean) =>
+export const getFormattedTableCoords = (isNeedRotate?: boolean) =>
 	arrayFromDigit(TABLE_SIDE_SIZE * TABLE_SIDE_SIZE).map((index) => {
 		const x = index % 10;
 		const y = Math.trunc(index / 10);

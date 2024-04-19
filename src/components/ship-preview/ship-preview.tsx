@@ -13,12 +13,14 @@ import styles from './styles.module.css';
 export const ShipPreview = observer(() => {
 	const { shipsStore, gameFieldStore } = useStoreContext();
 
-	const { activeSize, activeSizeRotation, rotateActiveShip, setActiveSize } = shipsStore;
-	const { activeInstalledShipCoords, removeActiveInstalledShip } = gameFieldStore;
-
-	if (!activeSize && !activeInstalledShipCoords) {
-		return null;
-	}
+	const { activeSize, activeSizeRotation, rotateActiveShip, setActiveSize, isAllShipsInstalled } =
+		shipsStore;
+	const {
+		activeInstalledShipCoords,
+		removeActiveInstalledShip,
+		randomlyInstallShips,
+		resetAllShips,
+	} = gameFieldStore;
 
 	const extendDraggableStyles = (style: CSSProperties): CSSProperties => ({
 		...style,
@@ -28,8 +30,10 @@ export const ShipPreview = observer(() => {
 	const handleClickCancelButton = () => {
 		if (activeSize) {
 			setActiveSize(null);
-		} else {
+		} else if (activeInstalledShipCoords) {
 			removeActiveInstalledShip();
+		} else if (isAllShipsInstalled) {
+			resetAllShips();
 		}
 	};
 
@@ -48,8 +52,13 @@ export const ShipPreview = observer(() => {
 				</DndDraggable>
 			)}
 			<div className={styles.buttons}>
+				{!activeSize && !activeInstalledShipCoords && (
+					<Button type="shuffle_ships" onClick={randomlyInstallShips} />
+				)}
 				{activeSize && <Button type="rotate_ship" onClick={rotateActiveShip} />}
-				<Button type="cancel" onClick={handleClickCancelButton} />
+				{(activeSize || activeInstalledShipCoords || isAllShipsInstalled) && (
+					<Button type="cancel" onClick={handleClickCancelButton} />
+				)}
 			</div>
 		</div>
 	);

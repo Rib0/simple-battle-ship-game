@@ -3,6 +3,7 @@ import { makeAutoObservable } from 'mobx';
 import { ShipRotation, ShipSize } from '@/types/ship';
 import { Nullable } from '@/types/utils';
 import { ROTATION_MAP } from '@/constants';
+import { getArrayOfShipsAmount, getShipsAmount } from '@/utils/ship';
 import { RootStore } from './root';
 
 export class ShipsStore {
@@ -12,12 +13,7 @@ export class ShipsStore {
 
 	activeSizeRotation = ShipRotation.LEFT;
 
-	shipsAmount: Record<ShipSize, number> = {
-		[ShipSize.ONE]: 4,
-		[ShipSize.TWO]: 3,
-		[ShipSize.THREE]: 2,
-		[ShipSize.FOUR]: 1,
-	};
+	shipsAmount = getShipsAmount();
 
 	constructor(store: RootStore) {
 		makeAutoObservable(this);
@@ -26,10 +22,14 @@ export class ShipsStore {
 	}
 
 	setActiveSize = (size: Nullable<ShipSize>) => {
+		this.store.gameFieldStore.setActiveInstalledShip(null);
 		this.activeSizeRotation = ShipRotation.LEFT;
 
 		this.activeSize = size;
-		this.store.gameFieldStore.setActiveInstalledShip(null);
+	};
+
+	resetShipAmount = () => {
+		this.shipsAmount = getShipsAmount();
 	};
 
 	decreaseShipAmount = (shipSize: ShipSize) => {
@@ -43,4 +43,8 @@ export class ShipsStore {
 	rotateActiveShip = () => {
 		this.activeSizeRotation = ROTATION_MAP[this.activeSizeRotation];
 	};
+
+	get isAllShipsInstalled() {
+		return Boolean(getArrayOfShipsAmount(this.shipsAmount).length === 0);
+	}
 }

@@ -5,6 +5,7 @@ import { Ship } from '@/components/ship';
 import { useStoreContext } from '@/context/store-context';
 import { getShipsStylesRelativeToTableWithRotation } from '@/utils/ship';
 
+import { CSSProperties } from 'preact/compat';
 import styles from './styles.module.css';
 
 export const ShipsInstalled = observer(() => {
@@ -16,21 +17,27 @@ export const ShipsInstalled = observer(() => {
 	const renderShips = () =>
 		Object.entries(ships).map(([coords, { size: shipSize, rotation: shipRotation }]) => {
 			const handleClick = () => {
-				setActiveInstalledShip(coords);
+				if (!activeSize) {
+					setActiveInstalledShip(coords);
+				}
 			};
 
+			const isActive = activeInstalledShipCoords === coords;
+
 			const className = cx(styles.ship, {
-				[styles.active]: activeInstalledShipCoords === coords,
-				[styles.inactive]:
-					activeSize ||
-					(activeInstalledShipCoords && activeInstalledShipCoords !== coords),
+				[styles.inactive]: activeSize || (activeInstalledShipCoords && !isActive),
 			});
 
-			const style = getShipsStylesRelativeToTableWithRotation({
-				coords,
-				shipSize,
-				shipRotation,
-			});
+			const style: CSSProperties = {
+				...getShipsStylesRelativeToTableWithRotation({
+					coords,
+					shipSize,
+					shipRotation,
+				}),
+				...{
+					transform: `scale(1.${isActive ? '2' : '0'})`,
+				},
+			};
 
 			return (
 				<Ship
