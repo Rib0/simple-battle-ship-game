@@ -1,6 +1,6 @@
 import { CSSProperties } from 'preact/compat';
 
-import { Coords } from '@/types/common';
+import { Coords } from '@/types/game-field';
 import { NullableHTMLDivElement } from './types';
 
 export const getDraggableStyles = ({ x, y }: Coords): CSSProperties => ({

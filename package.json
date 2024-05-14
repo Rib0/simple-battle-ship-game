@@ -2,10 +2,11 @@
 	"name": "simple-battle-ship-game",
 	"private": true,
 	"version": "0.0.0",
-	"type": "module",
 	"scripts": {
-		"dev": "vite --port=8080",
-		"build": "tsc && vite build",
+		"dev:client": "vite",
+		"dev:server": "nodemon",
+		"dev": "concurrently \"yarn dev:client\" \"yarn dev:server\"",
+		"build:client": "tsc && vite build",
 		"preview": "vite preview",
 		"eslint:fix": "eslint --ext .ts,.tsx src/ --fix",
 		"stylelint:fix": "stylelint \"**/*.css\" --fix",
@@ -30,17 +31,27 @@
 	"dependencies": {
 		"@mobx-devtools/tools": "^0.0.4",
 		"classnames": "^2.5.1",
+		"cookie": "^0.6.0",
+		"koa": "^2.15.3",
+		"koa-route": "^4.0.1",
 		"mobx": "^6.12.0",
 		"mobx-react-lite": "^4.0.6",
+		"nanoid": "3.3.4",
 		"preact": "^10.19.3",
-		"reset-css": "^5.0.2"
+		"reset-css": "^5.0.2",
+		"socket.io": "^4.7.5",
+		"socket.io-client": "^4.7.5"
 	},
 	"devDependencies": {
 		"@preact/preset-vite": "^2.8.1",
+		"@types/koa": "^2.15.0",
+		"@types/koa-route": "^3.2.8",
+		"@types/koa__cors": "^5.0.0",
 		"@types/node": "^20.11.19",
 		"@types/uuid": "^9.0.8",
 		"@typescript-eslint/eslint-plugin": "^6.19.0",
 		"@typescript-eslint/parser": "^6.19.0",
+		"concurrently": "^8.2.2",
 		"eslint": "^8.2.0",
 		"eslint-config-airbnb": "19.0.4",
 		"eslint-config-prettier": "^9.1.0",
@@ -53,13 +64,16 @@
 		"eslint-plugin-react-hooks": "^4.3.0",
 		"husky": "^8.0.3",
 		"lint-staged": "^15.2.0",
+		"nodemon": "^3.1.0",
 		"postcss-nested": "^6.0.1",
 		"prettier": "^3.2.4",
 		"stylelint": "^16.2.0",
 		"stylelint-config-idiomatic-order": "^10.0.0",
 		"stylelint-config-standard": "^36.0.0",
+		"ts-node": "^10.9.2",
+		"tsconfig-paths": "^4.2.0",
 		"typescript": "^5.3.3",
 		"vite": "^5.0.12",
-		"vite-plugin-checker": "^0.6.2"
+		"wait-on": "^7.2.0"
 	}
 }

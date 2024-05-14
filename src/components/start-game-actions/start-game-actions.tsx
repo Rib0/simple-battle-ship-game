@@ -1,17 +1,20 @@
 import { CSSProperties } from 'preact/compat';
 import { observer } from 'mobx-react-lite';
+import cx from 'classnames';
 
 import { Ship } from '@/components/ship';
 import { Button } from '@/components/button';
 import { DndDraggable } from '@/components/drag-and-drop';
 
+import { useSocketGameEvents } from '@/hooks/use-socket-game-events';
 import { useStoreContext } from '@/context/store-context';
 import { getShipRotationStyles } from '@/utils/ship';
 
 import styles from './styles.module.css';
 
-export const ShipPreview = observer(() => {
+export const StartGameActions = observer(() => {
 	const { shipsStore, gameFieldStore } = useStoreContext();
+	const { searchGame } = useSocketGameEvents();
 
 	const { activeSize, activeSizeRotation, rotateActiveShip, setActiveSize, isAllShipsInstalled } =
 		shipsStore;
@@ -38,7 +41,7 @@ export const ShipPreview = observer(() => {
 	};
 
 	return (
-		<div className={styles.shipPreview}>
+		<div className={styles.root}>
 			{activeSize && (
 				<DndDraggable
 					className={styles.draggable}
@@ -59,6 +62,9 @@ export const ShipPreview = observer(() => {
 				{(activeSize || activeInstalledShipCoords || isAllShipsInstalled) && (
 					<Button type="cancel" onClick={handleClickCancelButton} />
 				)}
+				<div className={cx(styles.fullWidth, !isAllShipsInstalled && styles.inactive)}>
+					<Button type="start_battle" onClick={searchGame} />
+				</div>
 			</div>
 		</div>
 	);

@@ -1,23 +1,30 @@
 .button {
-	width: 80px;
-	height: 80px;
+	width: 70px;
+	height: 70px;
 	padding: 0;
 	border: none;
 	border-radius: 15px;
+	background: no-repeat 0 0 / cover;
 	cursor: pointer;
 	outline: none;
 
 	&.type {
 		&_rotate_ship {
-			background: url('@/assets/rotate-ship-icon.png') no-repeat 0 0 / cover;
+			background-image: url('@/assets/rotate-ship-icon.png');
 		}
 
 		&_shuffle_ships {
-			background: url('@/assets/auto.png') no-repeat 0 0 / cover;
+			background-image: url('@/assets/auto.png');
+		}
+
+		&_start_battle {
+			width: 210px;
+			background-image: url('@/assets/start-battle.png');
+			background-size: contain;
 		}
 
 		&_cancel {
-			background: url('@/assets/cancel.png') no-repeat 0 0 / cover;
+			background-image: url('@/assets/cancel.png');
 		}
 	}
 

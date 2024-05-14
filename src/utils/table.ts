@@ -1,6 +1,5 @@
 import { ShipRotation, ShipSize } from '@/types/ship';
 
-import { Coords } from '@/types/common';
 import {
 	DIFF_AROUND,
 	DIFF_HORIZONTAL,
@@ -9,6 +8,7 @@ import {
 	DIFF_VERTICAL,
 } from '@/constants/diff-coords';
 import { LAST_TABLE_SIDE_INDEX, TABLE_SIDE_SIZE } from '@/constants/table';
+import { Coords } from '@/types/game-field';
 import { arrayFromDigit } from './array-from-digit';
 
 export const parseCoords = (coords: string | string[]) => {
@@ -19,7 +19,7 @@ export const parseCoords = (coords: string | string[]) => {
 
 export const formatCoords = ({ x, y }: Coords) => `${x}-${y}`;
 
-const getCellsCoordsAroundCell = ([x, y]: number[], diffCoords: number[][]) =>
+export const getCellsCoordsAroundCell = ([x, y]: number[], diffCoords: number[][]) =>
 	diffCoords.map(([diffX, diffY]) => {
 		const resultX = x + diffX;
 		const resultY = y + diffY;

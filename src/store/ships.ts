@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx';
 
 import { ShipRotation, ShipSize } from '@/types/ship';
 import { Nullable } from '@/types/utils';
-import { ROTATION_MAP } from '@/constants';
+import { SHIP_ROTATION_MAP } from '@/constants/ships';
 import { getArrayOfShipsAmount, getShipsAmount } from '@/utils/ship';
 import { RootStore } from './root';
 
@@ -41,7 +41,7 @@ export class ShipsStore {
 	};
 
 	rotateActiveShip = () => {
-		this.activeSizeRotation = ROTATION_MAP[this.activeSizeRotation];
+		this.activeSizeRotation = SHIP_ROTATION_MAP[this.activeSizeRotation];
 	};
 
 	get isAllShipsInstalled() {

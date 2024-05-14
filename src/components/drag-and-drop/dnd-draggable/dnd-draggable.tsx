@@ -2,7 +2,7 @@ import { CSSProperties, PropsWithChildren, useEffect, useState } from 'preact/co
 import { observer } from 'mobx-react-lite';
 import cx from 'classnames';
 
-import { Coords } from '@/types/common';
+import { Coords } from '@/types/game-field';
 import { useDndContext } from '../dnd-context';
 import { getDraggableStyles, getPointerEventData } from '../utils';
 import { INITIAL_COORDS } from '../constants';

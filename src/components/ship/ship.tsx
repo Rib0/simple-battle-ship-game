@@ -6,8 +6,8 @@ import cx from 'classnames';
 import { ShipRotation, ShipSize } from '@/types/ship';
 
 import { arrayFromDigit } from '@/utils/array-from-digit';
-
 import { getShipRotationStyles } from '@/utils/ship';
+
 import styles from './styles.module.css';
 
 type Props = {

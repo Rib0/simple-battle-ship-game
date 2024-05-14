@@ -1,4 +1,4 @@
-.shipPreview {
+.root {
 	display: flex;
 	flex-direction: column;
 	gap: 70px;
@@ -10,6 +10,16 @@
 
 	.buttons {
 		display: flex;
+		flex-wrap: wrap;
 		gap: 15px;
+
+		.fullWidth {
+			flex: 0 0 100%;
+		}
+
+		.inactive {
+			opacity: 0.3;
+			pointer-events: none;
+		}
 	}
 }

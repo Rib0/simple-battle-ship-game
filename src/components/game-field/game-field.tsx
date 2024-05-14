@@ -3,9 +3,7 @@ import { observer } from 'mobx-react-lite';
 
 import { DndProvider } from '@/components/drag-and-drop';
 import { DndDroppable } from '@/components/drag-and-drop/dnd-droppable';
-import { Table } from '@/components/table';
-import { ShipsForInstall } from '@/components/ships-for-install';
-import { ShipPreview } from '@/components/ship-preview';
+import { Table } from '@/components/tables';
 import type { DndContextOptionsType } from '@/components/drag-and-drop/types';
 import { useStoreContext } from '@/context/store-context';
 import {
@@ -16,9 +14,7 @@ import {
 } from '@/utils/ship';
 import { Nullable } from '@/types/utils';
 
-import styles from './styles.module.css';
-
-export const GameWindow = observer(() => {
+export const GameField = observer(() => {
 	const { gameFieldStore } = useStoreContext();
 	const { getInactiveCoordsForInstall } = gameFieldStore;
 
@@ -54,12 +50,12 @@ export const GameWindow = observer(() => {
 	) => {
 		const { draggableElement, droppableElement } = data;
 
-		const positionForInstall = getShipInstallShiftRelativeToTable(
+		const shiftForInstall = getShipInstallShiftRelativeToTable(
 			draggableElement,
 			droppableElement,
 		);
 
-		if (positionForInstall) {
+		if (shiftForInstall) {
 			const { shipRotation, shipSize } = getShipDataByDataset(draggableElement);
 			const tableCoordsHoveredByShip = getTableCoordsHoveredByShip(
 				draggableElement,
@@ -84,7 +80,7 @@ export const GameWindow = observer(() => {
 				});
 			};
 
-			updateOffset(positionForInstall, callback);
+			updateOffset(shiftForInstall, callback);
 			setHoveredCoords(null);
 		} else {
 			setInitialOffset();
@@ -92,18 +88,10 @@ export const GameWindow = observer(() => {
 	};
 
 	return (
-		<DndProvider
-			onDragMove={handleDragMove}
-			onDragEnd={handleDragEnd}
-			className={styles.gameWindow}
-		>
+		<DndProvider onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
 			<DndDroppable>
 				<Table hoveredCoords={hoveredCoords} />
 			</DndDroppable>
-			<div className={styles.ships}>
-				<ShipsForInstall />
-				<ShipPreview />
-			</div>
 		</DndProvider>
 	);
 });

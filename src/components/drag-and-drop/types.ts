@@ -1,5 +1,5 @@
 import { Nullable } from '@/types/utils';
-import { Coords } from '@/types/common';
+import { Coords } from '@/types/game-field';
 import { getPointerEventData } from './utils';
 
 export type NullableHTMLDivElement = Nullable<HTMLDivElement>;

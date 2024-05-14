@@ -1,8 +1,9 @@
 {
 	"compilerOptions": {
+		"esModuleInterop": true,
 		"target": "ES2020",
 		"useDefineForClassFields": true,
-		"module": "ESNext",
+		"module": "commonjs",
 		"lib": ["ES2020", "DOM", "DOM.Iterable"],
 		"skipLibCheck": true,
 		"baseUrl": ".",
@@ -13,7 +14,7 @@
 		},
 
 		/* Bundler mode */
-		"moduleResolution": "bundler",
+		"moduleResolution": "Node",
 		"allowImportingTsExtensions": true,
 		"resolveJsonModule": true,
 		"isolatedModules": true,
@@ -23,11 +24,13 @@
 
 		/* Linting */
 		"strict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
+		// "noUnusedLocals": true,
 		"noFallthroughCasesInSwitch": true,
 		"types": ["node", "vite/client", "preact"],
 	},
-	"include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
+	"include": ["src/**/*"],
 	"references": [{ "path": "./tsconfig.node.json" }],
+	"ts-node": {
+		"require": ["tsconfig-paths/register"],
+	},
 }

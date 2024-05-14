@@ -2,15 +2,13 @@ import { observer } from 'mobx-react-lite';
 import cx from 'classnames';
 
 import { ShipsInstalled } from '@/components/ships-installed';
-import { arrayFromDigit } from '@/utils/array-from-digit';
 import { formatCoords } from '@/utils/table';
 import { useStoreContext } from '@/context/store-context';
-import { TABLE_SIDE_SIZE } from '@/constants/table';
 import { Nullable } from '@/types/utils';
+import { fieldSideArray } from '@/components/tables/constants';
 
+import stylesCommon from '@/components/tables/styles.module.css';
 import styles from './styles.module.css';
-
-const fieldSideArray = arrayFromDigit(TABLE_SIDE_SIZE);
 
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable jsx-a11y/control-has-associated-label */
@@ -23,10 +21,10 @@ export const Table = observer<Props>(({ hoveredCoords }) => {
 	const { gameFieldStore, shipsStore } = useStoreContext();
 
 	return (
-		<table className={styles.table}>
+		<table className={stylesCommon.table}>
 			<tbody>
 				{fieldSideArray.map((_, rI) => (
-					<tr key={rI} className={styles.tr}>
+					<tr key={rI} className={stylesCommon.tr}>
 						{fieldSideArray.map((__, cI) => {
 							const formattedCoords = formatCoords({ x: cI, y: rI });
 
@@ -34,7 +32,7 @@ export const Table = observer<Props>(({ hoveredCoords }) => {
 							const cantInstall =
 								gameFieldStore.getInactiveCoordsForInstall.has(formattedCoords);
 
-							const className = cx(styles.td, {
+							const className = cx(stylesCommon.td, {
 								[styles.hovered]: isHovered,
 								[styles.cantInstall]: shipsStore.activeSize && cantInstall,
 								[styles.canInstall]: shipsStore.activeSize && !cantInstall,

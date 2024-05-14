@@ -1,0 +1,11 @@
+.hovered {
+	background-color: var(--color-green) !important;
+}
+
+.canInstall {
+	background-color: var(--color-light-green);
+}
+
+.cantInstall {
+	background-color: var(--color-red);
+}

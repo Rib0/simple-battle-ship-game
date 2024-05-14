@@ -28,6 +28,12 @@ module.exports = {
 		'react/prop-types': 'off',
 		'react/jsx-props-no-spreading': 'off',
 		'@typescript-eslint/no-shadow': ['error'],
+		'@typescript-eslint/no-misused-promises': [
+			'error',
+			{
+				checksVoidReturn: false,
+			},
+		],
 		'import/prefer-default-export': 'off',
 		'import/extensions': 'off',
 		'no-shadow': 'off',
@@ -56,6 +62,14 @@ module.exports = {
 			version: 'detect', // let eslint detect react version of project itself
 		},
 	},
+	overrides: [
+		{
+			files: 'src/server/**/*',
+			rules: {
+				'no-param-reassign': 'off',
+			},
+		},
+	],
 };
 
 // из плагина можно наследовать также и такие поля как env, parseOptions и тд.
