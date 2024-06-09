@@ -1,41 +1,50 @@
+import { useCallback } from 'preact/hooks';
 import { io } from 'socket.io-client';
 
-import { SocketEvents } from '@/types/socket-events';
+import { ClientSocket, SocketEvents } from '@/types/socket';
 import { useSocketContext } from '@/context/socket-context';
+import { KEYS } from '@/constants/locale-storage';
+import { SERVER_HOST } from '@/constants/socket';
 import { useLocalStorage } from './use-local-storage';
 
 export const useSocketGameEvents = () => {
 	const { socket, connectSocket } = useSocketContext();
-	const { get } = useLocalStorage('roomId');
+	const { get } = useLocalStorage(KEYS.ROOM_ID);
 
-	const initiateConnection = () => {
-		const socketConnection = io('http://localhost:3000', {
-			// TODO: эти настройки только для dev
-
-			// TODO: на сервере проверять есть ли такой playerId в roomId, полезно в случае потери подключения к игре
+	const initiateSocketConnection = useCallback(() => {
+		const socketConnection: ClientSocket = io(SERVER_HOST, {
 			withCredentials: true,
 		});
 
 		connectSocket(socketConnection);
-
-		return socketConnection;
-	};
+	}, [connectSocket]);
 
 	const searchGame = () => {
-		let socketConnection = socket;
+		socket?.emit(SocketEvents.SEARCH_GAME);
+	};
 
-		if (!socketConnection) {
-			socketConnection = initiateConnection();
-		}
+	const findGameToReconnect = () => {
+		const roomId = get() || '';
 
-		socketConnection?.emit(SocketEvents.SEARCH_GAME);
+		socket?.emit(SocketEvents.FIND_GAME_TO_RECONNECT, roomId);
+	};
+
+	const inviteById = (id: string) => {
+		socket?.emit(SocketEvents.INVITE_BY_ID, id);
 	};
 
 	const attack = (coords: string) => {
-		const roomId = get();
+		const roomId = get() || '';
 
-		socket?.emit(SocketEvents.ATTACK, { roomId, coords });
+		socket?.emit(SocketEvents.ATTACK, coords, roomId);
 	};
 
-	return { searchGame, attack };
+	return {
+		socket,
+		initiateSocketConnection,
+		searchGame,
+		findGameToReconnect,
+		inviteById,
+		attack,
+	};
 };

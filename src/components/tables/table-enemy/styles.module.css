@@ -1,0 +1,23 @@
+.td {
+	&.bomb {
+		background: url('@/assets/bomb.png') center no-repeat;
+		background-size: contain;
+	}
+
+	&.damaged {
+		background: url('@/assets/damaged.png') center no-repeat;
+		background-size: contain;
+	}
+
+	&.canAttack {
+		&:hover {
+			background: url('@/assets/explosion.png') center no-repeat;
+			background-size: cover;
+		}
+	}
+}
+
+.inactive {
+	opacity: 0.3;
+	pointer-events: none;
+}

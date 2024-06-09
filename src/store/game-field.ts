@@ -8,6 +8,7 @@ import {
 } from '@/utils/table';
 import { Nullable } from '@/types/utils';
 import { Field, CellType, GameFieldShips } from '@/types/game-field';
+import { GameState } from '@/types/socket';
 import { getRandomlyInstalledShips, getShipCoords } from '@/utils/ship';
 import { RootStore } from './root';
 
@@ -19,6 +20,8 @@ export class GameFieldStore {
 	activeInstalledShipCoords: Nullable<string> = null;
 
 	private field: Field = {};
+
+	private enemyField: Field = {};
 
 	private inactiveCoordsForInstall = new Set<string>();
 
@@ -113,7 +116,34 @@ export class GameFieldStore {
 		this.store.shipsStore.increaseShipAmount(shipSize);
 	};
 
+	installGameState = (myGameState: GameState, enemyField: Field) => {
+		const { field, ships } = myGameState;
+
+		this.ships = ships;
+		this.field = field;
+
+		this.enemyField = enemyField;
+	};
+
 	get getField() {
 		return this.field;
 	}
+
+	setCellType = (coords: string, isMe: boolean, cellType: CellType) => {
+		const fieldName = isMe ? 'field' : 'enemyField';
+
+		this[fieldName][coords] = cellType;
+	};
+
+	canAttackEnemyCell = (coords: string) => {
+		const cell = this.enemyField[coords];
+
+		return ![CellType.BOMB, CellType.DAMAGED].includes(cell);
+	};
+
+	getCellType = (coords: string, isMe: boolean) => {
+		const fieldName = isMe ? 'field' : 'enemyField';
+
+		return this[fieldName][coords] || '';
+	};
 }

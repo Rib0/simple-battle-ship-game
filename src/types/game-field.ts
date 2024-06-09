@@ -7,5 +7,6 @@ export type GameFieldShips = Record<string, { rotation: ShipRotation; size: Ship
 export enum CellType {
 	SHIP = 'SHIP',
 	BOMB = 'BOMB',
+	DAMAGED = 'DAMAGED',
 }
 export type Field = Record<string, CellType>;

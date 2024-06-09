@@ -1,12 +1,13 @@
 import { createContext } from 'preact';
-import { PropsWithChildren, useContext, useState } from 'preact/compat';
+import { PropsWithChildren, useCallback, useContext, useState } from 'preact/compat';
 import { observer } from 'mobx-react-lite';
-import { Socket } from 'socket.io-client';
+
 import { useSocketHandleServerEvents } from '@/hooks/use-socket-handle-server-events';
+import { ClientSocket } from '@/types/socket';
 
 type SocketContextValue = {
-	connectSocket: (socket: Socket) => void;
-	socket?: Socket;
+	connectSocket: (socket: ClientSocket) => void;
+	socket?: ClientSocket;
 };
 
 const SocketContext = createContext<SocketContextValue>({
@@ -15,13 +16,13 @@ const SocketContext = createContext<SocketContextValue>({
 const useSocketContext = () => useContext(SocketContext);
 
 const SocketProvider = observer<PropsWithChildren>(({ children }) => {
-	const [socket, setSocket] = useState<Socket>();
+	const [socket, setSocket] = useState<ClientSocket>();
 
 	useSocketHandleServerEvents(socket);
 
-	const handleConnectSocket = (socketConnection: Socket) => {
+	const handleConnectSocket = useCallback((socketConnection: ClientSocket) => {
 		setSocket(socketConnection);
-	};
+	}, []);
 
 	const value = {
 		connectSocket: handleConnectSocket,

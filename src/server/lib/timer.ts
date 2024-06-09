@@ -1,13 +1,11 @@
-import { Server } from 'socket.io';
-
-import { SocketEvents } from '@/types/socket-events';
+import { ServerIo, SocketEvents } from '@/types/socket';
 
 export class Timer {
 	private static timerId: NodeJS.Timeout | null = null;
 
 	private static callbacks: Record<string, VoidFunction[]> = {};
 
-	static start(io: Server) {
+	static start(io: ServerIo) {
 		if (Timer.timerId) {
 			return;
 		}
@@ -16,13 +14,6 @@ export class Timer {
 			io.emit(SocketEvents.TIMER_TICK);
 			Timer.triggerCallbacks();
 		}, 1000);
-	}
-
-	static stop() {
-		if (Timer.timerId) {
-			clearInterval(Timer.timerId);
-			Timer.timerId = null;
-		}
 	}
 
 	static addCallback(callback: VoidFunction, delay: number) {
@@ -37,13 +28,13 @@ export class Timer {
 	}
 
 	private static triggerCallbacks() {
-		const now = new Date().getTime();
 		const timesToTrigger = Object.keys(Timer.callbacks);
 
 		if (!timesToTrigger.length) {
 			return;
 		}
 
+		const now = new Date().getTime();
 		const callbacksKeysToTrigger = timesToTrigger.filter((time) => now >= Number(time));
 
 		if (!callbacksKeysToTrigger.length) {

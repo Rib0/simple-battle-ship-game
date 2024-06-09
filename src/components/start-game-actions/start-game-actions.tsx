@@ -1,8 +1,9 @@
-import { CSSProperties } from 'preact/compat';
+import { CSSProperties, useState } from 'preact/compat';
 import { observer } from 'mobx-react-lite';
 import cx from 'classnames';
 
 import { Ship } from '@/components/ship';
+import { Input } from '@/components/input';
 import { Button } from '@/components/button';
 import { DndDraggable } from '@/components/drag-and-drop';
 
@@ -13,8 +14,9 @@ import { getShipRotationStyles } from '@/utils/ship';
 import styles from './styles.module.css';
 
 export const StartGameActions = observer(() => {
+	const [id, setId] = useState('');
 	const { shipsStore, gameFieldStore } = useStoreContext();
-	const { searchGame } = useSocketGameEvents();
+	const { searchGame, inviteById } = useSocketGameEvents();
 
 	const { activeSize, activeSizeRotation, rotateActiveShip, setActiveSize, isAllShipsInstalled } =
 		shipsStore;
@@ -40,6 +42,20 @@ export const StartGameActions = observer(() => {
 		}
 	};
 
+	const handleChangeId = (value: string) => {
+		setId(value);
+	};
+
+	const handleGoToBattleClick = () => {
+		const trimmedId = id.trim();
+
+		if (trimmedId) {
+			inviteById(id);
+		} else {
+			searchGame();
+		}
+	};
+
 	return (
 		<div className={styles.root}>
 			{activeSize && (
@@ -62,8 +78,15 @@ export const StartGameActions = observer(() => {
 				{(activeSize || activeInstalledShipCoords || isAllShipsInstalled) && (
 					<Button type="cancel" onClick={handleClickCancelButton} />
 				)}
-				<div className={cx(styles.fullWidth, !isAllShipsInstalled && styles.inactive)}>
-					<Button type="start_battle" onClick={searchGame} />
+				<div
+					className={cx(
+						styles.fullWidth,
+						styles.container,
+						!isAllShipsInstalled && styles.inactive,
+					)}
+				>
+					<Button type="start_battle" onClick={handleGoToBattleClick} />
+					<Input onChange={handleChangeId} placeholder="Пригласить по id" />
 				</div>
 			</div>
 		</div>

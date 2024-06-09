@@ -6,11 +6,16 @@ import { useSocketGameEvents } from '@/hooks/use-socket-game-events';
 import { formatCoords } from '@/utils/table';
 
 import stylesCommon from '@/components/tables/styles.module.css';
+import { useStoreContext } from '@/context/store-context';
+
+import { CellType } from '@/types/game-field';
+import styles from './styles.module.css';
 
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 
 export const TableEnemy = observer(() => {
+	const { gameStore, gameFieldStore } = useStoreContext();
 	const { attack } = useSocketGameEvents();
 
 	const handleClick = (e: MouseEvent) => {
@@ -24,17 +29,29 @@ export const TableEnemy = observer(() => {
 	};
 
 	return (
-		<table className={stylesCommon.table}>
+		<table className={cx(stylesCommon.table, !gameStore.isEnemyOnline && styles.inactive)}>
 			<tbody>
 				{fieldSideArray.map((_, rI) => (
 					<tr key={rI} className={stylesCommon.tr}>
 						{fieldSideArray.map((__, cI) => {
-							const className = cx(stylesCommon.td);
+							const formattedCoords = formatCoords({ x: cI, y: rI });
+
+							const canAttack = gameFieldStore.canAttackEnemyCell(formattedCoords);
+							const cellType = gameFieldStore.getCellType(formattedCoords, false);
+							const isDisabled = [CellType.BOMB, CellType.DAMAGED].includes(cellType);
+
+							const className = cx(
+								stylesCommon.td,
+								styles.td,
+								canAttack && styles.canAttack,
+								styles[cellType.toLowerCase()],
+							);
 
 							return (
 								<td
+									disabled={isDisabled}
 									key={cI}
-									data-coords={formatCoords({ x: cI, y: rI })}
+									data-coords={formattedCoords}
 									onClick={handleClick}
 									className={className}
 								/>

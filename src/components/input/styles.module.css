@@ -1,0 +1,14 @@
+.input {
+	padding: 10px 7px;
+	border-collapse: separate;
+	border-image: url('/src/assets/table-border.png');
+	border-image-repeat: repeat;
+	border-image-slice: 7;
+	border-image-width: 3px;
+	outline: none;
+	transition: border-image-width 0.1s;
+
+	&:focus {
+		border-image-width: 5px;
+	}
+}

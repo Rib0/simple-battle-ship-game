@@ -13,6 +13,11 @@
 		flex-wrap: wrap;
 		gap: 15px;
 
+		.container {
+			display: flex;
+			align-items: center;
+		}
+
 		.fullWidth {
 			flex: 0 0 100%;
 		}

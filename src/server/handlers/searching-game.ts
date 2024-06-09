@@ -1,14 +1,13 @@
-import { Server, Socket } from 'socket.io';
 import { nanoid } from 'nanoid';
 
 import { ROOMS, SEARCHING_GAME_PLAYERS } from '@/server/constants';
-import { getPlayerId } from '@/server/lib/cookie';
-import { SocketEvents } from '@/types/socket-events';
-import { Field } from '@/types/game-field';
+import { getPlayerIdByHandshake } from '@/server/lib/cookie';
+import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
+import { changeTurn } from '../lib/socket';
 
 let isSearching: NodeJS.Timeout | undefined;
 
-const tryPutPlayersToRoom = async (io: Server) => {
+const tryPutPlayersToRoom = async (io: ServerIo) => {
 	isSearching = setTimeout(() => tryPutPlayersToRoom(io), 3000);
 
 	const players = SEARCHING_GAME_PLAYERS.slice(0, 2);
@@ -25,29 +24,37 @@ const tryPutPlayersToRoom = async (io: Server) => {
 
 		const isAlreadyInRoom = players.some((player) => player.rooms.size > 2);
 		if (isAlreadyInRoom) {
-			await Promise.all(players.map((player) => player.leave(roomId)));
+			io.socketsLeave(roomId);
 			return;
 		}
 
-		const [player1, player2] = players;
-
-		const [player1Field, player2Field] = await Promise.all<Field>(
+		const [player1Id, player2Id] = players.map(getPlayerIdByHandshake);
+		const [{ id: player1SocketId }, { id: player2SocketId }] = players;
+		const [
+			{ field: player1Field, ships: player1Ships },
+			{ field: player2Field, ships: player2Ships },
+		] = await Promise.all(
 			players.map((player) => player.emitWithAck(SocketEvents.JOINED_ROOM, roomId)),
 		);
-
-		const player1Id = getPlayerId(player1);
-		const player2Id = getPlayerId(player2);
+		players.forEach((player) => {
+			player.data.roomId = roomId;
+		});
 
 		ROOMS[roomId] = {
 			[player1Id]: {
-				socketId: player1.id,
+				enemyPlayerId: player2Id,
+				socketId: player1SocketId,
 				field: player1Field,
+				ships: player1Ships,
 			},
 			[player2Id]: {
-				socketId: player2.id,
+				enemyPlayerId: player1Id,
+				socketId: player2SocketId,
 				field: player2Field,
+				ships: player2Ships,
 			},
 		};
+		changeTurn(players);
 		SEARCHING_GAME_PLAYERS.splice(0, 2);
 	} catch (e) {
 		await Promise.all(players.map((player) => player.leave(roomId)));
@@ -57,7 +64,7 @@ const tryPutPlayersToRoom = async (io: Server) => {
 	}
 };
 
-export const searchingGameHandler = (io: Server, socket: Socket) => {
+export const searchingGameHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.SEARCH_GAME, async () => {
 		const isPlayerSearchingGame = SEARCHING_GAME_PLAYERS.some((player) => player === socket);
 
