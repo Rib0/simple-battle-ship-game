@@ -1,9 +1,12 @@
+import { Nullable } from '@/types/utils';
 import { makeAutoObservable } from 'mobx';
 
 export class GameStore {
 	isStarted = false;
 
 	isEnemyOnline = false;
+
+	invitedByPlayer: Nullable<string> = null;
 
 	constructor() {
 		makeAutoObservable(this);
@@ -15,5 +18,9 @@ export class GameStore {
 
 	setIsEnemyOnline = (value: boolean) => {
 		this.isEnemyOnline = value;
+	};
+
+	setInvitedByPlayer = (value: Nullable<string>) => {
+		this.invitedByPlayer = value;
 	};
 }

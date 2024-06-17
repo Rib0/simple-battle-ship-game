@@ -1,10 +1,10 @@
 import { useState } from 'preact/hooks';
 import { observer } from 'mobx-react-lite';
 
-import { DndProvider } from '@/components/drag-and-drop';
-import { DndDroppable } from '@/components/drag-and-drop/dnd-droppable';
+import { DndProvider } from '@/components/common/drag-and-drop';
+import { DndDroppable } from '@/components/common/drag-and-drop/dnd-droppable';
 import { Table } from '@/components/tables';
-import type { DndContextOptionsType } from '@/components/drag-and-drop/types';
+import type { DndContextOptionsType } from '@/components/common/drag-and-drop/types';
 import { useStoreContext } from '@/context/store-context';
 import {
 	getShipDataByDataset,

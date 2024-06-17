@@ -1,4 +1,4 @@
-import { NullableHTMLDivElement } from '@/components/drag-and-drop/types';
+import { NullableHTMLDivElement } from '@/components/common/drag-and-drop/types';
 import { LAST_TABLE_SIDE_INDEX, TABLE_SIDE_SIZE } from '@/constants/table';
 import { ShipRotation, ShipSize } from '@/types/ship';
 import { arrayFromDigit } from './array-from-digit';

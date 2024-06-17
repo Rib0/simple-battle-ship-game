@@ -1,8 +1,8 @@
 import { useCallback } from 'preact/hooks';
 
-import { KEYS } from '@/constants/locale-storage';
+import { Keys } from '@/constants/locale-storage';
 
-export const useLocalStorage = <T = string>(key: KEYS) => {
+export const useLocalStorage = <T = string>(key: Keys) => {
 	const get = useCallback(() => {
 		const value = localStorage.getItem(key);
 

@@ -30,6 +30,7 @@
 	},
 	"dependencies": {
 		"@mobx-devtools/tools": "^0.0.4",
+		"antd": "^5.18.1",
 		"classnames": "^2.5.1",
 		"cookie": "^0.6.0",
 		"mobx": "^6.12.0",

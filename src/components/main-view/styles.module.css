@@ -1,11 +1,16 @@
 .root {
 	display: flex;
+	flex-direction: column;
 	margin-top: 100px;
 	margin-left: 200px;
 	gap: 20px;
-}
 
-.mainGameField {
-	display: flex;
-	gap: 20px;
+	.header {
+		min-height: 50px;
+	}
+
+	.mainGameField {
+		display: flex;
+		gap: 20px;
+	}
 }

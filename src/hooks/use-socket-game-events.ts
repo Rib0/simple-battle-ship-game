@@ -3,13 +3,17 @@ import { io } from 'socket.io-client';
 
 import { ClientSocket, SocketEvents } from '@/types/socket';
 import { useSocketContext } from '@/context/socket-context';
-import { KEYS } from '@/constants/locale-storage';
+import { Keys } from '@/constants/locale-storage';
 import { SERVER_HOST } from '@/constants/socket';
+import { useStoreContext } from '@/context/store-context';
 import { useLocalStorage } from './use-local-storage';
 
 export const useSocketGameEvents = () => {
 	const { socket, connectSocket } = useSocketContext();
-	const { get } = useLocalStorage(KEYS.ROOM_ID);
+	const { gameStore } = useStoreContext();
+	const { get } = useLocalStorage(Keys.ROOM_ID);
+
+	const { invitedByPlayer } = gameStore;
 
 	const initiateSocketConnection = useCallback(() => {
 		const socketConnection: ClientSocket = io(SERVER_HOST, {
@@ -33,6 +37,20 @@ export const useSocketGameEvents = () => {
 		socket?.emit(SocketEvents.INVITE_BY_ID, id);
 	};
 
+	const acceptInvitation = () => {
+		const playerId = invitedByPlayer || '';
+
+		socket?.emit(SocketEvents.ACCEPT_INVITATION, playerId);
+		gameStore.setInvitedByPlayer(null);
+	};
+
+	const rejectInvitation = () => {
+		const playerId = invitedByPlayer || '';
+
+		socket?.emit(SocketEvents.REJECT_INVITATION, playerId);
+		gameStore.setInvitedByPlayer(null);
+	};
+
 	const attack = (coords: string) => {
 		const roomId = get() || '';
 
@@ -45,6 +63,8 @@ export const useSocketGameEvents = () => {
 		searchGame,
 		findGameToReconnect,
 		inviteById,
+		acceptInvitation,
+		rejectInvitation,
 		attack,
 	};
 };

@@ -3,9 +3,9 @@ import { observer } from 'mobx-react-lite';
 import cx from 'classnames';
 
 import { Ship } from '@/components/ship';
-import { Input } from '@/components/input';
-import { Button } from '@/components/button';
-import { DndDraggable } from '@/components/drag-and-drop';
+import { Input } from '@/components/common/input';
+import { Button } from '@/components/common/button';
+import { DndDraggable } from '@/components/common/drag-and-drop';
 
 import { useSocketGameEvents } from '@/hooks/use-socket-game-events';
 import { useStoreContext } from '@/context/store-context';

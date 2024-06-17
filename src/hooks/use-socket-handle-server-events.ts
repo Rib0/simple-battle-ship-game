@@ -3,12 +3,12 @@ import { useEffect } from 'preact/hooks';
 import { useStoreContext } from '@/context/store-context';
 import { ClientSocket, GameState, SocketEvents } from '@/types/socket';
 import { CellType, Field } from '@/types/game-field';
-import { KEYS } from '@/constants/locale-storage';
+import { Keys } from '@/constants/locale-storage';
 import { useLocalStorage } from './use-local-storage';
 
 export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 	const { gameStore, gameFieldStore } = useStoreContext();
-	const { set } = useLocalStorage(KEYS.ROOM_ID);
+	const { set } = useLocalStorage(Keys.ROOM_ID);
 
 	useEffect(() => {
 		if (!socket) {
@@ -17,8 +17,16 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 
 		socket.on(SocketEvents.TIMER_TICK, () => {});
 
-		socket.on(SocketEvents.INVITED, (id) => {
-			alert(id);
+		socket.on(SocketEvents.INVITE_BY_ID, (id) => {
+			if (gameStore.invitedByPlayer) {
+				return;
+			}
+
+			gameStore.setInvitedByPlayer(id);
+		});
+
+		socket.on(SocketEvents.REJECT_INVITATION, () => {
+			alert('отказ');
 		});
 
 		socket.on(
