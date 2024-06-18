@@ -30,18 +30,18 @@ export const MainView = observer(() => {
 	const playerId = getPlayerIdByCookie();
 
 	return (
-		<div className={styles.root}>
+		<Space direction='vertical' className={styles.root}>
 			{!gameStore.isStarted && (
-				<Space className={styles.header}>
+				<Space direction='vertical' className={styles.header}>
 					<div>{playerId}</div>
 					<InviteMessage />
 				</Space>
 			)}
-			<div className={styles.mainGameField}>
+			<Space>
 				<GameField />
 				{!gameStore.isStarted && <SetupForGame />}
-			</div>
-			{gameStore.isStarted && <TableEnemy />}
-		</div>
+				{gameStore.isStarted && <TableEnemy />}
+			</Space>
+		</Space>
 	);
 });
