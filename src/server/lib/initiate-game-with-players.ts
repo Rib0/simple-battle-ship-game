@@ -1,9 +1,9 @@
 import { nanoid } from 'nanoid';
 
 import { ROOMS, SEARCHING_GAME_PLAYERS } from '@/server/constants';
-import { getPlayerIdByHandshake } from '@/server/lib/cookie';
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { changeTurn } from './change-turn';
+import { getPlayerId } from './handshake';
 
 export const initiateGameWithPlayers = async (players: ServerSocket[], io: ServerIo) => {
 	const roomId = nanoid();
@@ -17,7 +17,12 @@ export const initiateGameWithPlayers = async (players: ServerSocket[], io: Serve
 			return;
 		}
 
-		const [player1Id, player2Id] = players.map(getPlayerIdByHandshake);
+		const [player1Id, player2Id] = players.map(getPlayerId);
+
+		if (!player1Id || !player2Id) {
+			return;
+		}
+
 		const [{ id: player1SocketId }, { id: player2SocketId }] = players;
 		const [
 			{ field: player1Field, ships: player1Ships },

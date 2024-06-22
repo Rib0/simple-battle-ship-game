@@ -1,19 +1,22 @@
 import { useEffect } from 'preact/hooks';
 
 import { useStoreContext } from '@/context/store-context';
-import { ClientSocket, GameState, SocketEvents } from '@/types/socket';
-import { CellType, Field } from '@/types/game-field';
-import { Keys } from '@/constants/locale-storage';
-import { useLocalStorage } from './use-local-storage';
+import { ClientSocket, SocketEvents } from '@/types/socket';
+import { CellType } from '@/types/game-field';
+import { LocaleStorage } from '@/utils/locale-storage';
 
 export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 	const { gameStore, gameFieldStore } = useStoreContext();
-	const { set } = useLocalStorage(Keys.ROOM_ID);
 
 	useEffect(() => {
 		if (!socket) {
 			return;
 		}
+
+		socket.on(SocketEvents.SET_AUTH_DATA, (playerId) => {
+			LocaleStorage.set('player_id_battle_ship_game', playerId);
+			gameStore.setPlayerId(playerId);
+		});
 
 		socket.on(SocketEvents.TIMER_TICK, () => {});
 
@@ -29,30 +32,24 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 			alert('отказ');
 		});
 
-		socket.on(
-			SocketEvents.JOINED_ROOM,
-			(roomId: string, callback: ({ field, ships }: GameState) => void) => {
-				const { getField, ships } = gameFieldStore;
-				const { setIsStarted, setIsEnemyOnline } = gameStore;
+		socket.on(SocketEvents.JOINED_ROOM, (roomId, callback) => {
+			const { getField, ships } = gameFieldStore;
+			const { setIsStarted, setIsEnemyOnline } = gameStore;
 
-				setIsStarted(true);
-				setIsEnemyOnline(true);
-				set(roomId);
-				callback({ field: getField, ships });
-			},
-		);
+			setIsStarted(true);
+			setIsEnemyOnline(true);
+			LocaleStorage.set('room_id_battle_ship_game', roomId);
+			callback({ field: getField, ships });
+		});
 
-		socket.on(
-			SocketEvents.RECONNECTED_TO_ROOM,
-			(myGameState: GameState, enemyField: Field, isEnemyOnline) => {
-				const { setIsStarted, setIsEnemyOnline } = gameStore;
-				const { installGameState } = gameFieldStore;
+		socket.on(SocketEvents.RECONNECTED_TO_ROOM, (myGameState, enemyField, isEnemyOnline) => {
+			const { setIsStarted, setIsEnemyOnline } = gameStore;
+			const { installGameState } = gameFieldStore;
 
-				setIsStarted(true);
-				installGameState(myGameState, enemyField);
-				setIsEnemyOnline(isEnemyOnline);
-			},
-		);
+			setIsStarted(true);
+			installGameState(myGameState, enemyField);
+			setIsEnemyOnline(isEnemyOnline);
+		});
 
 		socket.on(SocketEvents.ENEMY_RECONNECTED_TO_ROOM, () => {
 			gameStore.setIsEnemyOnline(true);
@@ -73,5 +70,5 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 		socket.on(SocketEvents.MISSED, (coords, isMe) => {
 			gameFieldStore.setCellType(coords, isMe, CellType.BOMB);
 		});
-	}, [socket, set, gameStore, gameFieldStore]);
+	}, [socket, gameStore, gameFieldStore]);
 };

@@ -4,6 +4,7 @@ import { Field, GameFieldShips } from './game-field';
 import { DeepPartial, Nullable } from './utils';
 
 export enum SocketEvents {
+	SET_AUTH_DATA = 'SET_AUTH_DATA',
 	TIMER_TICK = 'TIMER_TICK',
 	SEARCH_GAME = 'SEARCH_GAME',
 	INVITE_BY_ID = 'INVITE_BY_ID',
@@ -24,10 +25,11 @@ export enum SocketEvents {
 }
 
 export type ClientToServerEvents = {
+	[SocketEvents.SET_AUTH_DATA]: VoidFunction;
 	[SocketEvents.SEARCH_GAME]: VoidFunction;
-	[SocketEvents.INVITE_BY_ID]: (id: string) => void;
-	[SocketEvents.ACCEPT_INVITATION]: (id: string) => void;
-	[SocketEvents.REJECT_INVITATION]: (id: string) => void;
+	[SocketEvents.INVITE_BY_ID]: (playerId: string) => void;
+	[SocketEvents.ACCEPT_INVITATION]: (playerId: string) => void;
+	[SocketEvents.REJECT_INVITATION]: (playerId: string) => void;
 	[SocketEvents.FIND_GAME_TO_RECONNECT]: (roomId: string) => void;
 	[SocketEvents.ATTACK]: (coords: string, roomId: string) => void;
 };
@@ -38,9 +40,10 @@ export type GameState = {
 };
 
 export type ServerToClientEvents = {
+	[SocketEvents.SET_AUTH_DATA]: (playerId: string) => void;
 	[SocketEvents.TIMER_TICK]: VoidFunction;
 	[SocketEvents.NO_PLAYER_TO_INVITE]: VoidFunction;
-	[SocketEvents.INVITE_BY_ID]: (id: string) => void;
+	[SocketEvents.INVITE_BY_ID]: (playerId: string) => void;
 	[SocketEvents.REJECT_INVITATION]: VoidFunction;
 	[SocketEvents.JOINED_ROOM]: (roomId: string, callback: (data: GameState) => void) => void;
 	[SocketEvents.RECONNECTED_TO_ROOM]: (
@@ -56,10 +59,11 @@ export type ServerToClientEvents = {
 };
 
 export type SocketData = {
+	playerId: string;
 	turn: boolean;
 	turnId: string;
 	roomId: Nullable<string>; // если есть roomId, то пользователь в игре
-	invitePlayerId: Nullable<string>;
+	invitePlayerId: Nullable<string>; // приглашенный playerId
 };
 
 export type ServerIo = Server<ClientToServerEvents, ServerToClientEvents, object, SocketData>;

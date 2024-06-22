@@ -7,7 +7,6 @@ import { Timer } from './lib/timer';
 const io: ServerIo = new Server({
 	cors: {
 		origin: 'http://localhost:8080', // TODO: сделать только для дева исользовать donteenv для разных сред, перенести хост в переменные
-		credentials: true, // отправляет с сервера заголовок 'Access-Control-Allow-Credentials: true' (разрешает отправлять заголовок cookie в header) для preflight запроса с другого домена, в случае, если клиент отправляет непустой Header Cookie
 	},
 });
 

@@ -1,11 +1,15 @@
 import { GameState, ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { Field } from '@/types/game-field';
 import { ROOMS } from '../constants';
-import { getPlayerIdByHandshake } from '../lib/cookie';
+import { getPlayerId } from '../lib/handshake';
 
 export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.FIND_GAME_TO_RECONNECT, async (roomId) => {
-		const playerId = getPlayerIdByHandshake(socket);
+		const playerId = getPlayerId(socket);
+
+		if (!playerId) {
+			return;
+		}
 
 		const playerData = ROOMS[roomId]?.[playerId];
 		const enemyPlayerId = playerData?.enemyPlayerId;

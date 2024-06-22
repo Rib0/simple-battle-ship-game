@@ -9,13 +9,12 @@ import { TableEnemy } from '@/components/tables';
 import { SetupForGame } from '@/components/setup-for-game';
 import { InviteMessage } from '@/components/common/invite-modal';
 
-import { getPlayerIdByCookie } from '@/utils/cookie';
-
 import styles from './styles.module.css';
 
 export const MainView = observer(() => {
 	const { gameStore } = useStoreContext();
-	const { socket, initiateSocketConnection, findGameToReconnect } = useSocketGameEvents();
+	const { socket, initiateSocketConnection, setAuthData, findGameToReconnect } =
+		useSocketGameEvents();
 
 	useEffect(() => {
 		initiateSocketConnection();
@@ -23,17 +22,16 @@ export const MainView = observer(() => {
 
 	useEffect(() => {
 		if (socket) {
+			setAuthData();
 			findGameToReconnect();
 		}
-	}, [socket, findGameToReconnect]);
-
-	const playerId = getPlayerIdByCookie();
+	}, [socket, setAuthData, findGameToReconnect]);
 
 	return (
-		<Space direction='vertical' className={styles.root}>
+		<Space direction="vertical" className={styles.root}>
 			{!gameStore.isStarted && (
-				<Space direction='vertical' className={styles.header}>
-					<div>{playerId}</div>
+				<Space direction="vertical" className={styles.header}>
+					<div>{gameStore.playerId}</div>
 					<InviteMessage />
 				</Space>
 			)}
