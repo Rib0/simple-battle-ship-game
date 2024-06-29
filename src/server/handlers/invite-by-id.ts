@@ -15,6 +15,10 @@ export const inviteByIdHandler = (io: ServerIo, socket: ServerSocket) => {
 			return;
 		}
 
+		if (invitedPlayer.data.playerInviterId) {
+			return;
+		}
+
 		const inviterId = getPlayerId(socket);
 
 		if (!inviterId || inviterId === invitedPlayerId) {
@@ -22,7 +26,8 @@ export const inviteByIdHandler = (io: ServerIo, socket: ServerSocket) => {
 		}
 
 		invitedPlayer.emit(SocketEvents.INVITE_BY_ID, inviterId);
-		socket.data.invitePlayerId = invitedPlayerId;
+		invitedPlayer.data.playerInviterId = inviterId;
+		socket.data.invitedPlayerId = invitedPlayerId;
 	});
 
 	socket.on(SocketEvents.ACCEPT_INVITATION, async (playerInviterId) => {
@@ -34,13 +39,21 @@ export const inviteByIdHandler = (io: ServerIo, socket: ServerSocket) => {
 
 		const invitedPlayerId = getPlayerId(socket);
 
-		if (!invitedPlayerId) {
+		if (!playerInviter || !invitedPlayerId) {
 			return;
 		}
 
-		if (playerInviter?.data.invitePlayerId !== invitedPlayerId) {
+		if (
+			playerInviter?.data.invitedPlayerId !== invitedPlayerId ||
+			socket.data.playerInviterId !== playerInviterId
+		) {
+			socket.data.playerInviterId = null;
+			playerInviter.data.invitedPlayerId = null;
 			return;
 		}
+
+		socket.data.playerInviterId = null;
+		playerInviter.data.invitedPlayerId = null;
 
 		const players = [playerInviter, socket];
 
@@ -56,13 +69,21 @@ export const inviteByIdHandler = (io: ServerIo, socket: ServerSocket) => {
 
 		const invitedPlayerId = getPlayerId(socket);
 
-		if (!invitedPlayerId) {
+		if (!playerInviter || !invitedPlayerId) {
 			return;
 		}
 
-		if (playerInviter?.data.invitePlayerId !== invitedPlayerId) {
+		if (
+			playerInviter?.data.invitedPlayerId !== invitedPlayerId ||
+			socket.data.playerInviterId !== playerInviterId
+		) {
+			socket.data.playerInviterId = null;
+			playerInviter.data.invitedPlayerId = null;
 			return;
 		}
+
+		socket.data.playerInviterId = null;
+		playerInviter.data.invitedPlayerId = null;
 
 		playerInviter.emit(SocketEvents.REJECT_INVITATION);
 	});

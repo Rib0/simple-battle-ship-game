@@ -1,30 +1,4 @@
-.root {
-	display: flex;
-	flex-direction: column;
-	gap: 70px;
-
-	.draggable {
-		display: flex;
-		align-self: flex-start;
-	}
-
-	.buttons {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 15px;
-
-		.container {
-			display: flex;
-			align-items: center;
-		}
-
-		.fullWidth {
-			flex: 0 0 100%;
-		}
-
-		.inactive {
-			opacity: 0.3;
-			pointer-events: none;
-		}
-	}
+.inactive {
+	opacity: 0.3;
+	pointer-events: none;
 }

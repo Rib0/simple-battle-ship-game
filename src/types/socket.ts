@@ -17,6 +17,7 @@ export enum SocketEvents {
 	RECONNECTED_TO_ROOM = 'RECONNECTED_TO_ROOM',
 	ENEMY_RECONNECTED_TO_ROOM = 'ENEMY_RECONNECTED_TO_ROOM',
 	ENEMY_DISCONNECTED = 'ENEMY_DISCONNECTED',
+	PLAYER_LEAVE_GAME = 'PLAYER_LEAVE_GAME',
 	CHANGE_TURN = 'CHANGE_TURN',
 	ATTACK = 'ATTACK',
 	DAMAGED = 'DAMAGED',
@@ -31,6 +32,7 @@ export type ClientToServerEvents = {
 	[SocketEvents.ACCEPT_INVITATION]: (playerId: string) => void;
 	[SocketEvents.REJECT_INVITATION]: (playerId: string) => void;
 	[SocketEvents.FIND_GAME_TO_RECONNECT]: (roomId: string) => void;
+	[SocketEvents.PLAYER_LEAVE_GAME]: VoidFunction;
 	[SocketEvents.ATTACK]: (coords: string, roomId: string) => void;
 };
 
@@ -53,18 +55,20 @@ export type ServerToClientEvents = {
 	) => void;
 	[SocketEvents.ENEMY_RECONNECTED_TO_ROOM]: VoidFunction;
 	[SocketEvents.ENEMY_DISCONNECTED]: VoidFunction;
+	[SocketEvents.PLAYER_LEAVE_GAME]: VoidFunction;
 	[SocketEvents.CHANGE_TURN]: (isYourTurn: boolean) => void;
 	[SocketEvents.DAMAGED]: (coords: string, isMe: boolean) => void;
 	[SocketEvents.MISSED]: (coords: string, isMe: boolean) => void;
 };
 
-export type SocketData = {
+export type SocketData = Partial<{
 	playerId: string;
 	turn: boolean;
 	turnId: string;
-	roomId: Nullable<string>; // если есть roomId, то пользователь в игре
-	invitePlayerId: Nullable<string>; // приглашенный playerId
-};
+	roomId: Nullable<string>; // нужно для события disconnect, чтобы отправить событие в комнату
+	invitedPlayerId: Nullable<string>; // приглашенный playerId
+	playerInviterId: Nullable<string>; // id игрока, который пригласил в игру
+}>;
 
 export type ServerIo = Server<ClientToServerEvents, ServerToClientEvents, object, SocketData>;
 export type ServerSocket = Socket<ClientToServerEvents, ServerToClientEvents, object, SocketData>;

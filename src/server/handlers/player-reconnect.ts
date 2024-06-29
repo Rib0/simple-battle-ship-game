@@ -19,6 +19,19 @@ export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 			return;
 		}
 
+		const isAllPlayerConnected = [playerData.socketId, enemyPlayerData.socketId].every((id) => {
+			if (!id) {
+				return false;
+			}
+
+			return io.sockets.sockets.get(id)?.connected;
+		});
+
+		if (isAllPlayerConnected) {
+			return;
+		}
+
+		socket.data.roomId = roomId;
 		ROOMS[roomId] = {
 			...ROOMS[roomId],
 			[playerId]: {

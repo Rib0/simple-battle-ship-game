@@ -1,36 +1,26 @@
-import { CSSProperties, useState } from 'preact/compat';
+import { JSX, useState } from 'preact/compat';
 import { observer } from 'mobx-react-lite';
-import cx from 'classnames';
+import { Flex, Input } from 'antd';
 
-import { Ship } from '@/components/ship';
-import { Input } from '@/components/common/input';
 import { Button } from '@/components/common/button';
-import { DndDraggable } from '@/components/common/drag-and-drop';
 
 import { useSocketGameEvents } from '@/hooks/use-socket-game-events';
 import { useStoreContext } from '@/context/store-context';
-import { getShipRotationStyles } from '@/utils/ship';
 
 import styles from './styles.module.css';
 
 export const StartGameActions = observer(() => {
-	const [id, setId] = useState('');
+	const [idToInvite, setIdToInvite] = useState('');
 	const { shipsStore, gameFieldStore } = useStoreContext();
 	const { searchGame, inviteById } = useSocketGameEvents();
 
-	const { activeSize, activeSizeRotation, rotateActiveShip, setActiveSize, isAllShipsInstalled } =
-		shipsStore;
+	const { activeSize, rotateActiveShip, setActiveSize, isAllShipsInstalled } = shipsStore;
 	const {
 		activeInstalledShipCoords,
 		removeActiveInstalledShip,
 		randomlyInstallShips,
 		resetAllShips,
 	} = gameFieldStore;
-
-	const extendDraggableStyles = (style: CSSProperties): CSSProperties => ({
-		...style,
-		transform: `${style.transform || ''} ${getShipRotationStyles(activeSizeRotation)}`,
-	});
 
 	const handleClickCancelButton = () => {
 		if (activeSize) {
@@ -42,53 +32,48 @@ export const StartGameActions = observer(() => {
 		}
 	};
 
-	const handleChangeId = (value: string) => {
-		setId(value);
+	const handleChangeIdToInvite = (e: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+		if (!(e?.target instanceof HTMLInputElement)) {
+			return;
+		}
+
+		const { value } = e.target;
+
+		setIdToInvite(value);
 	};
 
 	const handleGoToBattleClick = () => {
-		const trimmedId = id.trim();
+		const trimmedId = idToInvite.trim();
 
 		if (trimmedId) {
-			inviteById(id);
+			inviteById(trimmedId);
 		} else {
 			searchGame();
 		}
 	};
 
 	return (
-		<div className={styles.root}>
-			{activeSize && (
-				<DndDraggable
-					className={styles.draggable}
-					extendDraggableStyles={extendDraggableStyles}
-					containerDataProps={{
-						'data-size': activeSize as unknown as string,
-						'data-rotation': activeSizeRotation as unknown as string,
-					}}
-				>
-					<Ship size={activeSize} />
-				</DndDraggable>
+		<Flex wrap gap="middle">
+			{!activeSize && !activeInstalledShipCoords && (
+				<Button type="shuffle_ships" onClick={randomlyInstallShips} />
 			)}
-			<div className={styles.buttons}>
-				{!activeSize && !activeInstalledShipCoords && (
-					<Button type="shuffle_ships" onClick={randomlyInstallShips} />
-				)}
-				{activeSize && <Button type="rotate_ship" onClick={rotateActiveShip} />}
-				{(activeSize || activeInstalledShipCoords || isAllShipsInstalled) && (
-					<Button type="cancel" onClick={handleClickCancelButton} />
-				)}
-				<div
-					className={cx(
-						styles.fullWidth,
-						styles.container,
-						!isAllShipsInstalled && styles.inactive,
-					)}
-				>
-					<Button type="start_battle" onClick={handleGoToBattleClick} />
-					<Input onChange={handleChangeId} placeholder="Пригласить по id" />
-				</div>
-			</div>
-		</div>
+			{activeSize && <Button type="rotate_ship" onClick={rotateActiveShip} />}
+			{(activeSize || activeInstalledShipCoords || isAllShipsInstalled) && (
+				<Button type="cancel" onClick={handleClickCancelButton} />
+			)}
+			<Flex
+				flex="0 0 100%"
+				align="center"
+				className={!isAllShipsInstalled ? styles.inactive : undefined}
+			>
+				<Button type="start_battle" onClick={handleGoToBattleClick} />
+				<Input
+					value={idToInvite}
+					onChange={handleChangeIdToInvite}
+					placeholder="Пригласить по id"
+					size="middle"
+				/>
+			</Flex>
+		</Flex>
 	);
 });

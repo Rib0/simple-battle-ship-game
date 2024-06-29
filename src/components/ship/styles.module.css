@@ -1,50 +1,47 @@
-.shipContainer {
-	display: flex;
-	align-items: center;
+.invisible {
+	visibility: hidden;
+}
 
-	.ship {
-		display: table;
-		padding: 0;
-		border: none;
-		background: url('@/assets/ships.png') no-repeat 0 0;
-		outline: none;
+.ship {
+	display: table;
+	padding: 0;
+	border: none;
+	background: url('@/assets/ships.png') no-repeat 0 0;
+	outline: none;
 
-		&.size {
-			&_1 {
-				background-position: 0 -208px;
-				background-size: 483%;
-			}
-
-			&_2 {
-				background-position: -112px -143px;
-				background-size: 248%;
-			}
-
-			&_3 {
-				background-position: 0 -71px;
-				background-size: 165%;
-			}
-
-			&_4 {
-				background-position: 0 0;
-				background-size: 125%;
-			}
+	&.size {
+		&_1 {
+			background-position: 0 -208px;
+			background-size: 483%;
 		}
 
-		.tr {
-			height: var(--ship-cell-size);
+		&_2 {
+			background-position: -112px -143px;
+			background-size: 248%;
 		}
 
-		.td {
-			width: var(--ship-cell-size);
+		&_3 {
+			background-position: 0 -71px;
+			background-size: 165%;
+		}
+
+		&_4 {
+			background-position: 0 0;
+			background-size: 125%;
 		}
 	}
 
-	.amount {
-		display: flex;
-		width: var(--table-cell-size);
-		height: var(--table-cell-size);
-		align-items: center;
-		margin-left: 5px;
+	.tr {
+		height: var(--ship-cell-size);
 	}
+
+	.td {
+		width: var(--ship-cell-size);
+	}
+}
+
+.amount {
+	width: var(--table-cell-size);
+	height: var(--table-cell-size);
+	margin-left: 5px;
 }

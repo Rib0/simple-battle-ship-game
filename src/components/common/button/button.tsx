@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'preact/compat';
+import { observer } from 'mobx-react-lite';
 import cx from 'classnames';
 
-import { observer } from 'mobx-react-lite';
 import styles from './styles.module.css';
 
 type Props = {

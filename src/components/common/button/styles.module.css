@@ -1,6 +1,6 @@
 .button {
-	width: 70px;
-	height: 70px;
+	width: 60px;
+	height: 60px;
 	padding: 0;
 	border: none;
 	border-radius: 15px;
@@ -18,7 +18,7 @@
 		}
 
 		&_start_battle {
-			width: 210px;
+			width: 190px;
 			background-image: url('@/assets/start-battle.png');
 			background-size: contain;
 		}

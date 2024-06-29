@@ -1,6 +1,7 @@
 import { CSSProperties } from 'preact/compat';
 import { useMemo } from 'preact/hooks';
 import { observer } from 'mobx-react-lite';
+import { Flex } from 'antd';
 import cx from 'classnames';
 
 import { ShipRotation, ShipSize } from '@/types/ship';
@@ -15,6 +16,7 @@ type Props = {
 	rotation?: ShipRotation;
 	amount?: number;
 	onClick?: (size: ShipSize) => void;
+	invisible?: boolean;
 	style?: CSSProperties;
 	className?: string;
 };
@@ -22,21 +24,21 @@ type Props = {
 /* eslint-disable jsx-a11y/control-has-associated-label */
 
 export const Ship = observer<Props>(
-	({ size, rotation, amount, onClick, style = {}, className }) => {
+	({ size, rotation, amount, onClick, invisible, style = {}, className }) => {
 		const shipSizeArray = useMemo(() => arrayFromDigit(size), [size]);
 
 		const handleClick = () => {
 			onClick?.(size);
 		};
 
-		const rootClassName = cx(styles.shipContainer, className);
+		const rootClassName = cx(invisible && styles.invisible, className);
 		const rootStyle = {
 			...style,
 			transform: `${style.transform || ''} ${rotation ? getShipRotationStyles(rotation) : ''}`,
 		};
 
 		return (
-			<div className={rootClassName} style={rootStyle}>
+			<Flex align="center" className={rootClassName} style={rootStyle}>
 				<button
 					type="button"
 					onClick={handleClick}
@@ -52,8 +54,12 @@ export const Ship = observer<Props>(
 						</tbody>
 					</table>
 				</button>
-				{amount !== undefined && <div className={styles.amount}>{amount}</div>}
-			</div>
+				{amount !== undefined && (
+					<Flex align="center" className={styles.amount}>
+						{amount}
+					</Flex>
+				)}
+			</Flex>
 		);
 	},
 );

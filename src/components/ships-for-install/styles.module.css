@@ -1,12 +1,4 @@
-.row {
+.draggable {
 	display: flex;
-	gap: 10px;
-
-	&:not(:last-child) {
-		margin-bottom: 10px;
-	}
-
-	.invisible {
-		visibility: hidden;
-	}
+	align-self: flex-start;
 }

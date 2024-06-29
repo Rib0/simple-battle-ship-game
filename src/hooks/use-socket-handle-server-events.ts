@@ -15,7 +15,7 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 
 		socket.on(SocketEvents.SET_AUTH_DATA, (playerId) => {
 			LocaleStorage.set('player_id_battle_ship_game', playerId);
-			gameStore.setPlayerId(playerId);
+			gameStore.setGameValue('playerId', playerId);
 		});
 
 		socket.on(SocketEvents.TIMER_TICK, () => {});
@@ -25,37 +25,47 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 				return;
 			}
 
-			gameStore.setInvitedByPlayer(id);
+			gameStore.setGameValue('invitedByPlayer', id);
 		});
 
 		socket.on(SocketEvents.REJECT_INVITATION, () => {
-			alert('отказ');
+			gameStore.addNotification('Пользователь отказался от игры');
+		});
+
+		socket.on(SocketEvents.NO_PLAYER_TO_INVITE, () => {
+			gameStore.addNotification('Такого игрока не существует');
 		});
 
 		socket.on(SocketEvents.JOINED_ROOM, (roomId, callback) => {
 			const { getField, ships } = gameFieldStore;
-			const { setIsStarted, setIsEnemyOnline } = gameStore;
+			const { setGameValue } = gameStore;
 
-			setIsStarted(true);
-			setIsEnemyOnline(true);
+			setGameValue('isStarted', true);
+			setGameValue('isEnemyOnline', true);
 			LocaleStorage.set('room_id_battle_ship_game', roomId);
 			callback({ field: getField, ships });
 		});
 
 		socket.on(SocketEvents.RECONNECTED_TO_ROOM, (myGameState, enemyField, isEnemyOnline) => {
-			const { setIsStarted, setIsEnemyOnline } = gameStore;
+			const { setGameValue } = gameStore;
 			const { installGameState } = gameFieldStore;
 
-			setIsStarted(true);
+			setGameValue('isStarted', true);
 			installGameState(myGameState, enemyField);
-			setIsEnemyOnline(isEnemyOnline);
+			setGameValue('isEnemyOnline', isEnemyOnline);
 		});
 
 		socket.on(SocketEvents.ENEMY_RECONNECTED_TO_ROOM, () => {
-			gameStore.setIsEnemyOnline(true);
+			gameStore.setGameValue('isEnemyOnline', true);
 		});
+
 		socket.on(SocketEvents.ENEMY_DISCONNECTED, () => {
-			gameStore.setIsEnemyOnline(false);
+			gameStore.setGameValue('isEnemyOnline', false);
+		});
+
+		socket.on(SocketEvents.PLAYER_LEAVE_GAME, () => {
+			// TODO: заканчивать игру
+			alert(22);
 		});
 
 		socket.on(SocketEvents.CHANGE_TURN, (value) => {

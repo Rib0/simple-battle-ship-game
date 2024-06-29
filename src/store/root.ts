@@ -19,6 +19,12 @@ class RootStore {
 		this.shipsStore = new ShipsStore(this);
 		this.gameStore = new GameStore();
 	}
+
+	createNewStoreData = () => {
+		this.gameFieldStore = new GameFieldStore(this);
+		this.shipsStore = new ShipsStore(this);
+		this.gameStore = new GameStore();
+	};
 }
 
 const rootStore = new RootStore();

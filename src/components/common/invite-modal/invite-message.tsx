@@ -1,8 +1,10 @@
 import { observer } from 'mobx-react-lite';
-import { Space, Alert, Button } from 'antd';
+import { Flex, Alert, Button, Typography } from 'antd';
 
 import { useStoreContext } from '@/context/store-context';
 import { useSocketGameEvents } from '@/hooks/use-socket-game-events';
+
+const { Text } = Typography;
 
 export const InviteMessage = observer(() => {
 	const { gameStore } = useStoreContext();
@@ -22,16 +24,16 @@ export const InviteMessage = observer(() => {
 		rejectInvitation();
 	};
 
-	// TODO: сделать жирным id игрока
-
 	const message = (
-		<Space>
-			Игрок <strong>{invitedByPlayer}</strong> приглашает вас в игру
+		<Flex gap="small" align="center">
+			<Text style={{ whiteSpace: 'nowrap' }}>
+				Игрок <Text strong>{invitedByPlayer}</Text> приглашает вас в игру
+			</Text>
 			<Button onClick={handleAcceptClick} type="primary">
 				Принять
 			</Button>
 			<Button onClick={handleCancelClick}>Отклонить</Button>
-		</Space>
+		</Flex>
 	);
 
 	return <Alert message={message} type="info" />;

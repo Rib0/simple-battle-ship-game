@@ -1,9 +1,11 @@
 import { useState } from 'preact/hooks';
 import { observer } from 'mobx-react-lite';
+import { Flex } from 'antd';
 
 import { DndProvider } from '@/components/common/drag-and-drop';
 import { DndDroppable } from '@/components/common/drag-and-drop/dnd-droppable';
-import { Table } from '@/components/tables';
+import { SetupForGame } from '@/components/setup-for-game';
+import { Table, TableEnemy } from '@/components/tables';
 import type { DndContextOptionsType } from '@/components/common/drag-and-drop/types';
 import { useStoreContext } from '@/context/store-context';
 import {
@@ -15,7 +17,7 @@ import {
 import { Nullable } from '@/types/utils';
 
 export const GameField = observer(() => {
-	const { gameFieldStore } = useStoreContext();
+	const { gameStore, gameFieldStore } = useStoreContext();
 	const { getInactiveCoordsForInstall } = gameFieldStore;
 
 	const [hoveredCoords, setHoveredCoords] = useState<Nullable<string[]>>(null);
@@ -89,9 +91,13 @@ export const GameField = observer(() => {
 
 	return (
 		<DndProvider onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
-			<DndDroppable>
-				<Table hoveredCoords={hoveredCoords} />
-			</DndDroppable>
+			<Flex gap="middle">
+				<DndDroppable>
+					<Table hoveredCoords={hoveredCoords} />
+				</DndDroppable>
+				{!gameStore.isStarted && <SetupForGame />}
+				{gameStore.isStarted && <TableEnemy />}
+			</Flex>
 		</DndProvider>
 	);
 });

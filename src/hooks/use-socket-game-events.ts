@@ -9,7 +9,9 @@ import { LocaleStorage } from '@/utils/locale-storage';
 
 export const useSocketGameEvents = () => {
 	const { socket, connectSocket } = useSocketContext();
-	const { gameStore } = useStoreContext();
+	const rootStore = useStoreContext();
+
+	const { gameStore } = rootStore;
 
 	const { invitedByPlayer } = gameStore;
 
@@ -53,7 +55,7 @@ export const useSocketGameEvents = () => {
 		}
 
 		socket?.emit(SocketEvents.ACCEPT_INVITATION, invitedByPlayer);
-		gameStore.setInvitedByPlayer(null);
+		gameStore.setGameValue('invitedByPlayer', null);
 	};
 
 	const rejectInvitation = () => {
@@ -62,7 +64,7 @@ export const useSocketGameEvents = () => {
 		}
 
 		socket?.emit(SocketEvents.REJECT_INVITATION, invitedByPlayer);
-		gameStore.setInvitedByPlayer(null);
+		gameStore.setGameValue('invitedByPlayer', null);
 	};
 
 	const attack = (coords: string) => {
@@ -75,6 +77,14 @@ export const useSocketGameEvents = () => {
 		socket?.emit(SocketEvents.ATTACK, coords, roomId);
 	};
 
+	const leaveGame = () => {
+		socket?.emit(SocketEvents.PLAYER_LEAVE_GAME);
+		LocaleStorage.remove('room_id_battle_ship_game');
+		rootStore.createNewStoreData();
+	};
+
+	// TODO: отсортировать по событиям socket
+
 	return {
 		socket,
 		initiateSocketConnection,
@@ -85,5 +95,6 @@ export const useSocketGameEvents = () => {
 		acceptInvitation,
 		rejectInvitation,
 		attack,
+		leaveGame,
 	};
 };

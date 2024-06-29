@@ -7,7 +7,6 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 		const { roomId } = socket.data;
 
 		if (!roomId) {
-			// TODO: продумать это, мб переустанавливать socket.data.roomId при reconnect игрока
 			return;
 		}
 
@@ -22,8 +21,9 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 				const actualRoomSocketSize = actualRooms.get(roomId)?.size;
 
 				if (!actualRoomSocketSize) {
+					socket.to(roomId).emit(SocketEvents.PLAYER_LEAVE_GAME);
+					io.socketsLeave(roomId);
 					delete ROOMS[roomId];
-					// Отправлять перед этим в комнату сообщение всем имеющимся участникам, что противник покинул игру io.socketsLeave("roomId");
 				}
 			}, 60_000);
 		}

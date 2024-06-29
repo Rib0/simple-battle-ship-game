@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react-lite';
+import { CSSProperties } from 'preact/compat';
 import cx from 'classnames';
 
 import { Ship } from '@/components/ship';
 import { useStoreContext } from '@/context/store-context';
 import { getShipsStylesRelativeToTableWithRotation } from '@/utils/ship';
 
-import { CSSProperties } from 'preact/compat';
 import styles from './styles.module.css';
 
 export const ShipsInstalled = observer(() => {
