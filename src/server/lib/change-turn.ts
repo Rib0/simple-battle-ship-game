@@ -1,43 +1,93 @@
 import { nanoid } from 'nanoid';
 
-import { ServerSocket, SocketEvents } from '@/types/socket';
+import { ServerIo, SocketEvents } from '@/types/socket';
+import { TURN_DURATION, TURN_DURATION_MS } from '@/constants/game';
 import { Timer } from './timer';
+import { ROOMS } from '../constants';
+import { getPlayerId } from './handshake';
 
-export const changeTurn = (players: ServerSocket[]) => {
-	const [player1, player2] = players;
+export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: string) => {
+	const roomData = ROOMS[roomId];
 
-	const hasDisconnected = players.some((player) => player.disconnected);
-
-	if (hasDisconnected) {
+	if (!roomData?.players) {
 		return;
 	}
 
-	const isFirstMove = players.every((player) => !player.data.turn);
+	const [player1, player2] = Object.values(roomData?.players);
 
-	if (isFirstMove) {
-		player1.data.turn = true;
-		player2.data.turn = false;
-	} else {
-		player1.data.turn = !player1.data.turn;
-		player2.data.turn = !player2.data.turn;
+	const sockets = Array.from(io.sockets.sockets.values());
+	const playersSockets = sockets.filter(
+		(socket) => player1?.socketId === socket.id || player2?.socketId === socket.id,
+	);
+	const [playerSocket1, playerSocket2] = playersSockets;
+
+	if (playersSockets.length < 2) {
+		return;
 	}
 
-	player1.emit(SocketEvents.CHANGE_TURN, player1.data.turn);
-	player2.emit(SocketEvents.CHANGE_TURN, player2.data.turn);
+	const hasDisconnected = playersSockets.some((player) => player.disconnected);
+	const isInRoom = playerSocket1.data.roomId === playerSocket2.data.roomId;
 
+	if (hasDisconnected || !isInRoom) {
+		return;
+	}
+
+	const [player1Id, player2Id] = playersSockets.map((socket) => getPlayerId(socket));
+	const isFirstMove = !roomData.turnPlayerId;
+
+	const turnStartTime = Timer.getTime;
 	const turnId = nanoid();
+	const isPlayer1Turn = roomData.turnPlayerId === player1Id;
 
-	player1.data.turnId = turnId;
-	player2.data.turnId = turnId;
+	if (!reconnectedPlayerId) {
+		if (isFirstMove) {
+			roomData.turnPlayerId = player1Id;
+		} else {
+			roomData.turnPlayerId = isPlayer1Turn ? player2Id : player1Id;
+		}
+
+		roomData.turnId = turnId; // TODO: вынести в отдельную функцию
+		roomData.turnStartTime = turnStartTime;
+
+		playerSocket1.emit(SocketEvents.CHANGE_TURN, !isPlayer1Turn, turnStartTime);
+		playerSocket2.emit(SocketEvents.CHANGE_TURN, isPlayer1Turn, turnStartTime);
+	} else {
+		const reconnectedPlayer = roomData.players[reconnectedPlayerId];
+		const disconnectedTime = turnStartTime - (reconnectedPlayer?.disconnectedTime || 0);
+
+		if (disconnectedTime > TURN_DURATION) {
+			roomData.turnId = turnId; // TODO: вынести в отдельную функцию
+			roomData.turnStartTime = turnStartTime;
+
+			playerSocket1.emit(SocketEvents.CHANGE_TURN, !isPlayer1Turn, turnStartTime);
+			playerSocket2.emit(SocketEvents.CHANGE_TURN, isPlayer1Turn, turnStartTime);
+		} else {
+			const turnStartTimeWithDisconnectedDiff = turnStartTime - disconnectedTime;
+
+			playerSocket1.emit(
+				SocketEvents.CHANGE_TURN,
+				isPlayer1Turn,
+				turnStartTimeWithDisconnectedDiff,
+			);
+			playerSocket2.emit(
+				SocketEvents.CHANGE_TURN,
+				!isPlayer1Turn,
+				turnStartTimeWithDisconnectedDiff,
+			);
+		}
+	}
 
 	const callback = () => {
-		const isStaleTurnId = players.some((player) => player.data.turnId !== turnId);
-		if (isStaleTurnId || hasDisconnected) {
+		const isStaleTurnId = roomData.turnId !== turnId;
+		const hasDisconnectedActual = playersSockets.some((player) => player.disconnected);
+		const isInRoomActual = playerSocket1.data.roomId === playerSocket2.data.roomId;
+
+		if (isStaleTurnId || hasDisconnectedActual || !isInRoomActual) {
 			return;
 		}
 
-		changeTurn(players);
+		changeTurn(io, roomId);
 	};
 
-	Timer.addCallback(callback, 30_000);
+	Timer.addCallback(callback, TURN_DURATION_MS);
 };

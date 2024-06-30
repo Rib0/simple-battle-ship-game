@@ -1,7 +1,9 @@
 import { observer } from 'mobx-react-lite';
+import { Flex } from 'antd';
 import cx from 'classnames';
 
 import { ShipsInstalled } from '@/components/ships-installed';
+import { TimeProgress } from '@/components/time-progress';
 import { formatCoords } from '@/utils/table';
 import { useStoreContext } from '@/context/store-context';
 import { Nullable } from '@/types/utils';
@@ -18,32 +20,35 @@ type Props = {
 };
 
 export const Table = observer<Props>(({ hoveredCoords }) => {
-	const { gameFieldStore, shipsStore } = useStoreContext();
+	const { gameStore, gameFieldStore, shipsStore } = useStoreContext();
 
 	return (
-		<table className={stylesCommon.table}>
-			<tbody>
-				{fieldSideArray.map((_, rI) => (
-					<tr key={rI} className={stylesCommon.tr}>
-						{fieldSideArray.map((__, cI) => {
-							const formattedCoords = formatCoords({ x: cI, y: rI });
+		<Flex vertical>
+			<table className={stylesCommon.table}>
+				<tbody>
+					{fieldSideArray.map((_, rI) => (
+						<tr key={rI} className={stylesCommon.tr}>
+							{fieldSideArray.map((__, cI) => {
+								const formattedCoords = formatCoords({ x: cI, y: rI });
 
-							const isHovered = hoveredCoords?.includes(formattedCoords);
-							const cantInstall =
-								gameFieldStore.getInactiveCoordsForInstall.has(formattedCoords);
+								const isHovered = hoveredCoords?.includes(formattedCoords);
+								const cantInstall =
+									gameFieldStore.getInactiveCoordsForInstall.has(formattedCoords);
 
-							const className = cx(stylesCommon.td, {
-								[styles.hovered]: isHovered,
-								[styles.cantInstall]: shipsStore.activeSize && cantInstall,
-								[styles.canInstall]: shipsStore.activeSize && !cantInstall,
-							});
+								const className = cx(stylesCommon.td, {
+									[styles.hovered]: isHovered,
+									[styles.cantInstall]: shipsStore.activeSize && cantInstall,
+									[styles.canInstall]: shipsStore.activeSize && !cantInstall,
+								});
 
-							return <td key={cI} className={className} />;
-						})}
-					</tr>
-				))}
-			</tbody>
-			<ShipsInstalled />
-		</table>
+								return <td key={cI} className={className} />;
+							})}
+						</tr>
+					))}
+				</tbody>
+				<ShipsInstalled />
+			</table>
+			{gameStore.isMyTurn && <TimeProgress />}
+		</Flex>
 	);
 });

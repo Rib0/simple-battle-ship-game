@@ -2,6 +2,7 @@ import { GameState, ServerIo, ServerSocket, SocketEvents } from '@/types/socket'
 import { Field } from '@/types/game-field';
 import { ROOMS } from '../constants';
 import { getPlayerId } from '../lib/handshake';
+import { changeTurn } from '../lib/change-turn';
 
 export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.FIND_GAME_TO_RECONNECT, async (roomId) => {
@@ -11,11 +12,11 @@ export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 			return;
 		}
 
-		const playerData = ROOMS[roomId]?.[playerId];
+		const playerData = ROOMS[roomId]?.players?.[playerId];
 		const enemyPlayerId = playerData?.enemyPlayerId;
-		const enemyPlayerData = ROOMS[roomId]?.[enemyPlayerId || ''];
+		const enemyPlayerData = ROOMS[roomId]?.players?.[enemyPlayerId || ''];
 
-		if (!playerData || !enemyPlayerData) {
+		if (!playerData || !enemyPlayerData || !enemyPlayerData.socketId) {
 			return;
 		}
 
@@ -34,9 +35,12 @@ export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 		socket.data.roomId = roomId;
 		ROOMS[roomId] = {
 			...ROOMS[roomId],
-			[playerId]: {
-				...playerData,
-				socketId: socket.id,
+			players: {
+				...ROOMS[roomId]?.players,
+				[playerId]: {
+					...playerData,
+					socketId: socket.id,
+				},
 			},
 		};
 
@@ -47,7 +51,7 @@ export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 			ships: playerData.ships,
 		};
 
-		const enemyPlayerSocket = io.sockets.sockets.get(enemyPlayerData.socketId!);
+		const enemyPlayerSocket = io.sockets.sockets.get(enemyPlayerData.socketId);
 
 		socket.emit(
 			SocketEvents.RECONNECTED_TO_ROOM,
@@ -56,5 +60,6 @@ export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 			enemyPlayerSocket?.connected || false,
 		);
 		socket.to(roomId).emit(SocketEvents.ENEMY_RECONNECTED_TO_ROOM);
+		changeTurn(io, roomId, playerId);
 	});
 };

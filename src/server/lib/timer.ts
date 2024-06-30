@@ -5,13 +5,17 @@ export class Timer {
 
 	private static callbacks: Record<string, VoidFunction[]> = {};
 
+	static get getTime() {
+		return Math.round(new Date().getTime() / 1000);
+	}
+
 	static start(io: ServerIo) {
 		if (Timer.timerId) {
 			return;
 		}
 
 		Timer.timerId = setInterval(() => {
-			io.emit(SocketEvents.TIMER_TICK);
+			io.emit(SocketEvents.TIMER_TICK, Timer.getTime);
 			Timer.triggerCallbacks();
 		}, 1000);
 	}

@@ -11,7 +11,6 @@ export enum SocketEvents {
 	ACCEPT_INVITATION = 'ACCEPT_INVITATION',
 	REJECT_INVITATION = 'REJECT_INVITATION',
 	NO_PLAYER_TO_INVITE = 'NO_PLAYER_TO_INVITE',
-	INVITED = 'INVITED',
 	JOINED_ROOM = 'JOINED_ROOM',
 	FIND_GAME_TO_RECONNECT = 'FIND_GAME_TO_RECONNECT',
 	RECONNECTED_TO_ROOM = 'RECONNECTED_TO_ROOM',
@@ -43,7 +42,7 @@ export type GameState = {
 
 export type ServerToClientEvents = {
 	[SocketEvents.SET_AUTH_DATA]: (playerId: string) => void;
-	[SocketEvents.TIMER_TICK]: VoidFunction;
+	[SocketEvents.TIMER_TICK]: (serverTime: number) => void;
 	[SocketEvents.NO_PLAYER_TO_INVITE]: VoidFunction;
 	[SocketEvents.INVITE_BY_ID]: (playerId: string) => void;
 	[SocketEvents.REJECT_INVITATION]: VoidFunction;
@@ -56,15 +55,12 @@ export type ServerToClientEvents = {
 	[SocketEvents.ENEMY_RECONNECTED_TO_ROOM]: VoidFunction;
 	[SocketEvents.ENEMY_DISCONNECTED]: VoidFunction;
 	[SocketEvents.PLAYER_LEAVE_GAME]: VoidFunction;
-	[SocketEvents.CHANGE_TURN]: (isYourTurn: boolean) => void;
+	[SocketEvents.CHANGE_TURN]: (isYourTurn: boolean, turnStartTime: number) => void;
 	[SocketEvents.DAMAGED]: (coords: string, isMe: boolean) => void;
 	[SocketEvents.MISSED]: (coords: string, isMe: boolean) => void;
 };
 
 export type SocketData = Partial<{
-	playerId: string;
-	turn: boolean;
-	turnId: string;
 	roomId: Nullable<string>; // нужно для события disconnect, чтобы отправить событие в комнату
 	invitedPlayerId: Nullable<string>; // приглашенный playerId
 	playerInviterId: Nullable<string>; // id игрока, который пригласил в игру
@@ -76,11 +72,17 @@ export type ClientSocket = ClientSocketDefault<ServerToClientEvents, ClientToSer
 
 export type Rooms = DeepPartial<{
 	[roomId: string]: {
-		[playerId: string]: {
-			enemyPlayerId: string;
-			socketId: Socket['id'];
-			field: Field;
-			ships: GameFieldShips;
+		turnStartTime: number;
+		turnPlayerId: string;
+		turnId: string;
+		players: {
+			[playerId: string]: {
+				disconnectedTime: number;
+				enemyPlayerId: string;
+				socketId: Socket['id'];
+				field: Field;
+				ships: GameFieldShips;
+			};
 		};
 	};
 }>;

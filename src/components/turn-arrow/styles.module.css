@@ -1,0 +1,11 @@
+.root {
+	width: 70px;
+	height: 160px;
+	align-self: center;
+	background: no-repeat 0 0 / cover;
+	background-image: url('@/assets/turn-arrow.png');
+
+	&.rotated {
+		transform: rotateY(180deg);
+	}
+}

@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { getPlayerId } from '../lib/handshake';
 
-export const setAuthData = (io: ServerIo, socket: ServerSocket) => {
+export const setAuthDataHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.SET_AUTH_DATA, () => {
 		const playerId = getPlayerId(socket);
 

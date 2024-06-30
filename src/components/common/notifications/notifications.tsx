@@ -16,15 +16,18 @@ export const Notifications = observer(() => {
 			return;
 		}
 
-		const { id, message } = lastNotitication;
+		const { id, message, onClose } = lastNotitication;
 
 		api.open({
 			key: id,
 			message,
 			showProgress: true,
-			onClose: () => removeNotitification(id),
+			onClose: () => {
+				removeNotitification(id);
+				onClose?.();
+			},
 		});
-	}, [lastNotitication, removeNotitification, api]);
+	}, [lastNotitication, api, removeNotitification]);
 
 	return <div>{contextHolder}</div>;
 });

@@ -12,7 +12,6 @@ export const useSocketGameEvents = () => {
 	const rootStore = useStoreContext();
 
 	const { gameStore } = rootStore;
-
 	const { invitedByPlayer } = gameStore;
 
 	const initiateSocketConnection = useCallback(() => {
@@ -34,16 +33,6 @@ export const useSocketGameEvents = () => {
 	const searchGame = () => {
 		socket?.emit(SocketEvents.SEARCH_GAME);
 	};
-
-	const findGameToReconnect = useCallback(() => {
-		const roomId = LocaleStorage.get('room_id_battle_ship_game');
-
-		if (!roomId) {
-			return;
-		}
-
-		socket?.emit(SocketEvents.FIND_GAME_TO_RECONNECT, roomId);
-	}, [socket]);
 
 	const inviteById = (id: string) => {
 		socket?.emit(SocketEvents.INVITE_BY_ID, id);
@@ -67,6 +56,22 @@ export const useSocketGameEvents = () => {
 		gameStore.setGameValue('invitedByPlayer', null);
 	};
 
+	const findGameToReconnect = useCallback(() => {
+		const roomId = LocaleStorage.get('room_id_battle_ship_game');
+
+		if (!roomId) {
+			return;
+		}
+
+		socket?.emit(SocketEvents.FIND_GAME_TO_RECONNECT, roomId);
+	}, [socket]);
+
+	const leaveGame = () => {
+		socket?.emit(SocketEvents.PLAYER_LEAVE_GAME);
+		LocaleStorage.remove('room_id_battle_ship_game');
+		rootStore.createNewStoreData();
+	};
+
 	const attack = (coords: string) => {
 		const roomId = LocaleStorage.get('room_id_battle_ship_game');
 
@@ -77,24 +82,16 @@ export const useSocketGameEvents = () => {
 		socket?.emit(SocketEvents.ATTACK, coords, roomId);
 	};
 
-	const leaveGame = () => {
-		socket?.emit(SocketEvents.PLAYER_LEAVE_GAME);
-		LocaleStorage.remove('room_id_battle_ship_game');
-		rootStore.createNewStoreData();
-	};
-
-	// TODO: отсортировать по событиям socket
-
 	return {
 		socket,
 		initiateSocketConnection,
 		setAuthData,
 		searchGame,
-		findGameToReconnect,
 		inviteById,
 		acceptInvitation,
 		rejectInvitation,
-		attack,
+		findGameToReconnect,
 		leaveGame,
+		attack,
 	};
 };

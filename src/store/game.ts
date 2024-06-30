@@ -1,21 +1,27 @@
 import { makeAutoObservable } from 'mobx';
 import { nanoid } from 'nanoid';
 
-import { Nullable } from '@/types/utils';
 import { LocaleStorage } from '@/utils/locale-storage';
+import { TURN_DURATION } from '@/constants/game';
+
+import { Nullable } from '@/types/utils';
 
 export class GameStore {
 	isStarted = false;
+
+	isMyTurn = false;
+
+	turnStartTime = 0;
+
+	currentTime = 0;
 
 	playerId = LocaleStorage.get('player_id_battle_ship_game');
 
 	isEnemyOnline = false;
 
-	isEnemyLeaveGame = false;
-
 	invitedByPlayer: Nullable<string> = null;
 
-	notitications: Array<{ id: string; message: string }> = [];
+	notitications: Array<{ id: string; message: string; onClose?: VoidFunction }> = [];
 
 	constructor() {
 		makeAutoObservable(this);
@@ -24,7 +30,13 @@ export class GameStore {
 	setGameValue = <
 		T extends keyof Pick<
 			GameStore,
-			'isStarted' | 'playerId' | 'isEnemyOnline' | 'isEnemyLeaveGame' | 'invitedByPlayer'
+			| 'isStarted'
+			| 'isMyTurn'
+			| 'turnStartTime'
+			| 'currentTime'
+			| 'playerId'
+			| 'isEnemyOnline'
+			| 'invitedByPlayer'
 		>,
 	>(
 		key: T,
@@ -33,10 +45,10 @@ export class GameStore {
 		this[key] = value;
 	};
 
-	addNotification = (message: string) => {
+	addNotification = (message: string, onClose?: VoidFunction) => {
 		const id = nanoid();
 
-		this.notitications.push({ id, message });
+		this.notitications.push({ id, message, onClose });
 	};
 
 	get lastNotitication() {
@@ -52,4 +64,13 @@ export class GameStore {
 
 		this.notitications.splice(index, 1);
 	};
+
+	get getDiffTurnStartTimeInPercent() {
+		const diffTime = this.currentTime - this.turnStartTime;
+		const timeRemain = TURN_DURATION - diffTime;
+
+		const result = (timeRemain / TURN_DURATION) * 100;
+
+		return result;
+	}
 }

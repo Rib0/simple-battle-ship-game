@@ -35,20 +35,22 @@ export const initiateGameWithPlayers = async (players: ServerSocket[], io: Serve
 		});
 
 		ROOMS[roomId] = {
-			[player1Id]: {
-				enemyPlayerId: player2Id,
-				socketId: player1SocketId,
-				field: player1Field,
-				ships: player1Ships,
-			},
-			[player2Id]: {
-				enemyPlayerId: player1Id,
-				socketId: player2SocketId,
-				field: player2Field,
-				ships: player2Ships,
+			players: {
+				[player1Id]: {
+					enemyPlayerId: player2Id,
+					socketId: player1SocketId,
+					field: player1Field,
+					ships: player1Ships,
+				},
+				[player2Id]: {
+					enemyPlayerId: player1Id,
+					socketId: player2SocketId,
+					field: player2Field,
+					ships: player2Ships,
+				},
 			},
 		};
-		changeTurn(players);
+		changeTurn(io, roomId);
 		SEARCHING_GAME_PLAYERS.splice(0, 2);
 	} catch (e) {
 		await Promise.all(players.map((player) => player.leave(roomId)));

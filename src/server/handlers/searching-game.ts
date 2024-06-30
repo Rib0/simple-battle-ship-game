@@ -8,6 +8,7 @@ const tryPutPlayersToRoom = async (io: ServerIo) => {
 	isSearching = setTimeout(() => tryPutPlayersToRoom(io), 3000);
 
 	const players = SEARCHING_GAME_PLAYERS.slice(0, 2);
+
 	if (players.length < 2) {
 		clearTimeout(isSearching);
 		isSearching = undefined;

@@ -6,17 +6,14 @@ import { getPlayerId } from '../lib/handshake';
 
 export const gameActionsHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.ATTACK, (coords, roomId) => {
-		if (!socket.data.turn) {
-			return;
-		}
-
+		const turnPlayerId = ROOMS[roomId]?.turnPlayerId;
 		const playerId = getPlayerId(socket);
 
-		if (!playerId) {
+		if (turnPlayerId !== playerId || !playerId) {
 			return;
 		}
 
-		const room = ROOMS[roomId];
+		const room = ROOMS[roomId]?.players;
 		const { enemyPlayerId = '', socketId: playerSocketId } = room?.[playerId] || {};
 		const { field: enemyField, socketId: enemySocketId } = room?.[enemyPlayerId] || {};
 
@@ -36,11 +33,8 @@ export const gameActionsHandler = (io: ServerIo, socket: ServerSocket) => {
 		socket.emit(eventType, coords, false);
 		socket.to(roomId).emit(eventType, coords, true);
 
-		const players = [playerSocketId, enemySocketId].map((socketId) =>
-			io.sockets.sockets.get(socketId),
-		);
 		if (!isDamaged) {
-			changeTurn(players as ServerSocket[]);
+			changeTurn(io, roomId);
 		}
 	});
 };

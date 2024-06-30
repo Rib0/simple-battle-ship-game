@@ -6,7 +6,9 @@ import { CellType } from '@/types/game-field';
 import { LocaleStorage } from '@/utils/locale-storage';
 
 export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
-	const { gameStore, gameFieldStore } = useStoreContext();
+	const rootStore = useStoreContext();
+
+	const { gameStore, gameFieldStore } = rootStore;
 
 	useEffect(() => {
 		if (!socket) {
@@ -18,7 +20,11 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 			gameStore.setGameValue('playerId', playerId);
 		});
 
-		socket.on(SocketEvents.TIMER_TICK, () => {});
+		socket.on(SocketEvents.TIMER_TICK, (currentTime: number) => {
+			if (gameStore.isEnemyOnline) {
+				gameStore.setGameValue('currentTime', currentTime);
+			}
+		});
 
 		socket.on(SocketEvents.INVITE_BY_ID, (id) => {
 			if (gameStore.invitedByPlayer) {
@@ -64,13 +70,13 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 		});
 
 		socket.on(SocketEvents.PLAYER_LEAVE_GAME, () => {
-			// TODO: заканчивать игру
-			alert(22);
+			gameStore.setGameValue('isEnemyOnline', false);
+			gameStore.addNotification('Противник покинул игру', rootStore.createNewStoreData);
 		});
 
-		socket.on(SocketEvents.CHANGE_TURN, (value) => {
-			// console.log('CHANGE_TURN');
-			// console.log(value);
+		socket.on(SocketEvents.CHANGE_TURN, (isMyTurn, turnStartTime) => {
+			gameStore.setGameValue('isMyTurn', isMyTurn);
+			gameStore.setGameValue('turnStartTime', turnStartTime);
 		});
 
 		socket.on(SocketEvents.DAMAGED, (coords, isMe) => {
@@ -80,5 +86,5 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 		socket.on(SocketEvents.MISSED, (coords, isMe) => {
 			gameFieldStore.setCellType(coords, isMe, CellType.BOMB);
 		});
-	}, [socket, gameStore, gameFieldStore]);
+	}, [socket, gameStore, gameFieldStore, rootStore]);
 };
