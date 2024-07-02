@@ -1,25 +1,27 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { ROOMS } from '../constants';
-import { getPlayerId } from '../lib/handshake';
+import { findSocketBySocketId, getPlayerId, getPlayersData } from '../lib/get-data';
 
 export const playerLeaveGameHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.PLAYER_LEAVE_GAME, () => {
-		const playerId = getPlayerId(socket);
 		const { roomId } = socket.data;
+		const playerId = getPlayerId(socket);
 
 		if (!roomId || !playerId) {
 			return;
 		}
 
-		const playerData = ROOMS[roomId]?.players?.[playerId];
-		const enemyPlayerId = playerData?.enemyPlayerId;
-		const enemyPlayerData = ROOMS[roomId]?.players?.[enemyPlayerId || ''];
+		const playersData = getPlayersData({ roomId, playerId });
+		if (!playersData) {
+			return;
+		}
 
-		const sockets = Array.from(io.sockets.sockets.values());
+		const { enemySocketId } = playersData;
+		if (!enemySocketId) {
+			return;
+		}
 
-		const enemyPlayerSocket = sockets.find(
-			(playerSocket) => enemyPlayerData?.socketId === playerSocket.id,
-		);
+		const enemyPlayerSocket = findSocketBySocketId({ io, socketId: enemySocketId });
 
 		if (enemyPlayerSocket) {
 			enemyPlayerSocket.data = {};

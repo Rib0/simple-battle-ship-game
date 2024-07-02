@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { ROOMS, SEARCHING_GAME_PLAYERS } from '@/server/constants';
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { changeTurn } from './change-turn';
-import { getPlayerId } from './handshake';
+import { getPlayerId } from './get-data';
 
 export const initiateGameWithPlayers = async (players: ServerSocket[], io: ServerIo) => {
 	const roomId = nanoid();

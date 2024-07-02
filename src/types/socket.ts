@@ -70,19 +70,23 @@ export type ServerIo = Server<ClientToServerEvents, ServerToClientEvents, object
 export type ServerSocket = Socket<ClientToServerEvents, ServerToClientEvents, object, SocketData>;
 export type ClientSocket = ClientSocketDefault<ServerToClientEvents, ClientToServerEvents>;
 
-export type Rooms = DeepPartial<{
-	[roomId: string]: {
-		turnStartTime: number;
-		turnPlayerId: string;
-		turnId: string;
-		players: {
-			[playerId: string]: {
-				disconnectedTime: number;
-				enemyPlayerId: string;
-				socketId: Socket['id'];
-				field: Field;
-				ships: GameFieldShips;
-			};
-		};
+export type PlayerData = {
+	disconnectedTime: number;
+	enemyPlayerId: string;
+	socketId: Socket['id'];
+	field: Field;
+	ships: GameFieldShips;
+};
+
+type RoomData = {
+	turnStartTime: number;
+	turnPlayerId: string;
+	turnId: string;
+	players: {
+		[playerId: string]: PlayerData;
 	};
+};
+
+export type Rooms = DeepPartial<{
+	[roomId: string]: RoomData;
 }>;

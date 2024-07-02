@@ -1,24 +1,19 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { Timer } from '../lib/timer';
 import { ROOMS } from '../constants';
-import { getPlayerId } from '../lib/handshake';
+import { getPlayerId, setPlayerData } from '../lib/get-data';
 
 export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on('disconnect', () => {
 		const { roomId } = socket.data;
-
-		if (!roomId) {
-			return;
-		}
-
 		const playerId = getPlayerId(socket);
 
-		if (!playerId) {
+		if (!roomId || !playerId) {
 			return;
 		}
 
-		const playerData = ROOMS[roomId]?.players?.[playerId] || {};
-		playerData.disconnectedTime = Timer.getTime;
+		const playerData = { disconnectedTime: Timer.getTime };
+		setPlayerData({ roomId, playerId, playerData });
 
 		socket.to(roomId).emit(SocketEvents.ENEMY_DISCONNECTED);
 

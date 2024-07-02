@@ -4,7 +4,9 @@ import { ServerIo, SocketEvents } from '@/types/socket';
 import { TURN_DURATION, TURN_DURATION_MS } from '@/constants/game';
 import { Timer } from './timer';
 import { ROOMS } from '../constants';
-import { getPlayerId } from './handshake';
+import { getPlayerId } from './get-data';
+
+// TODO: поправить тут все
 
 export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: string) => {
 	const roomData = ROOMS[roomId];
@@ -52,28 +54,34 @@ export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: s
 		playerSocket1.emit(SocketEvents.CHANGE_TURN, !isPlayer1Turn, turnStartTime);
 		playerSocket2.emit(SocketEvents.CHANGE_TURN, isPlayer1Turn, turnStartTime);
 	} else {
+		const isReconnectedPlayerTurn = reconnectedPlayerId === roomData.turnPlayerId;
 		const reconnectedPlayer = roomData.players[reconnectedPlayerId];
 		const disconnectedTime = turnStartTime - (reconnectedPlayer?.disconnectedTime || 0);
 
-		if (disconnectedTime > TURN_DURATION) {
-			roomData.turnId = turnId; // TODO: вынести в отдельную функцию
-			roomData.turnStartTime = turnStartTime;
+		if (isReconnectedPlayerTurn) {
+			if (disconnectedTime > TURN_DURATION) {
+				roomData.turnId = turnId; // TODO: вынести в отдельную функцию
+				roomData.turnStartTime = turnStartTime;
 
-			playerSocket1.emit(SocketEvents.CHANGE_TURN, !isPlayer1Turn, turnStartTime);
-			playerSocket2.emit(SocketEvents.CHANGE_TURN, isPlayer1Turn, turnStartTime);
+				playerSocket1.emit(SocketEvents.CHANGE_TURN, !isPlayer1Turn, turnStartTime);
+				playerSocket2.emit(SocketEvents.CHANGE_TURN, isPlayer1Turn, turnStartTime);
+			} else {
+				const turnStartTimeWithDisconnectedDiff = turnStartTime - disconnectedTime;
+
+				playerSocket1.emit(
+					SocketEvents.CHANGE_TURN,
+					isPlayer1Turn,
+					turnStartTimeWithDisconnectedDiff,
+				);
+				playerSocket2.emit(
+					SocketEvents.CHANGE_TURN,
+					!isPlayer1Turn,
+					turnStartTimeWithDisconnectedDiff,
+				);
+			}
 		} else {
-			const turnStartTimeWithDisconnectedDiff = turnStartTime - disconnectedTime;
-
-			playerSocket1.emit(
-				SocketEvents.CHANGE_TURN,
-				isPlayer1Turn,
-				turnStartTimeWithDisconnectedDiff,
-			);
-			playerSocket2.emit(
-				SocketEvents.CHANGE_TURN,
-				!isPlayer1Turn,
-				turnStartTimeWithDisconnectedDiff,
-			);
+			playerSocket1.emit(SocketEvents.CHANGE_TURN, isPlayer1Turn, turnStartTime);
+			playerSocket2.emit(SocketEvents.CHANGE_TURN, !isPlayer1Turn, turnStartTime);
 		}
 	}
 
@@ -86,7 +94,7 @@ export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: s
 			return;
 		}
 
-		changeTurn(io, roomId);
+		changeTurn(io, roomId); // TODO: здесь проставлять корректное время для смены хода в зависимости от переподключения и всего остального
 	};
 
 	Timer.addCallback(callback, TURN_DURATION_MS);

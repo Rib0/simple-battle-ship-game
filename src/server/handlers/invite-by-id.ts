@@ -1,27 +1,23 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { initiateGameWithPlayers } from '../lib/initiate-game-with-players';
-import { getPlayerId } from '../lib/handshake';
+import { findSocketByPlayerId, getPlayerId } from '../lib/get-data';
 
 export const inviteByIdHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.INVITE_BY_ID, (invitedPlayerId) => {
-		const sockets = Array.from(io.sockets.sockets.values());
+		const invitedPlayer = findSocketByPlayerId({ io, playerId: invitedPlayerId });
+		const inviterId = getPlayerId(socket);
 
-		const invitedPlayer = sockets.find(
-			(playerSocket) => getPlayerId(playerSocket) === invitedPlayerId,
-		);
-
-		if (!invitedPlayer) {
+		if (!invitedPlayer || !inviterId) {
 			socket.emit(SocketEvents.NO_PLAYER_TO_INVITE);
 			return;
 		}
 
 		if (invitedPlayer.data.playerInviterId) {
+			// Игрок уже приглашен
 			return;
 		}
 
-		const inviterId = getPlayerId(socket);
-
-		if (!inviterId || inviterId === invitedPlayerId) {
+		if (inviterId === invitedPlayerId) {
 			return;
 		}
 
@@ -31,12 +27,7 @@ export const inviteByIdHandler = (io: ServerIo, socket: ServerSocket) => {
 	});
 
 	socket.on(SocketEvents.ACCEPT_INVITATION, async (playerInviterId) => {
-		const sockets = Array.from(io.sockets.sockets.values());
-
-		const playerInviter = sockets.find(
-			(playerSocket) => getPlayerId(playerSocket) === playerInviterId,
-		);
-
+		const playerInviter = findSocketByPlayerId({ io, playerId: playerInviterId });
 		const invitedPlayerId = getPlayerId(socket);
 
 		if (!playerInviter || !invitedPlayerId) {
@@ -61,12 +52,7 @@ export const inviteByIdHandler = (io: ServerIo, socket: ServerSocket) => {
 	});
 
 	socket.on(SocketEvents.REJECT_INVITATION, (playerInviterId) => {
-		const sockets = Array.from(io.sockets.sockets.values());
-
-		const playerInviter = sockets.find(
-			(playerSocket) => getPlayerId(playerSocket) === playerInviterId,
-		);
-
+		const playerInviter = findSocketByPlayerId({ io, playerId: playerInviterId });
 		const invitedPlayerId = getPlayerId(socket);
 
 		if (!playerInviter || !invitedPlayerId) {

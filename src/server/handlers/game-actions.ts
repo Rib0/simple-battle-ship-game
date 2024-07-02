@@ -1,23 +1,25 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { CellType } from '@/types/game-field';
-import { ROOMS } from '../constants';
 import { changeTurn } from '../lib/change-turn';
-import { getPlayerId } from '../lib/handshake';
+import { getPlayerId, getPlayersData, getTurnPlayerId } from '../lib/get-data';
 
 export const gameActionsHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.ATTACK, (coords, roomId) => {
-		const turnPlayerId = ROOMS[roomId]?.turnPlayerId;
+		const turnPlayerId = getTurnPlayerId(roomId);
 		const playerId = getPlayerId(socket);
 
 		if (turnPlayerId !== playerId || !playerId) {
 			return;
 		}
 
-		const room = ROOMS[roomId]?.players;
-		const { enemyPlayerId = '', socketId: playerSocketId } = room?.[playerId] || {};
-		const { field: enemyField, socketId: enemySocketId } = room?.[enemyPlayerId] || {};
+		const playersData = getPlayersData({ roomId, playerId });
+		if (!playersData) {
+			return;
+		}
 
-		if (!enemyField || !playerSocketId || !enemySocketId) {
+		const { socketId, enemySocketId, enemyField } = playersData;
+
+		if (!enemyField || !socketId || !enemySocketId) {
 			return;
 		}
 
