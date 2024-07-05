@@ -42,7 +42,7 @@ export type GameState = {
 
 export type ServerToClientEvents = {
 	[SocketEvents.SET_AUTH_DATA]: (playerId: string) => void;
-	[SocketEvents.TIMER_TICK]: (serverTime: number) => void;
+	[SocketEvents.TIMER_TICK]: VoidFunction;
 	[SocketEvents.NO_PLAYER_TO_INVITE]: VoidFunction;
 	[SocketEvents.INVITE_BY_ID]: (playerId: string) => void;
 	[SocketEvents.REJECT_INVITATION]: VoidFunction;
@@ -72,6 +72,7 @@ export type ClientSocket = ClientSocketDefault<ServerToClientEvents, ClientToSer
 
 export type PlayerData = {
 	disconnectedTime: number;
+	timeRemain: number;
 	enemyPlayerId: string;
 	socketId: Socket['id'];
 	field: Field;

@@ -1,6 +1,5 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
-import { ROOMS } from '../constants';
-import { findSocketBySocketId, getPlayerId, getPlayersData } from '../lib/get-data';
+import { deleteRoom, findSocketBySocketId, getPlayerId, getPlayersData } from '../lib/utils';
 
 export const playerLeaveGameHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.PLAYER_LEAVE_GAME, () => {
@@ -31,6 +30,6 @@ export const playerLeaveGameHandler = (io: ServerIo, socket: ServerSocket) => {
 
 		socket.to(roomId).emit(SocketEvents.PLAYER_LEAVE_GAME);
 		io.socketsLeave(roomId);
-		delete ROOMS[roomId];
+		deleteRoom(roomId);
 	});
 };

@@ -4,10 +4,17 @@ import { ROOMS } from '../constants';
 export const getPlayerId = (socket: ServerSocket) =>
 	socket.handshake.auth?.playerId as string | undefined;
 
-export const getTurnPlayerId = (roomId: string) => ROOMS[roomId]?.turnPlayerId;
+export const getRoomData = (roomId: string) => {
+	const roomData = ROOMS[roomId];
+
+	return roomData;
+};
+
+export const getTurnPlayerId = (roomId: string) => getRoomData(roomId)?.turnPlayerId;
 
 export const getPlayersData = ({ roomId, playerId }: { roomId: string; playerId: string }) => {
-	const players = ROOMS[roomId]?.players;
+	const roomData = getRoomData(roomId);
+	const players = roomData?.players;
 
 	if (!players) {
 		return null;
@@ -15,6 +22,7 @@ export const getPlayersData = ({ roomId, playerId }: { roomId: string; playerId:
 
 	const {
 		disconnectedTime,
+		timeRemain,
 		enemyPlayerId = '',
 		socketId,
 		field,
@@ -22,6 +30,7 @@ export const getPlayersData = ({ roomId, playerId }: { roomId: string; playerId:
 	} = players?.[playerId] || {};
 	const {
 		disconnectedTime: enemyDisconnectedTime,
+		timeRemain: enemyTimeRemain,
 		enemyPlayerId: enemyEnemyPlayerId,
 		socketId: enemySocketId,
 		field: enemyField,
@@ -30,17 +39,38 @@ export const getPlayersData = ({ roomId, playerId }: { roomId: string; playerId:
 
 	return {
 		disconnectedTime,
+		timeRemain,
 		enemyPlayerId,
 		socketId,
 		field,
 		ships,
 		enemyDisconnectedTime,
+		enemyTimeRemain,
 		enemyEnemyPlayerId,
 		enemySocketId,
 		enemyField,
 		enemyShips,
 	};
 };
+
+export const setRoomData = ({
+	roomId,
+	...newRoomData
+}: {
+	roomId: string;
+	turnPlayerId?: string;
+	turnId?: string;
+	turnStartTime?: number;
+}) => {
+	const roomData = getRoomData(roomId);
+
+	ROOMS[roomId] = {
+		...roomData,
+		...newRoomData,
+	};
+};
+
+export const deleteRoom = (roomId: string) => delete ROOMS[roomId];
 
 export const setPlayerData = ({
 	roomId,
@@ -51,25 +81,31 @@ export const setPlayerData = ({
 	playerId: string;
 	playerData: Partial<PlayerData>;
 }) => {
-	const room = ROOMS[roomId]?.players || {};
-	const prevPlayerData = room[playerId];
+	const { players = {}, ...restRoomData } = getRoomData(roomId) || {};
+	const prevPlayerData = players[playerId] || {};
 
-	room[playerId] = {
-		...prevPlayerData,
-		...playerData,
+	ROOMS[roomId] = {
+		...restRoomData,
+		players: {
+			...players,
+			[playerId]: {
+				...prevPlayerData,
+				...playerData,
+			},
+		},
 	};
-};
-
-export const findSocketByPlayerId = ({ io, playerId }: { io: ServerIo; playerId: string }) => {
-	const sockets = Array.from(io.sockets.sockets.values());
-
-	return sockets.find((playerSocket) => getPlayerId(playerSocket) === playerId);
 };
 
 export const findSocketBySocketId = ({ io, socketId }: { io: ServerIo; socketId?: string }) => {
 	const sockets = Array.from(io.sockets.sockets.values());
 
 	return sockets.find((playerSocket) => playerSocket.id === socketId);
+};
+
+export const findSocketByPlayerId = ({ io, playerId }: { io: ServerIo; playerId: string }) => {
+	const sockets = Array.from(io.sockets.sockets.values());
+
+	return sockets.find((playerSocket) => getPlayerId(playerSocket) === playerId);
 };
 
 export const checkIsAllPlayersConnectedBySocketIds = ({

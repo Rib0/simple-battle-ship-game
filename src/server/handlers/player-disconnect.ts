@@ -1,7 +1,7 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
+import { TURN_DURATION } from '@/constants/game';
 import { Timer } from '../lib/timer';
-import { ROOMS } from '../constants';
-import { getPlayerId, setPlayerData } from '../lib/get-data';
+import { deleteRoom, getPlayerId, getPlayersData, getRoomData, setPlayerData } from '../lib/utils';
 
 export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on('disconnect', () => {
@@ -12,8 +12,22 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 			return;
 		}
 
-		const playerData = { disconnectedTime: Timer.getTime };
-		setPlayerData({ roomId, playerId, playerData });
+		const disconnectedTime = Timer.getTime;
+		const { timeRemain = TURN_DURATION } = getPlayersData({ roomId, playerId }) || {};
+		const { turnStartTime = disconnectedTime } = getRoomData(roomId) || {};
+
+		const nextTimeRemain = timeRemain - (disconnectedTime - turnStartTime);
+
+		const playerData = {
+			disconnectedTime,
+			timeRemain: nextTimeRemain < 0 ? 0 : nextTimeRemain,
+		};
+
+		setPlayerData({
+			roomId,
+			playerId,
+			playerData,
+		});
 
 		socket.to(roomId).emit(SocketEvents.ENEMY_DISCONNECTED);
 
@@ -28,7 +42,7 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 				if (!actualRoomSocketSize) {
 					socket.to(roomId).emit(SocketEvents.PLAYER_LEAVE_GAME);
 					io.socketsLeave(roomId);
-					delete ROOMS[roomId];
+					deleteRoom(roomId);
 				}
 			}, 60_000);
 		}

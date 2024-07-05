@@ -1,6 +1,6 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { initiateGameWithPlayers } from '../lib/initiate-game-with-players';
-import { findSocketByPlayerId, getPlayerId } from '../lib/get-data';
+import { findSocketByPlayerId, getPlayerId } from '../lib/utils';
 
 export const inviteByIdHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.INVITE_BY_ID, (invitedPlayerId) => {

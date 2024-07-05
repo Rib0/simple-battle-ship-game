@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
-import { findSocketByPlayerId, getPlayerId } from '../lib/get-data';
+import { findSocketByPlayerId, getPlayerId } from '../lib/utils';
 
 export const setAuthDataHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.SET_AUTH_DATA, () => {

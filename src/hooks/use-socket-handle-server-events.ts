@@ -20,9 +20,9 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 			gameStore.setGameValue('playerId', playerId);
 		});
 
-		socket.on(SocketEvents.TIMER_TICK, (currentTime: number) => {
+		socket.on(SocketEvents.TIMER_TICK, () => {
 			if (gameStore.isEnemyOnline) {
-				gameStore.setGameValue('currentTime', currentTime);
+				gameStore.decreaseTimeRemain();
 			}
 		});
 
@@ -74,9 +74,9 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 			gameStore.addNotification('Противник покинул игру', rootStore.createNewStoreData);
 		});
 
-		socket.on(SocketEvents.CHANGE_TURN, (isMyTurn, turnStartTime) => {
+		socket.on(SocketEvents.CHANGE_TURN, (isMyTurn, timeRemain) => {
 			gameStore.setGameValue('isMyTurn', isMyTurn);
-			gameStore.setGameValue('turnStartTime', turnStartTime);
+			gameStore.setGameValue('timeRemain', timeRemain);
 		});
 
 		socket.on(SocketEvents.DAMAGED, (coords, isMe) => {

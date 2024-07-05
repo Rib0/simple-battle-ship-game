@@ -13,7 +13,7 @@ const COLORS = {
 export const TimeProgress = observer(() => {
 	const { gameStore } = useStoreContext();
 
-	const percent = gameStore.getDiffTurnStartTimeInPercent;
+	const percent = gameStore.getTimeRemainInPercent;
 
 	const color = useMemo(() => {
 		if (percent < 33) {

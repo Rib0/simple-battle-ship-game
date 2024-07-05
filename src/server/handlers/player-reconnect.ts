@@ -6,7 +6,7 @@ import {
 	getPlayerId,
 	getPlayersData,
 	setPlayerData,
-} from '../lib/get-data';
+} from '../lib/utils';
 import { changeTurn } from '../lib/change-turn';
 
 export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {

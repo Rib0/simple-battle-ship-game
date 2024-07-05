@@ -1,7 +1,7 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { CellType } from '@/types/game-field';
 import { changeTurn } from '../lib/change-turn';
-import { getPlayerId, getPlayersData, getTurnPlayerId } from '../lib/get-data';
+import { getPlayerId, getPlayersData, getTurnPlayerId } from '../lib/utils';
 
 export const gameActionsHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.ATTACK, (coords, roomId) => {

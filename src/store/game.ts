@@ -11,9 +11,7 @@ export class GameStore {
 
 	isMyTurn = false;
 
-	turnStartTime = 0;
-
-	currentTime = 0;
+	timeRemain = 0;
 
 	playerId = LocaleStorage.get('player_id_battle_ship_game');
 
@@ -32,8 +30,7 @@ export class GameStore {
 			GameStore,
 			| 'isStarted'
 			| 'isMyTurn'
-			| 'turnStartTime'
-			| 'currentTime'
+			| 'timeRemain'
 			| 'playerId'
 			| 'isEnemyOnline'
 			| 'invitedByPlayer'
@@ -65,12 +62,13 @@ export class GameStore {
 		this.notitications.splice(index, 1);
 	};
 
-	get getDiffTurnStartTimeInPercent() {
-		const diffTime = this.currentTime - this.turnStartTime;
-		const timeRemain = TURN_DURATION - diffTime;
-
-		const result = (timeRemain / TURN_DURATION) * 100;
+	get getTimeRemainInPercent() {
+		const result = (this.timeRemain / TURN_DURATION) * 100;
 
 		return result;
 	}
+
+	decreaseTimeRemain = () => {
+		this.timeRemain -= 1;
+	};
 }

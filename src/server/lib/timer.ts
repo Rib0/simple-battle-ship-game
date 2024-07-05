@@ -6,7 +6,7 @@ export class Timer {
 	private static callbacks: Record<string, VoidFunction[]> = {};
 
 	static get getTime() {
-		return Math.round(new Date().getTime() / 1000);
+		return Math.ceil(new Date().getTime() / 1000);
 	}
 
 	static start(io: ServerIo) {
@@ -15,13 +15,14 @@ export class Timer {
 		}
 
 		Timer.timerId = setInterval(() => {
-			io.emit(SocketEvents.TIMER_TICK, Timer.getTime);
+			io.emit(SocketEvents.TIMER_TICK);
 			Timer.triggerCallbacks();
 		}, 1000);
 	}
 
+	// delay в секундах
 	static addCallback(callback: VoidFunction, delay: number) {
-		const now = new Date().getTime();
+		const now = Timer.getTime;
 		const triggerTime = now + delay;
 
 		if (Timer.callbacks[triggerTime]) {
@@ -38,7 +39,7 @@ export class Timer {
 			return;
 		}
 
-		const now = new Date().getTime();
+		const now = Timer.getTime;
 		const callbacksKeysToTrigger = timesToTrigger.filter((time) => now >= Number(time));
 
 		if (!callbacksKeysToTrigger.length) {
