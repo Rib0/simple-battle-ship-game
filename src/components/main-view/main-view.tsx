@@ -1,11 +1,9 @@
 import { useEffect } from 'preact/hooks';
 import { observer } from 'mobx-react-lite';
-import { Flex } from 'antd';
 
 import { useSocketGameEvents } from '@/hooks/use-socket-game-events';
 import { Notifications } from '@/components/common/notifications';
 import { GameField } from '@/components/game-field';
-import { PlayersInfo } from '@/components/players-info';
 
 import styles from './styles.module.css';
 
@@ -25,12 +23,9 @@ export const MainView = observer(() => {
 	}, [socket, setAuthData, findGameToReconnect]);
 
 	return (
-		<>
+		<div className={styles.root}>
 			<Notifications />
-			<Flex vertical gap="small" className={styles.root}>
-				<PlayersInfo />
-				<GameField />
-			</Flex>
-		</>
+			<GameField />
+		</div>
 	);
 });

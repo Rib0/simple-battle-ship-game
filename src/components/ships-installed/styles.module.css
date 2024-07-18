@@ -5,3 +5,8 @@
 		opacity: 0.3;
 	}
 }
+
+.ab {
+	display: flex;
+	align-self: flex-start;
+}

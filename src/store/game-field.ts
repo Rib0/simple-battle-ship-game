@@ -67,8 +67,7 @@ export class GameFieldStore {
 			this.field[coord] = CellType.SHIP;
 		});
 
-		const inactiveCoords = getCellsCoordsAroundShip({ shipCoords, shipRotation, shipSize });
-		inactiveCoords.forEach((coord) => this.inactiveCoordsForInstall.add(coord));
+		this.updateInactiveCoordsForInstall();
 
 		this.store.shipsStore.decreaseShipAmount(shipSize);
 		this.store.shipsStore.setActiveSize(null);
@@ -90,6 +89,31 @@ export class GameFieldStore {
 		this.activeInstalledShipCoords = shipCoords;
 	};
 
+	updateInactiveCoordsForInstall = () => {
+		this.inactiveCoordsForInstall.clear();
+
+		Object.entries(this.ships).forEach(
+			([coords, { rotation: shipRotation, size: shipSize }]) => {
+				const [[xFirstCellCoord, yFirstCellCoord]] = parseCoords(coords);
+
+				const shipCoords = getShipCoords({
+					xFirstCellCoord,
+					yFirstCellCoord,
+					shipSize,
+					shipRotation,
+				});
+				const cellsCoordsAroundShip = getCellsCoordsAroundShip({
+					shipCoords,
+					shipRotation,
+					shipSize,
+				});
+				[...shipCoords, ...cellsCoordsAroundShip].forEach((coord) =>
+					this.inactiveCoordsForInstall.add(coord),
+				);
+			},
+		);
+	};
+
 	removeActiveInstalledShip = () => {
 		const shipInitialCoords = this.activeInstalledShipCoords!;
 		const { size: shipSize, rotation: shipRotation } = this.ships[shipInitialCoords];
@@ -100,18 +124,13 @@ export class GameFieldStore {
 			shipSize,
 			shipRotation,
 		});
-		const cellsCoordsAroundShip = getCellsCoordsAroundShip({
-			shipCoords: shipCoordsForDelete,
-			shipRotation,
-			shipSize,
-		});
 
 		shipCoordsForDelete.forEach((coord) => {
 			delete this.field[coord];
 		});
-		cellsCoordsAroundShip.forEach((coord) => this.inactiveCoordsForInstall.delete(coord));
 
 		delete this.ships[this.activeInstalledShipCoords!];
+		this.updateInactiveCoordsForInstall();
 		this.setActiveInstalledShip(null);
 		this.store.shipsStore.increaseShipAmount(shipSize);
 	};

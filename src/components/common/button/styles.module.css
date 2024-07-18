@@ -4,7 +4,7 @@
 	padding: 0;
 	border: none;
 	border-radius: 15px;
-	background: no-repeat 0 0 / cover;
+	background: no-repeat 0 0 / contain;
 	cursor: pointer;
 	outline: none;
 
@@ -18,7 +18,8 @@
 		}
 
 		&_start_battle {
-			width: 190px;
+			width: 202px;
+			height: 52px;
 			background-image: url('@/assets/start-battle.png');
 			background-size: contain;
 		}

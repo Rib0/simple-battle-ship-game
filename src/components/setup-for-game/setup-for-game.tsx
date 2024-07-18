@@ -4,8 +4,10 @@ import { Flex } from 'antd';
 import { ShipsForInstall } from '@/components/ships-for-install';
 import { StartGameActions } from '@/components/start-game-actions';
 
+import styles from './styles.module.css';
+
 export const SetupForGame = observer(() => (
-	<Flex vertical justify="space-between">
+	<Flex vertical justify="space-between" className={styles.root}>
 		<ShipsForInstall />
 		<StartGameActions />
 	</Flex>

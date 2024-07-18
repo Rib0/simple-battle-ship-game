@@ -3,9 +3,8 @@ import { observer } from 'mobx-react-lite';
 import { Flex } from 'antd';
 
 import { DndProvider } from '@/components/common/drag-and-drop';
-import { DndDroppable } from '@/components/common/drag-and-drop/dnd-droppable';
 import { SetupForGame } from '@/components/setup-for-game';
-import { Table, TableEnemy } from '@/components/tables';
+import { TableWithActions, TableEnemyWithInfo } from '@/components/tables';
 import type { DndContextOptionsType } from '@/components/common/drag-and-drop/types';
 import { useStoreContext } from '@/context/store-context';
 import {
@@ -92,15 +91,13 @@ export const GameField = observer(() => {
 
 	return (
 		<DndProvider onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
-			<Flex gap="middle">
-				<DndDroppable>
-					<Table hoveredCoords={hoveredCoords} />
-				</DndDroppable>
+			<Flex gap="middle" align={gameStore.isStarted ? 'flex-end' : ''}>
+				<TableWithActions hoveredCoords={hoveredCoords} />
 				{!gameStore.isStarted && <SetupForGame />}
 				{gameStore.isStarted && (
 					<>
 						<TurnArrow />
-						<TableEnemy />
+						<TableEnemyWithInfo />
 					</>
 				)}
 			</Flex>

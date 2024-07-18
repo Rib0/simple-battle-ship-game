@@ -9,16 +9,17 @@ import { getShipsStylesRelativeToTableWithRotation } from '@/utils/ship';
 import styles from './styles.module.css';
 
 export const ShipsInstalled = observer(() => {
-	const { gameFieldStore, shipsStore } = useStoreContext();
-
+	const { gameStore, gameFieldStore, shipsStore } = useStoreContext();
+	const { isStarted } = gameStore;
 	const { ships, setActiveInstalledShip, activeInstalledShipCoords } = gameFieldStore;
 	const { activeSize } = shipsStore;
 
 	const renderShips = () =>
 		Object.entries(ships).map(([coords, { size: shipSize, rotation: shipRotation }]) => {
 			const handleClick = () => {
-				if (!activeSize) {
-					setActiveInstalledShip(coords);
+				if (!activeSize && !isStarted) {
+					const resultCoords = activeInstalledShipCoords ? null : coords;
+					setActiveInstalledShip(resultCoords);
 				}
 			};
 

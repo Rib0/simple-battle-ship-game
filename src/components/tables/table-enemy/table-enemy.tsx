@@ -2,8 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { Flex } from 'antd';
 import cx from 'classnames';
 
-import { TimeProgress } from '@/components/time-progress';
-import { fieldSideArray } from '@/components/tables/constants';
+import { FIELD_SIDE_ARRAY } from '@/components/tables/constants';
 import { useSocketGameEvents } from '@/hooks/use-socket-game-events';
 import { formatCoords } from '@/utils/table';
 
@@ -34,9 +33,9 @@ export const TableEnemy = observer(() => {
 		<Flex vertical>
 			<table className={cx(stylesCommon.table, !gameStore.isEnemyOnline && styles.inactive)}>
 				<tbody>
-					{fieldSideArray.map((_, rI) => (
+					{FIELD_SIDE_ARRAY.map((_, rI) => (
 						<tr key={rI} className={stylesCommon.tr}>
-							{fieldSideArray.map((__, cI) => {
+							{FIELD_SIDE_ARRAY.map((__, cI) => {
 								const formattedCoords = formatCoords({ x: cI, y: rI });
 
 								const canAttack =
@@ -67,7 +66,6 @@ export const TableEnemy = observer(() => {
 					))}
 				</tbody>
 			</table>
-			{!gameStore.isMyTurn && <TimeProgress />}
 		</Flex>
 	);
 });

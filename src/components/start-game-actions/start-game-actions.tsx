@@ -53,7 +53,7 @@ export const StartGameActions = observer(() => {
 	};
 
 	return (
-		<Flex wrap gap="middle">
+		<Flex wrap gap="middle" className={styles.root}>
 			{!activeSize && !activeInstalledShipCoords && (
 				<Button type="shuffle_ships" onClick={randomlyInstallShips} />
 			)}

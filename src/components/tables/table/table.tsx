@@ -3,11 +3,10 @@ import { Flex } from 'antd';
 import cx from 'classnames';
 
 import { ShipsInstalled } from '@/components/ships-installed';
-import { TimeProgress } from '@/components/time-progress';
 import { formatCoords } from '@/utils/table';
 import { useStoreContext } from '@/context/store-context';
 import { Nullable } from '@/types/utils';
-import { fieldSideArray } from '@/components/tables/constants';
+import { FIELD_SIDE_ARRAY } from '@/components/tables/constants';
 
 import stylesCommon from '@/components/tables/styles.module.css';
 import styles from './styles.module.css';
@@ -20,15 +19,15 @@ type Props = {
 };
 
 export const Table = observer<Props>(({ hoveredCoords }) => {
-	const { gameStore, gameFieldStore, shipsStore } = useStoreContext();
+	const { gameFieldStore, shipsStore } = useStoreContext();
 
 	return (
 		<Flex vertical>
 			<table className={stylesCommon.table}>
 				<tbody>
-					{fieldSideArray.map((_, rI) => (
+					{FIELD_SIDE_ARRAY.map((_, rI) => (
 						<tr key={rI} className={stylesCommon.tr}>
-							{fieldSideArray.map((__, cI) => {
+							{FIELD_SIDE_ARRAY.map((__, cI) => {
 								const formattedCoords = formatCoords({ x: cI, y: rI });
 
 								const isHovered = hoveredCoords?.includes(formattedCoords);
@@ -48,7 +47,6 @@ export const Table = observer<Props>(({ hoveredCoords }) => {
 				</tbody>
 				<ShipsInstalled />
 			</table>
-			{gameStore.isMyTurn && <TimeProgress />}
 		</Flex>
 	);
 });

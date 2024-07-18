@@ -6,7 +6,7 @@ import { useSocketGameEvents } from '@/hooks/use-socket-game-events';
 
 const { Text } = Typography;
 
-export const InviteMessage = observer(() => {
+export const InviteAlert = observer(() => {
 	const { gameStore } = useStoreContext();
 	const { acceptInvitation, rejectInvitation } = useSocketGameEvents();
 

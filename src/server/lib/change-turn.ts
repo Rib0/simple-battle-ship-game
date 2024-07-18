@@ -67,7 +67,7 @@ export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: s
 		setRoomData(nextRoomData);
 		setPlayerData({
 			roomId,
-			playerId: turnPlayerId,
+			playerId: keepTurn && prevTurnPlayerId ? prevTurnPlayerId : turnPlayerId,
 			playerData: { timeRemain },
 		});
 
@@ -91,10 +91,11 @@ export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: s
 		changeTurnWithTime(TURN_DURATION);
 	} else {
 		const isReconnectedPlayerTurn = reconnectedPlayerId === prevTurnPlayerId;
-		const { timeRemain = TURN_DURATION } =
-			getPlayersData({ roomId, playerId: reconnectedPlayerId }) || {};
 
 		if (isReconnectedPlayerTurn) {
+			const { timeRemain = TURN_DURATION } =
+				getPlayersData({ roomId, playerId: reconnectedPlayerId }) || {};
+
 			if (timeRemain <= 0) {
 				changeTurnWithTime(TURN_DURATION);
 			} else {

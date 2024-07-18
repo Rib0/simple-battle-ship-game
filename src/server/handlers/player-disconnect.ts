@@ -44,7 +44,7 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 					io.socketsLeave(roomId);
 					deleteRoom(roomId);
 				}
-			}, 60_000);
+			}, 60);
 		}
 	});
 };
