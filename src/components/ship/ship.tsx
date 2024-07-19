@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { Flex } from 'antd';
 import cx from 'classnames';
 
+import { Digit } from '@/components/common/digit';
 import { ShipRotation, ShipSize } from '@/types/ship';
 
 import { arrayFromDigit } from '@/utils/array-from-digit';
@@ -54,11 +55,7 @@ export const Ship = observer<Props>(
 						</tbody>
 					</table>
 				</button>
-				{amount !== undefined && (
-					<Flex align="center" className={styles.amount}>
-						{amount}
-					</Flex>
-				)}
+				{amount !== undefined && <Digit value={amount} />}
 			</Flex>
 		);
 	},

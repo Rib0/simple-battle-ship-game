@@ -55,7 +55,15 @@ export const initiateGameWithPlayers = async (players: ServerSocket[], io: Serve
 
 		changeTurn(io, roomId);
 
-		SEARCHING_GAME_PLAYERS.splice(0, 2);
+		players.forEach((player) => {
+			const playerSearchingGameIndex = SEARCHING_GAME_PLAYERS.findIndex(
+				(socket) => socket === player,
+			);
+
+			if (playerSearchingGameIndex !== -1) {
+				SEARCHING_GAME_PLAYERS.splice(playerSearchingGameIndex, 1);
+			}
+		});
 	} catch (e) {
 		await Promise.all(players.map((player) => player.leave(roomId)));
 		deleteRoom(roomId);

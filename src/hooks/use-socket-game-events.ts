@@ -1,30 +1,16 @@
 import { useCallback } from 'preact/hooks';
-import { io } from 'socket.io-client';
 
-import { ClientSocket, SocketEvents } from '@/types/socket';
+import { SocketEvents } from '@/types/socket';
 import { useSocketContext } from '@/context/socket-context';
-import { SERVER_HOST } from '@/constants/socket';
 import { useStoreContext } from '@/context/store-context';
 import { LocaleStorage } from '@/utils/locale-storage';
 
 export const useSocketGameEvents = () => {
-	const { socket, connectSocket } = useSocketContext();
+	const { socket } = useSocketContext();
 	const rootStore = useStoreContext();
 
 	const { gameStore } = rootStore;
 	const { invitedByPlayer } = gameStore;
-
-	const initiateSocketConnection = useCallback(() => {
-		const playerId = LocaleStorage.get('player_id_battle_ship_game');
-
-		const socketConnection: ClientSocket = io(SERVER_HOST, {
-			auth: {
-				playerId,
-			},
-		});
-
-		connectSocket(socketConnection);
-	}, [connectSocket]);
 
 	const setAuthData = useCallback(() => {
 		socket?.emit(SocketEvents.SET_AUTH_DATA);
@@ -83,8 +69,6 @@ export const useSocketGameEvents = () => {
 	};
 
 	return {
-		socket,
-		initiateSocketConnection,
 		setAuthData,
 		searchGame,
 		inviteById,

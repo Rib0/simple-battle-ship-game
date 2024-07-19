@@ -33,12 +33,17 @@ export const Table = observer<Props>(({ hoveredCoords }) => {
 								const isHovered = hoveredCoords?.includes(formattedCoords);
 								const cantInstall =
 									gameFieldStore.getInactiveCoordsForInstall.has(formattedCoords);
+								const cellType = gameFieldStore.getCellType(formattedCoords, true);
 
-								const className = cx(stylesCommon.td, {
-									[styles.hovered]: isHovered,
-									[styles.cantInstall]: shipsStore.activeSize && cantInstall,
-									[styles.canInstall]: shipsStore.activeSize && !cantInstall,
-								});
+								const className = cx(
+									stylesCommon.td,
+									stylesCommon[cellType.toLocaleLowerCase()],
+									{
+										[styles.canInstall]: shipsStore.activeSize && !cantInstall,
+										[styles.cantInstall]: shipsStore.activeSize && cantInstall,
+										[styles.hovered]: isHovered,
+									},
+								);
 
 								return <td key={cI} className={className} />;
 							})}

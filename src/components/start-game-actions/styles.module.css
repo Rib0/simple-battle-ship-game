@@ -1,6 +1,4 @@
-.root {
-	.inactive {
-		opacity: 0.3;
-		pointer-events: none;
-	}
+.inactive {
+	opacity: 0.3;
+	pointer-events: none;
 }

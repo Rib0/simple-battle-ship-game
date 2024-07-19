@@ -1,0 +1,21 @@
+.digit {
+	width: var(--table-cell-size);
+	height: var(--table-cell-size);
+	background: url('@/assets/digits.png') no-repeat 0 0;
+
+	&._1 {
+		background-position: -9px 3px;
+	}
+
+	&._2 {
+		background-position: -66px 3px;
+	}
+
+	&._3 {
+		background-position: -128px 3px;
+	}
+
+	&._4 {
+		background-position: -188px 0;
+	}
+}

@@ -39,9 +39,3 @@
 		width: var(--ship-cell-size);
 	}
 }
-
-.amount {
-	width: var(--table-cell-size);
-	height: var(--table-cell-size);
-	margin-left: 5px;
-}

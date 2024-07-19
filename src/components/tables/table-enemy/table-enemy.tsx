@@ -46,10 +46,9 @@ export const TableEnemy = observer(() => {
 								);
 
 								const className = cx(
-									stylesCommon.td,
-									styles.td,
 									canAttack && styles.canAttack,
-									styles[cellType.toLowerCase()],
+									stylesCommon.td,
+									stylesCommon[cellType.toLowerCase()],
 								);
 
 								return (

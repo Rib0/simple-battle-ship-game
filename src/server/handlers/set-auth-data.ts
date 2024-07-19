@@ -11,6 +11,7 @@ export const setAuthDataHandler = (io: ServerIo, socket: ServerSocket) => {
 
 		if ((socketWithEqualPlayerId && socketWithEqualPlayerId !== socket) || !playerId) {
 			const newPlayerId = nanoid();
+			socket.handshake.auth.playerId = newPlayerId;
 			socket.emit(SocketEvents.SET_AUTH_DATA, newPlayerId);
 		}
 	});

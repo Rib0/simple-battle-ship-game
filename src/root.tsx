@@ -7,13 +7,13 @@ import { observer } from 'mobx-react-lite';
 import { SocketProvider } from './context/socket-context';
 import { StoreProvider } from './context/store-context';
 
-import { MainView } from './components/main-view';
+import { App } from './components/app';
 
-export const App = observer(() => (
+export const Root = observer(() => (
 	<StrictMode>
 		<SocketProvider>
 			<StoreProvider>
-				<MainView />
+				<App />
 			</StoreProvider>
 		</SocketProvider>
 	</StrictMode>

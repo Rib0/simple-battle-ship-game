@@ -35,7 +35,7 @@ export const TableWithActions = observer<Props>(({ hoveredCoords }) => {
 	};
 
 	return (
-		<Flex vertical gap="small">
+		<Flex className={styles.root} vertical gap="middle">
 			<Flex className={gameStore.isStarted ? styles.hidden : ''} vertical gap="small">
 				<Text copyable>{gameStore.playerId}</Text>
 				<InviteAlert />
