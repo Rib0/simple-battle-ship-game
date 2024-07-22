@@ -3,18 +3,11 @@ import { nanoid } from 'nanoid';
 import { ServerIo, SocketEvents } from '@/types/socket';
 import { TURN_DURATION } from '@/constants/game';
 import { Timer } from './timer';
-import {
-	findSocketBySocketId,
-	getPlayerId,
-	getPlayersData,
-	getRoomData,
-	getTurnPlayerId,
-	setPlayerData,
-	setRoomData,
-} from './utils';
+import { findSocketBySocketId, getPlayerId } from './utils';
+import { ServerState } from '../server-state';
 
 export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: string) => {
-	const roomData = getRoomData(roomId);
+	const roomData = ServerState.getRoomData(roomId);
 
 	if (!roomData?.players) {
 		return;
@@ -47,14 +40,14 @@ export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: s
 
 	const turnId = nanoid();
 	const turnStartTime = Timer.getTime;
-	const prevTurnPlayerId = getTurnPlayerId(roomId);
+	const prevTurnPlayerId = ServerState.getTurnPlayerId(roomId);
 	const isPlayer1PrevTurn = prevTurnPlayerId === player1Id;
 	const turnPlayerId = isPlayer1PrevTurn ? player2Id : player1Id;
 
 	let changeTurnCallbackDelay = TURN_DURATION;
 
 	const changeTurnWithTime = (timeRemain: number, keepTurn?: boolean) => {
-		const nextRoomData: Parameters<typeof setRoomData>[0] = {
+		const nextRoomData: Parameters<typeof ServerState.setRoomData>[0] = {
 			roomId,
 			turnId,
 			turnStartTime,
@@ -64,8 +57,8 @@ export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: s
 			roomData.turnPlayerId = turnPlayerId;
 		}
 
-		setRoomData(nextRoomData);
-		setPlayerData({
+		ServerState.setRoomData(nextRoomData);
+		ServerState.setPlayerData({
 			roomId,
 			playerId: keepTurn && prevTurnPlayerId ? prevTurnPlayerId : turnPlayerId,
 			playerData: { timeRemain },
@@ -94,7 +87,7 @@ export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: s
 
 		if (isReconnectedPlayerTurn) {
 			const { timeRemain = TURN_DURATION } =
-				getPlayersData({ roomId, playerId: reconnectedPlayerId }) || {};
+				ServerState.getPlayersData({ roomId, playerId: reconnectedPlayerId }) || {};
 
 			if (timeRemain <= 0) {
 				changeTurnWithTime(TURN_DURATION);
@@ -107,7 +100,7 @@ export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: s
 	}
 
 	const callback = () => {
-		const isStaleTurnId = getRoomData(roomId)?.turnId !== turnId;
+		const isStaleTurnId = ServerState.getRoomData(roomId)?.turnId !== turnId;
 		const hasDisconnectedActual = playersSockets.some((socket) => socket?.disconnected);
 		const isInRoomActual = player1Socket?.data.roomId === player2Socket?.data.roomId;
 

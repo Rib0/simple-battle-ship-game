@@ -1,7 +1,8 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { TURN_DURATION } from '@/constants/game';
 import { Timer } from '../lib/timer';
-import { deleteRoom, getPlayerId, getPlayersData, getRoomData, setPlayerData } from '../lib/utils';
+import { getPlayerId } from '../lib/utils';
+import { ServerState } from '../server-state';
 
 export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on('disconnect', () => {
@@ -13,8 +14,9 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 		}
 
 		const disconnectedTime = Timer.getTime;
-		const { timeRemain = TURN_DURATION } = getPlayersData({ roomId, playerId }) || {};
-		const { turnStartTime = disconnectedTime } = getRoomData(roomId) || {};
+		const { timeRemain = TURN_DURATION } =
+			ServerState.getPlayersData({ roomId, playerId }) || {};
+		const { turnStartTime = disconnectedTime } = ServerState.getRoomData(roomId) || {};
 
 		const nextTimeRemain = timeRemain - (disconnectedTime - turnStartTime);
 
@@ -23,7 +25,7 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 			timeRemain: nextTimeRemain < 0 ? 0 : nextTimeRemain,
 		};
 
-		setPlayerData({
+		ServerState.setPlayerData({
 			roomId,
 			playerId,
 			playerData,
@@ -42,7 +44,7 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 				if (!actualRoomSocketSize) {
 					socket.to(roomId).emit(SocketEvents.PLAYER_LEAVE_GAME);
 					io.socketsLeave(roomId);
-					deleteRoom(roomId);
+					ServerState.deleteRoom(roomId);
 				}
 			}, 60);
 		}

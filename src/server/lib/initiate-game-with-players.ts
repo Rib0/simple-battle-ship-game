@@ -1,9 +1,9 @@
 import { nanoid } from 'nanoid';
 
-import { SEARCHING_GAME_PLAYERS } from '@/server/constants';
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { changeTurn } from './change-turn';
-import { deleteRoom, getPlayerId, setPlayerData } from './utils';
+import { getPlayerId } from './utils';
+import { ServerState } from '../server-state';
 
 export const initiateGameWithPlayers = async (players: ServerSocket[], io: ServerIo) => {
 	const roomId = nanoid();
@@ -50,23 +50,15 @@ export const initiateGameWithPlayers = async (players: ServerSocket[], io: Serve
 			ships: player2Ships,
 		};
 
-		setPlayerData({ roomId, playerId: player1Id, playerData: player1Data });
-		setPlayerData({ roomId, playerId: player2Id, playerData: player2Data });
+		ServerState.setPlayerData({ roomId, playerId: player1Id, playerData: player1Data });
+		ServerState.setPlayerData({ roomId, playerId: player2Id, playerData: player2Data });
 
 		changeTurn(io, roomId);
 
-		players.forEach((player) => {
-			const playerSearchingGameIndex = SEARCHING_GAME_PLAYERS.findIndex(
-				(socket) => socket === player,
-			);
-
-			if (playerSearchingGameIndex !== -1) {
-				SEARCHING_GAME_PLAYERS.splice(playerSearchingGameIndex, 1);
-			}
-		});
+		ServerState.removeSearchingGamePlayers(players);
 	} catch (e) {
 		await Promise.all(players.map((player) => player.leave(roomId)));
-		deleteRoom(roomId);
+		ServerState.deleteRoom(roomId);
 		// eslint-disable-next-line no-console
 		console.log((e as Error).message);
 	}

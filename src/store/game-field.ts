@@ -33,6 +33,14 @@ export class GameFieldStore {
 		this.store = store;
 	}
 
+	resetStore() {
+		this.ships = {};
+		this.activeInstalledShipCoords = null;
+		this.field = {};
+		this.enemyField = {};
+		this.inactiveCoordsForInstall = new Set<string>();
+	}
+
 	get getInactiveCoordsForInstall() {
 		const { activeSize, activeSizeRotation } = this.store.shipsStore;
 

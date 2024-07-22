@@ -55,7 +55,7 @@ export const useSocketGameEvents = () => {
 	const leaveGame = () => {
 		socket?.emit(SocketEvents.PLAYER_LEAVE_GAME);
 		LocaleStorage.remove('room_id_battle_ship_game');
-		rootStore.createNewStoreData();
+		rootStore.resetAllStores();
 	};
 
 	const attack = (coords: string) => {

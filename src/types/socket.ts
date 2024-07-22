@@ -58,6 +58,7 @@ export type ServerToClientEvents = {
 	[SocketEvents.CHANGE_TURN]: (isYourTurn: boolean, turnStartTime: number) => void;
 	[SocketEvents.DAMAGED]: (coords: string, isMe: boolean) => void;
 	[SocketEvents.MISSED]: (coords: string, isMe: boolean) => void;
+	[SocketEvents.PLAYER_WON]: (isMe: boolean) => void;
 };
 
 export type SocketData = Partial<{

@@ -21,7 +21,7 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 		});
 
 		socket.on(SocketEvents.TIMER_TICK, () => {
-			if (gameStore.isEnemyOnline) {
+			if (gameStore.isEnemyOnline && !gameStore.isPaused) {
 				gameStore.decreaseTimeRemain();
 			}
 		});
@@ -35,11 +35,14 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 		});
 
 		socket.on(SocketEvents.REJECT_INVITATION, () => {
-			gameStore.addNotification('Пользователь отказался от игры');
+			gameStore.addNotification({
+				message: 'Пользователь отказался от игры',
+				type: 'warning',
+			});
 		});
 
 		socket.on(SocketEvents.NO_PLAYER_TO_INVITE, () => {
-			gameStore.addNotification('Такого игрока не существует');
+			gameStore.addNotification({ message: 'Такого игрока не существует', type: 'error' });
 		});
 
 		socket.on(SocketEvents.JOINED_ROOM, (roomId, callback) => {
@@ -71,7 +74,11 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 
 		socket.on(SocketEvents.PLAYER_LEAVE_GAME, () => {
 			gameStore.setGameValue('isEnemyOnline', false);
-			gameStore.addNotification('Противник покинул игру', rootStore.createNewStoreData);
+			LocaleStorage.remove('room_id_battle_ship_game');
+			gameStore.addNotification(
+				{ message: 'Противник покинул игру', type: 'warning' },
+				rootStore.resetAllStores,
+			);
 		});
 
 		socket.on(SocketEvents.CHANGE_TURN, (isMyTurn, timeRemain) => {
@@ -85,6 +92,15 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 
 		socket.on(SocketEvents.MISSED, (coords, isMe) => {
 			gameFieldStore.setCellType(coords, isMe, CellType.BOMB);
+		});
+
+		socket.on(SocketEvents.PLAYER_WON, (isMe) => {
+			const message = isMe ? 'Вы выиграли' : 'Вы проиграли';
+			const type = isMe ? 'success' : 'warning';
+
+			LocaleStorage.remove('room_id_battle_ship_game');
+			gameStore.setGameValue('isPaused', true);
+			gameStore.addNotification({ message, type }, rootStore.resetAllStores);
 		});
 	}, [socket, gameStore, gameFieldStore, rootStore]);
 };

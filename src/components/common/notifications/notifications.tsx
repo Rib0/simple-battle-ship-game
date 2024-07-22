@@ -16,12 +16,14 @@ export const Notifications = observer(() => {
 			return;
 		}
 
-		const { id, message, onClose } = lastNotitication;
+		const { id, message, onClose, type } = lastNotitication;
 
 		api.open({
+			type,
 			key: id,
 			message,
 			showProgress: true,
+			role: 'alert',
 			onClose: () => {
 				removeNotitification(id);
 				onClose?.();

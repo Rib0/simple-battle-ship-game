@@ -21,6 +21,12 @@ export class ShipsStore {
 		this.store = store;
 	}
 
+	resetStore() {
+		this.activeSize = null;
+		this.activeSizeRotation = ShipRotation.LEFT;
+		this.shipsAmount = getShipsAmount();
+	}
+
 	setActiveSize = (size: Nullable<ShipSize>) => {
 		this.store.gameFieldStore.setActiveInstalledShip(null);
 		this.activeSizeRotation = ShipRotation.LEFT;

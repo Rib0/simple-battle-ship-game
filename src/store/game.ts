@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx';
+import { NotificationArgsProps } from 'antd';
 import { nanoid } from 'nanoid';
 
 import { LocaleStorage } from '@/utils/locale-storage';
@@ -8,6 +9,8 @@ import { Nullable } from '@/types/utils';
 
 export class GameStore {
 	isStarted = false;
+
+	isPaused = false;
 
 	isMyTurn = false;
 
@@ -19,16 +22,33 @@ export class GameStore {
 
 	invitedByPlayer: Nullable<string> = null;
 
-	notitications: Array<{ id: string; message: string; onClose?: VoidFunction }> = [];
+	notitications: Array<{
+		id: string;
+		message: string;
+		onClose?: VoidFunction;
+		type?: NotificationArgsProps['type'];
+	}> = [];
 
 	constructor() {
 		makeAutoObservable(this);
+	}
+
+	resetStore() {
+		this.isStarted = false;
+		this.isPaused = false;
+		this.isMyTurn = false;
+		this.timeRemain = 0;
+		this.playerId = LocaleStorage.get('player_id_battle_ship_game');
+		this.isEnemyOnline = false;
+		this.invitedByPlayer = null;
+		this.notitications = [];
 	}
 
 	setGameValue = <
 		T extends keyof Pick<
 			GameStore,
 			| 'isStarted'
+			| 'isPaused'
 			| 'isMyTurn'
 			| 'timeRemain'
 			| 'playerId'
@@ -42,10 +62,13 @@ export class GameStore {
 		this[key] = value;
 	};
 
-	addNotification = (message: string, onClose?: VoidFunction) => {
+	addNotification = (
+		{ message, type = 'info' }: { message: string; type: NotificationArgsProps['type'] },
+		onClose?: VoidFunction,
+	) => {
 		const id = nanoid();
 
-		this.notitications.push({ id, message, onClose });
+		this.notitications.push({ id, message, onClose, type });
 	};
 
 	get lastNotitication() {

@@ -4,10 +4,9 @@ import {
 	checkIsAllPlayersConnectedBySocketIds,
 	findSocketBySocketId,
 	getPlayerId,
-	getPlayersData,
-	setPlayerData,
 } from '../lib/utils';
 import { changeTurn } from '../lib/change-turn';
+import { ServerState } from '../server-state';
 
 export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.FIND_GAME_TO_RECONNECT, async (roomId) => {
@@ -17,7 +16,7 @@ export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 			return;
 		}
 
-		const playersData = getPlayersData({ roomId, playerId });
+		const playersData = ServerState.getPlayersData({ roomId, playerId });
 		if (!playersData) {
 			return;
 		}
@@ -36,7 +35,7 @@ export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 		socket.data.roomId = roomId;
 
 		const playerData = { socketId: socket.id };
-		setPlayerData({ roomId, playerId, playerData });
+		ServerState.setPlayerData({ roomId, playerId, playerData });
 
 		await socket.join(roomId);
 

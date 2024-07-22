@@ -29,9 +29,13 @@ export const TableEnemy = observer(() => {
 		attack(coords);
 	};
 
+	const tableClassName = cx(stylesCommon.table, {
+		[styles.inactive]: !gameStore.isEnemyOnline || gameStore.isPaused,
+	});
+
 	return (
 		<Flex vertical>
-			<table className={cx(stylesCommon.table, !gameStore.isEnemyOnline && styles.inactive)}>
+			<table className={tableClassName}>
 				<tbody>
 					{FIELD_SIDE_ARRAY.map((_, rI) => (
 						<tr key={rI} className={stylesCommon.tr}>
