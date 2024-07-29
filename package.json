@@ -29,6 +29,7 @@
 		]
 	},
 	"dependencies": {
+		"@ant-design/icons": "^5.4.0",
 		"@mobx-devtools/tools": "^0.0.4",
 		"antd": "^5.18.1",
 		"classnames": "^2.5.1",
@@ -42,6 +43,7 @@
 		"socket.io-client": "^4.7.5"
 	},
 	"devDependencies": {
+		"@csstools/postcss-global-data": "^2.1.1",
 		"@preact/preset-vite": "^2.8.1",
 		"@types/node": "^20.11.19",
 		"@types/uuid": "^9.0.8",
@@ -61,7 +63,9 @@
 		"husky": "^8.0.3",
 		"lint-staged": "^15.2.0",
 		"nodemon": "^3.1.0",
-		"postcss-nested": "^6.0.1",
+		"postcss-import": "^16.1.0",
+		"postcss-nested": "^6.2.0",
+		"postcss-preset-env": "^9.6.0",
 		"prettier": "^3.2.4",
 		"stylelint": "^16.2.0",
 		"stylelint-config-idiomatic-order": "^10.0.0",

@@ -29,7 +29,7 @@ export const ShipsForInstall = observer(() => {
 	};
 
 	return (
-		<Flex vertical gap={70}>
+		<Flex vertical flex="1">
 			<Flex gap="small" vertical>
 				{SHIPS_STRUCTURE.map((row) => (
 					<Flex>
@@ -44,18 +44,20 @@ export const ShipsForInstall = observer(() => {
 					</Flex>
 				))}
 			</Flex>
-			{activeSize && (
-				<DndDraggable
-					className={styles.draggable}
-					extendDraggableStyles={extendDraggableStyles}
-					containerDataProps={{
-						'data-size': activeSize as unknown as string,
-						'data-rotation': activeSizeRotation as unknown as string,
-					}}
-				>
-					<Ship size={activeSize} />
-				</DndDraggable>
-			)}
+			<Flex flex="1">
+				{activeSize && (
+					<DndDraggable
+						className={styles.draggable}
+						extendDraggableStyles={extendDraggableStyles}
+						containerDataProps={{
+							'data-size': activeSize as unknown as string,
+							'data-rotation': activeSizeRotation as unknown as string,
+						}}
+					>
+						<Ship size={activeSize} />
+					</DndDraggable>
+				)}
+			</Flex>
 		</Flex>
 	);
 });

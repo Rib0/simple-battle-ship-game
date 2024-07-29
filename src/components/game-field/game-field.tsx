@@ -92,12 +92,16 @@ export const GameField = observer(() => {
 	return (
 		<DndProvider onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
 			<Flex gap="middle" align={gameStore.isStarted ? 'flex-end' : ''}>
-				<TableWithActions hoveredCoords={hoveredCoords} />
+				<Flex flex="0 0 auto">
+					<TableWithActions hoveredCoords={hoveredCoords} />
+				</Flex>
 				{!gameStore.isStarted && <SetupForGame />}
 				{gameStore.isStarted && (
 					<>
 						<TurnArrow />
-						<TableEnemyWithInfo />
+						<Flex flex="0 1 auto">
+							<TableEnemyWithInfo />
+						</Flex>
 					</>
 				)}
 			</Flex>

@@ -35,11 +35,7 @@ export const TableWithActions = observer<Props>(({ hoveredCoords }) => {
 	};
 
 	return (
-		<Flex className={styles.root} vertical gap="middle">
-			<Flex className={gameStore.isStarted ? styles.hidden : ''} vertical gap="small">
-				<Text copyable>{gameStore.playerId}</Text>
-				<InviteAlert />
-			</Flex>
+		<Flex className={styles.root} vertical gap="small">
 			<div>
 				<Button
 					onClick={handleLeaveButtonClick}
@@ -50,6 +46,10 @@ export const TableWithActions = observer<Props>(({ hoveredCoords }) => {
 					Покинуть игру
 				</Button>
 			</div>
+			<Flex className={gameStore.isStarted ? styles.hidden : ''} vertical gap="small">
+				<InviteAlert />
+				<Text copyable>{gameStore.playerId}</Text>
+			</Flex>
 			<DndDroppable>
 				<Table hoveredCoords={hoveredCoords} />
 			</DndDroppable>

@@ -11,23 +11,47 @@
 
 	&.size {
 		&_1 {
-			background-position: 0 -208px;
 			background-size: 483%;
+
+			@media (--md-viewport) {
+				background-position: 0 -152px;
+			}
+
+			@media (--lg-viewport) {
+				background-position: 0 -208px;
+			}
 		}
 
 		&_2 {
-			background-position: -112px -143px;
 			background-size: 248%;
+
+			@media (--md-viewport) {
+				background-position: -83px -105px;
+			}
+
+			@media (--lg-viewport) {
+				background-position: -112px -143px;
+			}
 		}
 
 		&_3 {
-			background-position: 0 -71px;
 			background-size: 165%;
+
+			@media (--md-viewport) {
+				background-position: 0 -52px;
+			}
+
+			@media (--lg-viewport) {
+				background-position: 0 -71px;
+			}
 		}
 
 		&_4 {
-			background-position: 0 0;
 			background-size: 125%;
+
+			@media (--md-viewport) {
+				background-position: 0 0;
+			}
 		}
 	}
 

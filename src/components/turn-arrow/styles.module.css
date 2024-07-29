@@ -1,6 +1,6 @@
 .root {
-	width: 70px;
-	height: 160px;
+	width: 45px;
+	height: 105px;
 	align-self: center;
 	background: no-repeat 0 0 / cover;
 	background-image: url('@/assets/turn-arrow.png');

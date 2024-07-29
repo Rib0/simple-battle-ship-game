@@ -23,7 +23,6 @@ export const Notifications = observer(() => {
 			key: id,
 			message,
 			showProgress: true,
-			role: 'alert',
 			onClose: () => {
 				removeNotitification(id);
 				onClose?.();

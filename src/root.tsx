@@ -1,4 +1,3 @@
-import 'reset-css';
 import './root.css';
 
 import { StrictMode } from 'preact/compat';

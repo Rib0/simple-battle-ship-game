@@ -7,7 +7,7 @@ import { StartGameActions } from '@/components/start-game-actions';
 import styles from './styles.module.css';
 
 export const SetupForGame = observer(() => (
-	<Flex vertical justify="space-between" className={styles.root}>
+	<Flex vertical className={styles.root}>
 		<ShipsForInstall />
 		<StartGameActions />
 	</Flex>

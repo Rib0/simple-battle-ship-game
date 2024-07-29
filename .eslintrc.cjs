@@ -5,7 +5,7 @@ module.exports = {
 		es2021: true,
 	},
 	extends: [
-		'airbnb', // 'eslint-plugin' in plugin name 'eslint-plutin-airbnb' can be omitted
+		'airbnb', // 'eslint-plugin' in plugin name 'eslint-plugin-airbnb' can be omitted
 		'airbnb/hooks',
 		'plugin:@typescript-eslint/recommended-type-checked',
 		'plugin:mobx/recommended',
@@ -13,7 +13,7 @@ module.exports = {
 	],
 	parser: '@typescript-eslint/parser',
 	parserOptions: {
-		project: ['./tsconfig.json', './tsconfig.eslint.json'],
+		project: ['./tsconfig.json'],
 		tsconfigRootDir: __dirname,
 		ecmaVersion: 'latest',
 		sourceType: 'module',
@@ -41,7 +41,7 @@ module.exports = {
 		'no-plusplus': [1, { allowForLoopAfterthoughts: true }],
 	},
 	plugins: ['@typescript-eslint', 'import'],
-	ignorePatterns: ['vite.config.ts'],
+	ignorePatterns: ['vite.config.ts', '.eslintrc.cjs', 'postcss.config.cjs'], // https://stackoverflow.com/a/61219638
 	reportUnusedDisableDirectives: true,
 	settings: {
 		'import/resolver': {

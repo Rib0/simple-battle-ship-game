@@ -1,12 +1,26 @@
+@import 'reset-css';
+
+@custom-media --sm-viewport (min-width: 650px);
+@custom-media --md-viewport (min-width: 850px);
+@custom-media --lg-viewport (min-width: 980px);
+
 * {
 	box-sizing: border-box;
 }
 
 :root {
-	--table-cell-size: 40px;
+	--table-cell-size: 25px;
 	--ship-cell-size: calc(var(--table-cell-size) - 2px);
 	--color-light-green: rgb(224 238 224);
 	--color-green: rgb(121 205 121);
 	--color-red: rgb(238 130 130);
 	--color-blue: rgb(183 229 239);
+
+	@media (--md-viewport) {
+		--table-cell-size: 30px;
+	}
+
+	@media (--lg-viewport) {
+		--table-cell-size: 40px;
+	}
 }
