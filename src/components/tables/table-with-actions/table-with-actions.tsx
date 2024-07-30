@@ -3,7 +3,7 @@ import { Button, Flex, Modal, Typography } from 'antd';
 
 import { DndDroppable } from '@/components/common/drag-and-drop/dnd-droppable';
 import { InviteAlert } from '@/components/common/invite-alert';
-import { TimeProgress } from '@/components/time-progress';
+import { TimeProgress } from '@/components/common/time-progress';
 import { useStoreContext } from '@/context/store-context';
 
 import { useSocketGameEvents } from '@/hooks/use-socket-game-events';
@@ -48,7 +48,9 @@ export const TableWithActions = observer<Props>(({ hoveredCoords }) => {
 			</div>
 			<Flex className={gameStore.isStarted ? styles.hidden : ''} vertical gap="small">
 				<InviteAlert />
-				<Text copyable>{gameStore.playerId}</Text>
+				<Text className={styles.text} copyable>
+					{gameStore.playerId}
+				</Text>
 			</Flex>
 			<DndDroppable>
 				<Table hoveredCoords={hoveredCoords} />

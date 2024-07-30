@@ -14,7 +14,7 @@ import {
 	checkIfShipOverInactiveTableCoords,
 } from '@/utils/ship';
 import { Nullable } from '@/types/utils';
-import { TurnArrow } from '../turn-arrow';
+import { TurnArrow } from '../common/turn-arrow';
 
 export const GameField = observer(() => {
 	const { gameStore, gameFieldStore } = useStoreContext();
@@ -91,7 +91,7 @@ export const GameField = observer(() => {
 
 	return (
 		<DndProvider onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
-			<Flex gap="middle" align={gameStore.isStarted ? 'flex-end' : ''}>
+			<Flex gap="small" align={gameStore.isStarted ? 'flex-end' : ''}>
 				<Flex flex="0 0 auto">
 					<TableWithActions hoveredCoords={hoveredCoords} />
 				</Flex>
@@ -99,7 +99,7 @@ export const GameField = observer(() => {
 				{gameStore.isStarted && (
 					<>
 						<TurnArrow />
-						<Flex flex="0 1 auto">
+						<Flex flex="0 0 auto">
 							<TableEnemyWithInfo />
 						</Flex>
 					</>

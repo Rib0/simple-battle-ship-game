@@ -1,11 +1,11 @@
 .table {
 	position: relative;
-	padding: 10px;
+	padding: var(--table-border-width);
 	border-collapse: separate;
 	border-image: url('@/assets/table-border.png');
 	border-image-repeat: repeat;
 	border-image-slice: 7;
-	border-image-width: 10px;
+	border-image-width: var(--table-border-width);
 
 	.tr {
 		height: var(--table-cell-size);
@@ -43,6 +43,10 @@
 			}
 		}
 	}
+}
+
+.text {
+	font-size: 1rem;
 }
 
 .root {

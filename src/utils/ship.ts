@@ -1,6 +1,7 @@
 import { NullableHTMLDivElement } from '@/components/common/drag-and-drop/types';
 import { LAST_TABLE_SIDE_INDEX, TABLE_SIDE_SIZE } from '@/constants/table';
 import { ShipRotation, ShipSize } from '@/types/ship';
+import { getRootCssVariable } from './get-root-css-variable';
 import { arrayFromDigit } from './array-from-digit';
 import {
 	formatCoords,
@@ -88,17 +89,24 @@ const isShipOutsideGameField = (draggableElement: DOMRect, droppableElement: DOM
 	Принимает результат getBoundingClientRect корабля
 	Результат получаем путем прибавления половины ширины палубы и вычитания ширины одного border таблицы из верхней левой координате корабля  
 */
-const getTopLeftCellShipCenterPosition = (rect: DOMRect) => ({
-	x: rect.x + 20 - 10,
-	y: rect.y + 20 - 10,
-});
+const getTopLeftCellShipCenterPosition = (rect: DOMRect) => {
+	const halfTableCellSize = Number(getRootCssVariable('table-cell-size')) / 2;
+	const tableBorderWidth = Number(getRootCssVariable('table-border-width'));
+
+	return {
+		x: rect.x + halfTableCellSize - tableBorderWidth,
+		y: rect.y + halfTableCellSize - tableBorderWidth,
+	};
+};
 
 /*
 	Возвращает координаты центра верхней левой палубы корабля
 	Принимает в пикселях позиции первой палубы корабля и верхнего левого угла таблицы
 */
 const getFirstCellShipCoords = (firstCellShipCoord: number, droppableCoord: number) =>
-	Math.trunc((firstCellShipCoord - droppableCoord) / 40); // 40 - ширина ячейки таблицы, вынести в переменные мб
+	Math.trunc(
+		(firstCellShipCoord - droppableCoord) / Number(getRootCssVariable('table-cell-size')),
+	);
 
 export const getShipDataByDataset = (draggableElement: HTMLDivElement) => ({
 	shipSize: Number(draggableElement.dataset.size),
@@ -144,9 +152,12 @@ export const getTableCoordsHoveredByShip = (
 const getShipPositionRelativeToTable = (firstCellShipCoords: string) => {
 	const [[x, y]] = parseCoords(firstCellShipCoords);
 
-	const left = x * 40 + 10 + 1; // сдвиг из-за разницы в ширине палубы и ячейки таблицы в 2 пикселя
-	const right = (TABLE_SIDE_SIZE - 1 - x) * 40 + 10 + 1;
-	const top = y * 40 + 10 + 1;
+	const tableCellSize = Number(getRootCssVariable('table-cell-size'));
+	const tableBorderWidth = Number(getRootCssVariable('table-border-width'));
+
+	const left = x * tableCellSize + tableBorderWidth + 1; // сдвиг из-за разницы в ширине палубы и ячейки таблицы в 2 пикселя
+	const right = (TABLE_SIDE_SIZE - 1 - x) * tableCellSize + tableBorderWidth + 1;
+	const top = y * tableCellSize + tableBorderWidth + 1;
 
 	return {
 		left,
@@ -207,7 +218,7 @@ export const getShipsStylesRelativeToTableWithRotation = ({
 	const targetHorizontalCoordKey = x > 4 && isVerticalRotation ? 'right' : 'left';
 	const targetHorizontalCoord = x > 4 && isVerticalRotation ? right : left;
 
-	const shipWidth = 38; // TODO: размер палубы корабля, вынести в переменные
+	const shipWidth = Number(getRootCssVariable('ship-cell-size'));
 
 	const styles = {
 		position: 'absolute',

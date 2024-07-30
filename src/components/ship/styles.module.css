@@ -11,10 +11,12 @@
 
 	&.size {
 		&_1 {
-			background-size: 483%;
+			background-position: 0 -121px;
+			background-size: 467%;
 
 			@media (--md-viewport) {
 				background-position: 0 -152px;
+				background-size: 483%;
 			}
 
 			@media (--lg-viewport) {
@@ -23,10 +25,12 @@
 		}
 
 		&_2 {
-			background-size: 248%;
+			background-position: -66px -84px;
+			background-size: 242%;
 
 			@media (--md-viewport) {
 				background-position: -83px -105px;
+				background-size: 248%;
 			}
 
 			@media (--lg-viewport) {
@@ -35,10 +39,12 @@
 		}
 
 		&_3 {
-			background-size: 165%;
+			background-position: 0 -42px;
+			background-size: 161%;
 
 			@media (--md-viewport) {
 				background-position: 0 -52px;
+				background-size: 165%;
 			}
 
 			@media (--lg-viewport) {

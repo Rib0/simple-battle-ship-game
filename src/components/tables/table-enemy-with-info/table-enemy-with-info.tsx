@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { Flex, Tag } from 'antd';
 
-import { TimeProgress } from '@/components/time-progress';
+import { TimeProgress } from '@/components/common/time-progress';
 import { useStoreContext } from '@/context/store-context';
 import { TableEnemy } from '../table-enemy/table-enemy';
 

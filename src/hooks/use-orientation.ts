@@ -4,13 +4,13 @@ import { Modal } from 'antd';
 import { checkIsMobile } from '@/utils/check-is-mobile';
 import { useMatchMedia } from './use-match-media';
 
-const mqs = '(orientation: landscape)';
+const MQS = '(orientation: landscape)';
 
 let modal: ReturnType<typeof Modal.confirm>;
 
 export const useOrientation = () => {
 	const isMobile = checkIsMobile();
-	const isMatches = useMatchMedia(mqs);
+	const isMatches = useMatchMedia(MQS);
 
 	const [isNeedChangeOrientation, setIsNeedChangeOrientation] = useState(isMobile && !isMatches);
 

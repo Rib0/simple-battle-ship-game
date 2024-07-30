@@ -1,7 +1,6 @@
 @import 'reset-css';
 
-@custom-media --sm-viewport (min-width: 650px);
-@custom-media --md-viewport (min-width: 850px);
+@custom-media --md-viewport (min-width: 750px);
 @custom-media --lg-viewport (min-width: 980px);
 
 * {
@@ -9,18 +8,35 @@
 }
 
 :root {
+	--table-border-width: 3px;
 	--table-cell-size: 25px;
-	--ship-cell-size: calc(var(--table-cell-size) - 2px);
+	--ship-cell-size: 23px;
 	--color-light-green: rgb(224 238 224);
 	--color-green: rgb(121 205 121);
 	--color-red: rgb(238 130 130);
 	--color-blue: rgb(183 229 239);
 
 	@media (--md-viewport) {
+		--table-border-width: 7px;
 		--table-cell-size: 30px;
+		--ship-cell-size: 28px;
 	}
 
 	@media (--lg-viewport) {
+		--table-border-width: 10px;
 		--table-cell-size: 40px;
+		--ship-cell-size: 38px;
+	}
+}
+
+html {
+	font-size: 8px;
+
+	@media (--md-viewport) {
+		font-size: 11px;
+	}
+
+	@media (--lg-viewport) {
+		font-size: 14px;
 	}
 }

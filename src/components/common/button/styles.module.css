@@ -1,12 +1,22 @@
 .button {
-	width: 60px;
-	height: 60px;
+	width: 38px;
+	height: 38px;
 	padding: 0;
 	border: none;
 	border-radius: 15px;
 	background: no-repeat 0 0 / contain;
 	cursor: pointer;
 	outline: none;
+
+	@media (--md-viewport) {
+		width: 45px;
+		height: 45px;
+	}
+
+	@media (--lg-viewport) {
+		width: 60px;
+		height: 60px;
+	}
 
 	&.type {
 		&_rotate_ship {
@@ -18,10 +28,19 @@
 		}
 
 		&_start_battle {
-			width: 202px;
-			height: 52px;
+			width: 130px;
+			height: 35px;
 			background-image: url('@/assets/start-battle.png');
-			background-size: contain;
+
+			@media (--md-viewport) {
+				width: 160px;
+				height: 40px;
+			}
+
+			@media (--lg-viewport) {
+				width: 202px;
+				height: 52px;
+			}
 		}
 
 		&_cancel {

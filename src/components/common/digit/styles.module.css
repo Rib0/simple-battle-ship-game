@@ -1,21 +1,54 @@
 .digit {
-	width: var(--table-cell-size);
-	height: var(--table-cell-size);
+	width: calc(var(--ship-cell-size) - 5px);
+	height: calc(var(--ship-cell-size) - 5px);
 	background: url('@/assets/digits.png') no-repeat 0 0;
+	background-size: cover;
 
 	&._1 {
-		background-position: -9px 3px;
+		background-position: -5px 2px;
+
+		@media (--md-viewport) {
+			background-position: -6px 2px;
+		}
+
+		@media (--lg-viewport) {
+			background-position: -9px 3px;
+		}
 	}
 
 	&._2 {
-		background-position: -66px 3px;
+		background-position: -35px 1px;
+
+		@media (--md-viewport) {
+			background-position: -44px 2px;
+		}
+
+		@media (--lg-viewport) {
+			background-position: -66px 3px;
+		}
 	}
 
 	&._3 {
-		background-position: -128px 3px;
+		background-position: -65px 0;
+
+		@media (--md-viewport) {
+			background-position: -83px 0;
+		}
+
+		@media (--lg-viewport) {
+			background-position: -119px 0;
+		}
 	}
 
 	&._4 {
-		background-position: -188px 0;
+		background-position: -95px -1px;
+
+		@media (--md-viewport) {
+			background-position: -122px 0;
+		}
+
+		@media (--lg-viewport) {
+			background-position: -175px -1px;
+		}
 	}
 }
