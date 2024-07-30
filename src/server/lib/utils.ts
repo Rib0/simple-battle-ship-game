@@ -29,3 +29,8 @@ export const checkIsAllPlayersConnectedBySocketIds = ({
 
 		return io.sockets.sockets.get(id)?.connected;
 	});
+
+export const delay = (ms: number) =>
+	new Promise((resolve) => {
+		setTimeout(resolve, ms);
+	});

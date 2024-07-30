@@ -41,6 +41,8 @@ export const initiateGameWithPlayers = async (players: ServerSocket[], io: Serve
 			socketId: player1SocketId,
 			field: player1Field,
 			ships: player1Ships,
+			killedShips: {},
+			enemiesKilledShips: {},
 		};
 
 		const player2Data = {
@@ -48,6 +50,8 @@ export const initiateGameWithPlayers = async (players: ServerSocket[], io: Serve
 			socketId: player2SocketId,
 			field: player2Field,
 			ships: player2Ships,
+			killedShips: {},
+			enemiesKilledShips: {},
 		};
 
 		ServerState.setPlayerData({ roomId, playerId: player1Id, playerData: player1Data });

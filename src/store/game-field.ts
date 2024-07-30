@@ -17,6 +17,10 @@ export class GameFieldStore {
 
 	ships: GameFieldShips = {};
 
+	killedShipsInitialCoords = new Set<string>();
+
+	enemiesKilledShips: GameFieldShips = {};
+
 	activeInstalledShipCoords: Nullable<string> = null;
 
 	private field: Field = {};
@@ -35,6 +39,8 @@ export class GameFieldStore {
 
 	resetStore() {
 		this.ships = {};
+		this.killedShipsInitialCoords = new Set<string>();
+		this.enemiesKilledShips = {};
 		this.activeInstalledShipCoords = null;
 		this.field = {};
 		this.enemyField = {};
@@ -54,6 +60,21 @@ export class GameFieldStore {
 			inactiveCoordsForInstall: this.inactiveCoordsForInstall,
 		});
 	}
+
+	updateKilledShipsInitialsCoords = (killedShipsInitialCoords: string | string[]) => {
+		const coords = Array.isArray(killedShipsInitialCoords)
+			? killedShipsInitialCoords
+			: [killedShipsInitialCoords];
+
+		coords.forEach((coord) => this.killedShipsInitialCoords.add(coord));
+	};
+
+	updateEnemiesKilledShipsInitialsCoords = (enemiesKilledShips: GameFieldShips) => {
+		this.enemiesKilledShips = {
+			...this.enemiesKilledShips,
+			...enemiesKilledShips,
+		};
+	};
 
 	installShip = ({
 		shipCoords,

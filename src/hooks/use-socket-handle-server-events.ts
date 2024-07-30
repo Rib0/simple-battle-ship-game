@@ -94,6 +94,14 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 			gameFieldStore.setCellType(coords, isMe, CellType.BOMB);
 		});
 
+		socket.on(SocketEvents.UPDATE_KILLED_SHIPS_INITIAL_COORDS, (killedShipsInitialCoords) => {
+			gameFieldStore.updateKilledShipsInitialsCoords(killedShipsInitialCoords);
+		});
+
+		socket.on(SocketEvents.UPDATE_ENEMIES_KILLED_SHIPS, (enemiesKilledShips) => {
+			gameFieldStore.updateEnemiesKilledShipsInitialsCoords(enemiesKilledShips);
+		});
+
 		socket.on(SocketEvents.PLAYER_WON, (isMe) => {
 			const message = isMe ? 'Вы выиграли' : 'Вы проиграли';
 			const type = isMe ? 'success' : 'warning';

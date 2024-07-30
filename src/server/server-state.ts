@@ -1,4 +1,4 @@
-import { PlayerData, Rooms, ServerIo, ServerSocket } from '@/types/socket';
+import { Rooms, ServerIo, ServerSocket, SetPlayerData } from '@/types/socket';
 import { initiateGameWithPlayers } from './lib/initiate-game-with-players';
 
 export class ServerState {
@@ -119,10 +119,15 @@ export class ServerState {
 	}: {
 		roomId: string;
 		playerId: string;
-		playerData: Partial<PlayerData>;
+		playerData: Partial<SetPlayerData>;
 	}) {
 		const { players = {}, ...restRoomData } = this.getRoomData(roomId) || {};
 		const prevPlayerData = players[playerId] || {};
+		const {
+			killedShipsInitialCoords: prevKilledShipsInitialCoords = [],
+			enemiesKilledShips: prevEnemiesKilledShips = {},
+		} = prevPlayerData;
+		const { killedShipsInitialCoords = [], enemiesKilledShips = {} } = playerData;
 
 		this.rooms[roomId] = {
 			...restRoomData,
@@ -131,6 +136,14 @@ export class ServerState {
 				[playerId]: {
 					...prevPlayerData,
 					...playerData,
+					killedShipsInitialCoords: [
+						...prevKilledShipsInitialCoords,
+						...killedShipsInitialCoords,
+					],
+					enemiesKilledShips: {
+						...prevEnemiesKilledShips,
+						...enemiesKilledShips,
+					},
 				},
 			},
 		};
