@@ -22,7 +22,7 @@ export enum SocketEvents {
 	DAMAGED = 'DAMAGED',
 	MISSED = 'MISSED',
 	UPDATE_KILLED_SHIPS_INITIAL_COORDS = 'UPDATE_KILLED_SHIPS_INITIAL_COORDS',
-	UPDATE_ENEMIES_KILLED_SHIPS = 'UPDATE_ENEMIES_KILLED_SHIPS',
+	UPDATE_ENEMY_KILLED_SHIPS = 'UPDATE_ENEMY_KILLED_SHIPS',
 	PLAYER_WON = 'PLAYER_WON',
 }
 
@@ -40,6 +40,8 @@ export type ClientToServerEvents = {
 export type GameState = {
 	field: Field;
 	ships: GameFieldShips;
+	killedShipsInitialCoords?: string[];
+	enemyKilledShips?: GameFieldShips;
 };
 
 export type ServerToClientEvents = {
@@ -60,10 +62,8 @@ export type ServerToClientEvents = {
 	[SocketEvents.CHANGE_TURN]: (isYourTurn: boolean, turnStartTime: number) => void;
 	[SocketEvents.DAMAGED]: (coords: string, isMe: boolean) => void;
 	[SocketEvents.MISSED]: (coords: string, isMe: boolean) => void;
-	[SocketEvents.UPDATE_KILLED_SHIPS_INITIAL_COORDS]: (
-		killedShipsInitialCoords: string | string[],
-	) => void;
-	[SocketEvents.UPDATE_ENEMIES_KILLED_SHIPS]: (enemiesKilledShips: GameFieldShips) => void;
+	[SocketEvents.UPDATE_KILLED_SHIPS_INITIAL_COORDS]: (killedShipsInitialCoords: string) => void;
+	[SocketEvents.UPDATE_ENEMY_KILLED_SHIPS]: (enemyKilledShips: GameFieldShips) => void;
 	[SocketEvents.PLAYER_WON]: (isMe: boolean) => void;
 };
 
@@ -85,7 +85,7 @@ export type PlayerData = {
 	field: Field;
 	ships: GameFieldShips;
 	killedShipsInitialCoords: string[];
-	enemiesKilledShips: GameFieldShips;
+	enemyKilledShips: GameFieldShips;
 };
 
 export type SetPlayerData = Omit<PlayerData, 'killedShipsInitialCoords'> & {

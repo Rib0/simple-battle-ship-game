@@ -267,7 +267,7 @@ export const getRandomlyInstalledShips = () => {
 			const [[xFirstCellCoord, yFirstCellCoord]] = parseCoords(coords);
 
 			// eslint-disable-next-line no-restricted-syntax
-			for (const shipRotation of shipRotations) {
+			for (const shipRotation of shuffle(shipRotations)) {
 				const shipCoords = getShipCoords({
 					xFirstCellCoord,
 					yFirstCellCoord,
@@ -297,6 +297,8 @@ export const getRandomlyInstalledShips = () => {
 						shipRotation,
 					});
 					cellsAroundShip.forEach((cell) => inactiveTableCoords.add(cell));
+
+					console.log(cellsAroundShip);
 
 					resultShipsInfo.push({ shipCoords, shipRotation, shipSize });
 					goNextShip = true;

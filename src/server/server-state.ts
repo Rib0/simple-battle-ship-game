@@ -86,6 +86,8 @@ export class ServerState {
 			socketId,
 			field,
 			ships,
+			killedShipsInitialCoords,
+			enemyKilledShips,
 		} = players?.[playerId] || {};
 		const {
 			disconnectedTime: enemyDisconnectedTime,
@@ -103,6 +105,8 @@ export class ServerState {
 			socketId,
 			field,
 			ships,
+			killedShipsInitialCoords,
+			enemyKilledShips,
 			enemyDisconnectedTime,
 			enemyTimeRemain,
 			enemyEnemyPlayerId,
@@ -125,9 +129,9 @@ export class ServerState {
 		const prevPlayerData = players[playerId] || {};
 		const {
 			killedShipsInitialCoords: prevKilledShipsInitialCoords = [],
-			enemiesKilledShips: prevEnemiesKilledShips = {},
+			enemyKilledShips: prevEnemyKilledShips = {},
 		} = prevPlayerData;
-		const { killedShipsInitialCoords = [], enemiesKilledShips = {} } = playerData;
+		const { killedShipsInitialCoords = [], enemyKilledShips = {} } = playerData;
 
 		this.rooms[roomId] = {
 			...restRoomData,
@@ -136,13 +140,11 @@ export class ServerState {
 				[playerId]: {
 					...prevPlayerData,
 					...playerData,
-					killedShipsInitialCoords: [
-						...prevKilledShipsInitialCoords,
-						...killedShipsInitialCoords,
-					],
-					enemiesKilledShips: {
-						...prevEnemiesKilledShips,
-						...enemiesKilledShips,
+					killedShipsInitialCoords:
+						prevKilledShipsInitialCoords.concat(killedShipsInitialCoords),
+					enemyKilledShips: {
+						...prevEnemyKilledShips,
+						...enemyKilledShips,
 					},
 				},
 			},

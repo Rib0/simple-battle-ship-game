@@ -17,9 +17,9 @@ export class GameFieldStore {
 
 	ships: GameFieldShips = {};
 
-	killedShipsInitialCoords = new Set<string>();
+	killedShipsInitialCoords: string[] = [];
 
-	enemiesKilledShips: GameFieldShips = {};
+	enemyKilledShips: GameFieldShips = {};
 
 	activeInstalledShipCoords: Nullable<string> = null;
 
@@ -39,12 +39,12 @@ export class GameFieldStore {
 
 	resetStore() {
 		this.ships = {};
-		this.killedShipsInitialCoords = new Set<string>();
-		this.enemiesKilledShips = {};
+		this.killedShipsInitialCoords = [];
+		this.enemyKilledShips = {};
 		this.activeInstalledShipCoords = null;
 		this.field = {};
 		this.enemyField = {};
-		this.inactiveCoordsForInstall = new Set<string>();
+		this.inactiveCoordsForInstall = new Set();
 	}
 
 	get getInactiveCoordsForInstall() {
@@ -61,18 +61,14 @@ export class GameFieldStore {
 		});
 	}
 
-	updateKilledShipsInitialsCoords = (killedShipsInitialCoords: string | string[]) => {
-		const coords = Array.isArray(killedShipsInitialCoords)
-			? killedShipsInitialCoords
-			: [killedShipsInitialCoords];
-
-		coords.forEach((coord) => this.killedShipsInitialCoords.add(coord));
+	updateKilledShipsInitialsCoords = (killedShipsInitialCoords: string) => {
+		this.killedShipsInitialCoords.push(killedShipsInitialCoords);
 	};
 
-	updateEnemiesKilledShipsInitialsCoords = (enemiesKilledShips: GameFieldShips) => {
-		this.enemiesKilledShips = {
-			...this.enemiesKilledShips,
-			...enemiesKilledShips,
+	updateEnemyKilledShipsInitialsCoords = (enemyKilledShips: GameFieldShips) => {
+		this.enemyKilledShips = {
+			...this.enemyKilledShips,
+			...enemyKilledShips,
 		};
 	};
 
@@ -165,9 +161,11 @@ export class GameFieldStore {
 	};
 
 	installGameState = (myGameState: GameState, enemyField: Field) => {
-		const { field, ships } = myGameState;
+		const { field, ships, killedShipsInitialCoords = [], enemyKilledShips = {} } = myGameState;
 
 		this.ships = ships;
+		this.killedShipsInitialCoords = killedShipsInitialCoords;
+		this.enemyKilledShips = enemyKilledShips;
 		this.field = field;
 
 		this.enemyField = enemyField;

@@ -24,7 +24,12 @@ export const getCellsCoordsAroundCell = ([x, y]: number[], diffCoords: number[][
 		const resultX = x + diffX;
 		const resultY = y + diffY;
 
-		if (resultX < 0 || resultY < 0) {
+		if (
+			resultX < 0 ||
+			resultY < 0 ||
+			resultX > LAST_TABLE_SIDE_INDEX ||
+			resultY > LAST_TABLE_SIDE_INDEX
+		) {
 			return null;
 		}
 
@@ -35,10 +40,12 @@ export const getCellsCoordsAroundShip = ({
 	shipCoords,
 	shipSize,
 	shipRotation,
+	withShipCoords = true,
 }: {
 	shipCoords: string[];
 	shipSize: ShipSize;
 	shipRotation: ShipRotation;
+	withShipCoords?: boolean;
 }) => {
 	const coordsAround = shipCoords
 		.map((coords, index) => {
@@ -88,7 +95,7 @@ export const getCellsCoordsAroundShip = ({
 
 			return acc;
 		},
-		[...shipCoords],
+		withShipCoords ? [...shipCoords] : [],
 	);
 
 	return allCoords;

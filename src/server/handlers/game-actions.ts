@@ -1,7 +1,7 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { CellType, Field, GameFieldShips } from '@/types/game-field';
 import { changeTurn } from '../lib/change-turn';
-import { destroyCoordsAroundShipIfNeeded } from '../lib/destroy-coords-around-ship-if-needed';
+import { handleDestroyedShip } from '../lib/handle-destroyed-ship';
 import { findSocketBySocketId, getPlayerId } from '../lib/utils';
 import { checkIsGameOver } from '../lib/check-is-game-over';
 import { ServerState } from '../server-state';
@@ -45,7 +45,7 @@ export const gameActionsHandler = (io: ServerIo, socket: ServerSocket) => {
 				return;
 			}
 
-			await destroyCoordsAroundShipIfNeeded({
+			await handleDestroyedShip({
 				field: enemyField as Field,
 				ships: enemyShips as GameFieldShips,
 				damagedCoords: coords,

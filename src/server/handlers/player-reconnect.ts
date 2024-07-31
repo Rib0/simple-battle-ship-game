@@ -21,7 +21,15 @@ export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 			return;
 		}
 
-		const { enemySocketId, enemyField, socketId, field, ships } = playersData;
+		const {
+			enemySocketId,
+			enemyField,
+			socketId,
+			field,
+			ships,
+			killedShipsInitialCoords,
+			enemyKilledShips,
+		} = playersData;
 
 		const isAllPlayerConnected = checkIsAllPlayersConnectedBySocketIds({
 			io,
@@ -42,6 +50,8 @@ export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 		const playerGameState = {
 			field,
 			ships,
+			killedShipsInitialCoords,
+			enemyKilledShips,
 		} as GameState;
 		const isEnemyPlayerSocketConnected =
 			findSocketBySocketId({ io, socketId: enemySocketId })?.connected || false;

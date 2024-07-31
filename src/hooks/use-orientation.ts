@@ -24,7 +24,7 @@ export const useOrientation = () => {
 
 		if (!isMatches) {
 			modal = Modal.confirm({
-				title: 'Переверните телефон',
+				title: 'Переверните устройство',
 				content: 'Играть можно только в горизонтальном режиме',
 				centered: true,
 				footer: null,

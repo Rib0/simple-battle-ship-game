@@ -98,8 +98,8 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 			gameFieldStore.updateKilledShipsInitialsCoords(killedShipsInitialCoords);
 		});
 
-		socket.on(SocketEvents.UPDATE_ENEMIES_KILLED_SHIPS, (enemiesKilledShips) => {
-			gameFieldStore.updateEnemiesKilledShipsInitialsCoords(enemiesKilledShips);
+		socket.on(SocketEvents.UPDATE_ENEMY_KILLED_SHIPS, (enemyKilledShips) => {
+			gameFieldStore.updateEnemyKilledShipsInitialsCoords(enemyKilledShips);
 		});
 
 		socket.on(SocketEvents.PLAYER_WON, (isMe) => {

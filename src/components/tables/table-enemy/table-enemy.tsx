@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { Flex } from 'antd';
 import cx from 'classnames';
 
+import { EnemyKilledShips } from '@/components/enemy-killed-ships';
 import { FIELD_SIDE_ARRAY } from '@/components/tables/constants';
 import { useSocketGameEvents } from '@/hooks/use-socket-game-events';
 import { formatCoords } from '@/utils/table';
@@ -68,6 +69,7 @@ export const TableEnemy = observer(() => {
 						</tr>
 					))}
 				</tbody>
+				<EnemyKilledShips />
 			</table>
 		</Flex>
 	);

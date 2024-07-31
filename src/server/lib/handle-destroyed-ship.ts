@@ -16,7 +16,7 @@ type Data = {
 	roomId: string;
 };
 
-export const destroyCoordsAroundShipIfNeeded = async (data: Data) => {
+export const handleDestroyedShip = async (data: Data) => {
 	const { field, ships, damagedCoords, socket, enemySocket, roomId } = data;
 
 	let killedShip: Nullable<{
@@ -74,9 +74,9 @@ export const destroyCoordsAroundShipIfNeeded = async (data: Data) => {
 	ServerState.setPlayerData({
 		roomId,
 		playerId,
-		playerData: { enemiesKilledShips: enemyKilledShip },
+		playerData: { enemyKilledShips: enemyKilledShip },
 	});
-	socket.emit(SocketEvents.UPDATE_ENEMIES_KILLED_SHIPS, enemyKilledShip);
+	socket.emit(SocketEvents.UPDATE_ENEMY_KILLED_SHIPS, enemyKilledShip);
 
 	ServerState.setPlayerData({
 		roomId,
@@ -89,28 +89,23 @@ export const destroyCoordsAroundShipIfNeeded = async (data: Data) => {
 		shipCoords: coords,
 		shipSize: size,
 		shipRotation: rotation,
+		withShipCoords: false,
 	});
+	const coordsAroundKilledShipForDestroy = coordsAroundKilledShip.filter(
+		(coord) => ![CellType.BOMB, CellType.DAMAGED].includes(field[coord]),
+	);
 
 	// eslint-disable-next-line no-restricted-syntax
-	for (const coordAround of coordsAroundKilledShip) {
+	for (const coordAround of coordsAroundKilledShipForDestroy) {
 		// чтобы предотвратить нажатие на ячейки вокруг убитого корабля
-		if (field[coordAround] === CellType.BOMB) {
-			// eslint-disable-next-line no-continue
-			continue;
-		}
 		field[coordAround] = CellType.DAMAGED;
 	}
 
 	// eslint-disable-next-line no-restricted-syntax
-	for (const coordAround of coordsAroundKilledShip) {
-		if (field[coordAround] === CellType.BOMB) {
-			// eslint-disable-next-line no-continue
-			continue;
-		}
-		field[coordAround] = CellType.DAMAGED;
-		socket.emit(SocketEvents.DAMAGED, coordAround, false);
-		socket.to(roomId).emit(SocketEvents.DAMAGED, coordAround, true);
+	for (const coordAround of coordsAroundKilledShipForDestroy) {
 		// eslint-disable-next-line no-await-in-loop
 		await delay(150);
+		socket.emit(SocketEvents.DAMAGED, coordAround, false);
+		socket.to(roomId).emit(SocketEvents.DAMAGED, coordAround, true);
 	}
 };
