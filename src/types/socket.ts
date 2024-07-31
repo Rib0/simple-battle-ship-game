@@ -92,6 +92,13 @@ export type SetPlayerData = Omit<PlayerData, 'killedShipsInitialCoords'> & {
 	killedShipsInitialCoords: string;
 };
 
+export type PlayersOnline = Record<
+	string,
+	{
+		isPlaying: boolean;
+	}
+>;
+
 type RoomData = {
 	turnStartTime: number;
 	turnPlayerId: string;

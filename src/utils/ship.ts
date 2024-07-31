@@ -1,5 +1,5 @@
 import { NullableHTMLDivElement } from '@/components/common/drag-and-drop/types';
-import { LAST_TABLE_SIDE_INDEX, TABLE_SIDE_SIZE } from '@/constants/table';
+import { TABLE_SIDE_SIZE } from '@/constants/table';
 import { ShipRotation, ShipSize } from '@/types/ship';
 import { getRootCssVariable } from './get-root-css-variable';
 import { arrayFromDigit } from './array-from-digit';
@@ -7,6 +7,7 @@ import {
 	formatCoords,
 	getCellsCoordsAroundShip,
 	getFormattedTableCoords,
+	isOutTableCoords,
 	parseCoords,
 } from './table';
 import { shuffle } from './shuffle';
@@ -278,13 +279,7 @@ export const getRandomlyInstalledShips = () => {
 				const hasInvalidCoords = shipCoords.some((c) => {
 					const [[x, y]] = parseCoords(c);
 
-					return (
-						x < 0 ||
-						x > LAST_TABLE_SIDE_INDEX ||
-						y < 0 ||
-						y > LAST_TABLE_SIDE_INDEX ||
-						inactiveTableCoords.has(c)
-					);
+					return isOutTableCoords(x, y) || inactiveTableCoords.has(c);
 				});
 
 				if (hasInvalidCoords) {
@@ -297,8 +292,6 @@ export const getRandomlyInstalledShips = () => {
 						shipRotation,
 					});
 					cellsAroundShip.forEach((cell) => inactiveTableCoords.add(cell));
-
-					console.log(cellsAroundShip);
 
 					resultShipsInfo.push({ shipCoords, shipRotation, shipSize });
 					goNextShip = true;

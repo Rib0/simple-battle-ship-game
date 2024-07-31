@@ -1,6 +1,5 @@
-.root {
+.main {
 	display: flex;
 	min-width: 667px;
 	justify-content: center;
-	margin: 10px auto;
 }

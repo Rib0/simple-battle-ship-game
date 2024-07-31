@@ -19,17 +19,15 @@ export const parseCoords = (coords: string | string[]) => {
 
 export const formatCoords = ({ x, y }: Coords) => `${x}-${y}`;
 
+export const isOutTableCoords = (x: number, y: number) =>
+	x < 0 || x > LAST_TABLE_SIDE_INDEX || y < 0 || y > LAST_TABLE_SIDE_INDEX;
+
 export const getCellsCoordsAroundCell = ([x, y]: number[], diffCoords: number[][]) =>
 	diffCoords.map(([diffX, diffY]) => {
 		const resultX = x + diffX;
 		const resultY = y + diffY;
 
-		if (
-			resultX < 0 ||
-			resultY < 0 ||
-			resultX > LAST_TABLE_SIDE_INDEX ||
-			resultY > LAST_TABLE_SIDE_INDEX
-		) {
+		if (isOutTableCoords(resultX, resultY)) {
 			return null;
 		}
 

@@ -1,10 +1,12 @@
-import { Rooms, ServerIo, ServerSocket, SetPlayerData } from '@/types/socket';
+import { PlayersOnline, Rooms, ServerIo, ServerSocket, SetPlayerData } from '@/types/socket';
 import { initiateGameWithPlayers } from './lib/initiate-game-with-players';
 
 export class ServerState {
 	private static searchingGamePlayers: ServerSocket[] = [];
 
-	static rooms: Rooms = {};
+	private static playersOnline: PlayersOnline;
+
+	private static rooms: Rooms = {};
 
 	private static isSearching: NodeJS.Timeout | undefined;
 
