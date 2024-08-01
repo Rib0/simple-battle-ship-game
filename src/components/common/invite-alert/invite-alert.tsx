@@ -12,10 +12,10 @@ export const InviteAlert = observer(() => {
 	const { gameStore, shipsStore } = useStoreContext();
 	const { acceptInvitation, rejectInvitation } = useSocketGameEvents();
 
-	const { invitedByPlayer } = gameStore;
+	const { invitedByPlayerId } = gameStore;
 	const { isAllShipsInstalled } = shipsStore;
 
-	if (!invitedByPlayer) {
+	if (!invitedByPlayerId) {
 		return null;
 	}
 
@@ -29,13 +29,25 @@ export const InviteAlert = observer(() => {
 
 	const message = (
 		<Flex gap="small" align="center">
-			<Text style={{ whiteSpace: 'nowrap' }}>
-				Игрок <Text strong>{invitedByPlayer}</Text> приглашает вас в игру
+			<Text className={styles.text}>
+				Игрок{' '}
+				<Text className={styles.fontSize} strong>
+					{invitedByPlayerId}
+				</Text>{' '}
+				приглашает вас в игру
 			</Text>
-			<Button disabled={!isAllShipsInstalled} onClick={handleAcceptClick} type="primary">
+			<Button
+				size="small"
+				onClick={handleAcceptClick}
+				disabled={!isAllShipsInstalled}
+				className={styles.fontSize}
+				type="primary"
+			>
 				Принять
 			</Button>
-			<Button onClick={handleCancelClick}>Отклонить</Button>
+			<Button size="small" onClick={handleCancelClick} className={styles.fontSize}>
+				Отклонить
+			</Button>
 		</Flex>
 	);
 

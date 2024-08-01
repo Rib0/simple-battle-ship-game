@@ -3,7 +3,7 @@ import { findSocketBySocketId, getPlayerId } from '../lib/utils';
 import { ServerState } from '../server-state';
 
 export const playerLeaveGameHandler = (io: ServerIo, socket: ServerSocket) => {
-	socket.on(SocketEvents.PLAYER_LEAVE_GAME, () => {
+	socket.on(SocketEvents.PLAYER_LEAVE_GAME, async () => {
 		const { roomId } = socket.data;
 		const playerId = getPlayerId(socket);
 
@@ -21,7 +21,7 @@ export const playerLeaveGameHandler = (io: ServerIo, socket: ServerSocket) => {
 			return;
 		}
 
-		const enemyPlayerSocket = findSocketBySocketId({ io, socketId: enemySocketId });
+		const enemyPlayerSocket = await findSocketBySocketId({ io, socketId: enemySocketId });
 
 		if (enemyPlayerSocket) {
 			enemyPlayerSocket.data = {};

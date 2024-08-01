@@ -4,10 +4,10 @@ import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { findSocketByPlayerId, getPlayerId } from '../lib/utils';
 
 export const setAuthDataHandler = (io: ServerIo, socket: ServerSocket) => {
-	socket.on(SocketEvents.SET_AUTH_DATA, () => {
+	socket.on(SocketEvents.SET_AUTH_DATA, async () => {
 		const playerId = getPlayerId(socket) || '';
 
-		const socketWithEqualPlayerId = findSocketByPlayerId({ io, playerId });
+		const socketWithEqualPlayerId = await findSocketByPlayerId({ io, playerId });
 
 		if ((socketWithEqualPlayerId && socketWithEqualPlayerId !== socket) || !playerId) {
 			const newPlayerId = nanoid();

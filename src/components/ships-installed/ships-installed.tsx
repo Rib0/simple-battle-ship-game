@@ -11,7 +11,7 @@ import styles from './styles.module.css';
 
 export const ShipsInstalled = observer(() => {
 	const { gameStore, gameFieldStore, shipsStore } = useStoreContext();
-	const { isStarted } = gameStore;
+	const { isStarted, isSearching, isAwaitingInvitationResponse } = gameStore;
 	const { killedShipsInitialCoords, ships, setActiveInstalledShip, activeInstalledShipCoords } =
 		gameFieldStore;
 	const { activeSize } = shipsStore;
@@ -22,10 +22,12 @@ export const ShipsInstalled = observer(() => {
 		() =>
 			Object.entries(ships).map(([coords, { size: shipSize, rotation: shipRotation }]) => {
 				const handleClick = () => {
-					if (!activeSize && !isStarted) {
-						const resultCoords = activeInstalledShipCoords ? null : coords;
-						setActiveInstalledShip(resultCoords);
+					if (activeSize || isStarted || isSearching || isAwaitingInvitationResponse) {
+						return;
 					}
+
+					const resultCoords = activeInstalledShipCoords ? null : coords;
+					setActiveInstalledShip(resultCoords);
 				};
 
 				const isActive = activeInstalledShipCoords === coords;
@@ -63,6 +65,8 @@ export const ShipsInstalled = observer(() => {
 			ships,
 			activeSize,
 			isStarted,
+			isSearching,
+			isAwaitingInvitationResponse,
 			activeInstalledShipCoords,
 			setActiveInstalledShip,
 			isMatchesMdViewport,

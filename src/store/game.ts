@@ -20,7 +20,11 @@ export class GameStore {
 
 	isEnemyOnline = false;
 
-	invitedByPlayer: Nullable<string> = null;
+	isSearching = false;
+
+	isAwaitingInvitationResponse = false;
+
+	invitedByPlayerId: Nullable<string> = null;
 
 	notitications: Array<{
 		id: string;
@@ -40,7 +44,9 @@ export class GameStore {
 		this.timeRemain = 0;
 		this.playerId = LocaleStorage.get('player_id_battle_ship_game');
 		this.isEnemyOnline = false;
-		this.invitedByPlayer = null;
+		this.isSearching = false;
+		this.isAwaitingInvitationResponse = false;
+		this.invitedByPlayerId = null;
 		this.notitications = [];
 	}
 
@@ -53,7 +59,9 @@ export class GameStore {
 			| 'timeRemain'
 			| 'playerId'
 			| 'isEnemyOnline'
-			| 'invitedByPlayer'
+			| 'isSearching'
+			| 'isAwaitingInvitationResponse'
+			| 'invitedByPlayerId'
 		>,
 	>(
 		key: T,

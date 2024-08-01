@@ -57,7 +57,7 @@ export const initiateGameWithPlayers = async (players: ServerSocket[], io: Serve
 		ServerState.setPlayerData({ roomId, playerId: player1Id, playerData: player1Data });
 		ServerState.setPlayerData({ roomId, playerId: player2Id, playerData: player2Data });
 
-		changeTurn(io, roomId);
+		await changeTurn(io, roomId);
 
 		ServerState.removeSearchingGamePlayers(players);
 	} catch (e) {

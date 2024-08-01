@@ -10,7 +10,6 @@ export const useSocketGameEvents = () => {
 	const rootStore = useStoreContext();
 
 	const { gameStore } = rootStore;
-	const { invitedByPlayer } = gameStore;
 
 	const setAuthData = useCallback(() => {
 		socket?.emit(SocketEvents.SET_AUTH_DATA);
@@ -18,28 +17,27 @@ export const useSocketGameEvents = () => {
 
 	const searchGame = () => {
 		socket?.emit(SocketEvents.SEARCH_GAME);
+		gameStore.setGameValue('isSearching', true);
+	};
+
+	const cancelSearchGame = () => {
+		socket?.emit(SocketEvents.CANCEL_SEARCH_GAME);
+		gameStore.setGameValue('isSearching', false);
 	};
 
 	const inviteById = (id: string) => {
 		socket?.emit(SocketEvents.INVITE_BY_ID, id);
+		gameStore.setGameValue('isAwaitingInvitationResponse', true);
 	};
 
 	const acceptInvitation = () => {
-		if (!invitedByPlayer) {
-			return;
-		}
-
-		socket?.emit(SocketEvents.ACCEPT_INVITATION, invitedByPlayer);
-		gameStore.setGameValue('invitedByPlayer', null);
+		socket?.emit(SocketEvents.ACCEPT_INVITATION);
+		gameStore.setGameValue('invitedByPlayerId', null);
 	};
 
 	const rejectInvitation = () => {
-		if (!invitedByPlayer) {
-			return;
-		}
-
-		socket?.emit(SocketEvents.REJECT_INVITATION, invitedByPlayer);
-		gameStore.setGameValue('invitedByPlayer', null);
+		socket?.emit(SocketEvents.REJECT_INVITATION);
+		gameStore.setGameValue('invitedByPlayerId', null);
 	};
 
 	const findGameToReconnect = useCallback(() => {
@@ -71,6 +69,7 @@ export const useSocketGameEvents = () => {
 	return {
 		setAuthData,
 		searchGame,
+		cancelSearchGame,
 		inviteById,
 		acceptInvitation,
 		rejectInvitation,

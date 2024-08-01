@@ -1,4 +1,13 @@
 .alert {
 	position: absolute;
 	top: -10px;
+
+	.text {
+		white-space: nowrap;
+	}
+
+	.fontSize,
+	.text {
+		font-size: 1rem;
+	}
 }

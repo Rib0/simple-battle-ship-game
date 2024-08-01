@@ -2,19 +2,21 @@ import { useState } from 'preact/compat';
 import { observer } from 'mobx-react-lite';
 import { Flex } from 'antd';
 
-import { Button } from '@/components/common/button';
 import { SearchInput } from '@/components/common/search-input';
+import { Button } from '@/components/common/button';
+import { Spin } from '@/components/common/spin';
 
 import { useSocketGameEvents } from '@/hooks/use-socket-game-events';
 import { useStoreContext } from '@/context/store-context';
 
-import styles from './styles.module.css';
+import { getSpinText } from './utils';
 
 export const StartGameActions = observer(() => {
 	const [idToInvite, setIdToInvite] = useState('');
-	const { shipsStore, gameFieldStore } = useStoreContext();
-	const { searchGame, inviteById } = useSocketGameEvents();
+	const { shipsStore, gameStore, gameFieldStore } = useStoreContext();
+	const { searchGame, cancelSearchGame, inviteById } = useSocketGameEvents();
 
+	const { isSearching, isAwaitingInvitationResponse, playerId } = gameStore;
 	const { activeSize, rotateActiveShip, setActiveSize, isAllShipsInstalled } = shipsStore;
 	const {
 		activeInstalledShipCoords,
@@ -23,7 +25,7 @@ export const StartGameActions = observer(() => {
 		resetAllShips,
 	} = gameFieldStore;
 
-	const handleClickCancelButton = () => {
+	const handleResetShipsClick = () => {
 		if (activeSize) {
 			setActiveSize(null);
 		} else if (activeInstalledShipCoords) {
@@ -38,6 +40,7 @@ export const StartGameActions = observer(() => {
 	};
 
 	const handleGoToBattleClick = () => {
+		setActiveSize(null);
 		const trimmedId = idToInvite.trim();
 
 		if (trimmedId) {
@@ -47,25 +50,38 @@ export const StartGameActions = observer(() => {
 		}
 	};
 
+	const isEqualInvitedPlayerId = playerId === idToInvite.trim();
+	const spinText = getSpinText({ isSearching, isAwaitingInvitationResponse });
+	const isSearchButtonDisabled =
+		!isAllShipsInstalled || isAwaitingInvitationResponse || isEqualInvitedPlayerId;
+	const isSearchingGame = isSearching || isAwaitingInvitationResponse;
+
 	return (
 		<Flex vertical gap="small">
+			<Spin visible={isSearchingGame} tip={spinText} />
 			<Flex gap="small">
-				{!activeSize && !activeInstalledShipCoords && (
-					<Button type="shuffle_ships" onClick={randomlyInstallShips} />
+				{isSearching ? (
+					<Button type="cancel" onClick={cancelSearchGame} />
+				) : (
+					<Button
+						disabled={isSearchButtonDisabled}
+						type="start_battle"
+						onClick={handleGoToBattleClick}
+					/>
 				)}
-				{activeSize && <Button type="rotate_ship" onClick={rotateActiveShip} />}
-				{(activeSize || activeInstalledShipCoords || isAllShipsInstalled) && (
-					<Button type="cancel" onClick={handleClickCancelButton} />
+				{!isSearchingGame && (
+					<>
+						{!activeSize && !activeInstalledShipCoords && (
+							<Button type="shuffle_ships" onClick={randomlyInstallShips} />
+						)}
+						{activeSize && <Button type="rotate_ship" onClick={rotateActiveShip} />}
+						{(activeSize || activeInstalledShipCoords || isAllShipsInstalled) && (
+							<Button type="cancel" onClick={handleResetShipsClick} />
+						)}
+					</>
 				)}
 			</Flex>
-			<Flex
-				vertical
-				gap="small"
-				className={!isAllShipsInstalled ? styles.inactive : undefined}
-			>
-				<Button type="start_battle" onClick={handleGoToBattleClick} />
-				<SearchInput onChange={handleChangeIdToInvite} value={idToInvite} />
-			</Flex>
+			<SearchInput onChange={handleChangeIdToInvite} value={idToInvite} />
 		</Flex>
 	);
 });

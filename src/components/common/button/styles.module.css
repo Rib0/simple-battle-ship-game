@@ -36,6 +36,11 @@
 		}
 	}
 
+	&.disabled {
+		opacity: 0.3;
+		pointer-events: none;
+	}
+
 	&:active {
 		transform: scale(0.97);
 	}

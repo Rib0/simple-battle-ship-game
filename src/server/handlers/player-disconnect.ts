@@ -9,6 +9,8 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 		const { roomId } = socket.data;
 		const playerId = getPlayerId(socket);
 
+		ServerState.removeSearchingGamePlayers([socket]);
+
 		if (!roomId || !playerId) {
 			return;
 		}

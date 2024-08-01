@@ -19,7 +19,7 @@ export const parseCoords = (coords: string | string[]) => {
 
 export const formatCoords = ({ x, y }: Coords) => `${x}-${y}`;
 
-export const isOutTableCoords = (x: number, y: number) =>
+export const isOutOfTableCoords = (x: number, y: number) =>
 	x < 0 || x > LAST_TABLE_SIDE_INDEX || y < 0 || y > LAST_TABLE_SIDE_INDEX;
 
 export const getCellsCoordsAroundCell = ([x, y]: number[], diffCoords: number[][]) =>
@@ -27,7 +27,7 @@ export const getCellsCoordsAroundCell = ([x, y]: number[], diffCoords: number[][
 		const resultX = x + diffX;
 		const resultY = y + diffY;
 
-		if (isOutTableCoords(resultX, resultY)) {
+		if (isOutOfTableCoords(resultX, resultY)) {
 			return null;
 		}
 

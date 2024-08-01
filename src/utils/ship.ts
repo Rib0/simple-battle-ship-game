@@ -7,7 +7,7 @@ import {
 	formatCoords,
 	getCellsCoordsAroundShip,
 	getFormattedTableCoords,
-	isOutTableCoords,
+	isOutOfTableCoords,
 	parseCoords,
 } from './table';
 import { shuffle } from './shuffle';
@@ -279,7 +279,7 @@ export const getRandomlyInstalledShips = () => {
 				const hasInvalidCoords = shipCoords.some((c) => {
 					const [[x, y]] = parseCoords(c);
 
-					return isOutTableCoords(x, y) || inactiveTableCoords.has(c);
+					return isOutOfTableCoords(x, y) || inactiveTableCoords.has(c);
 				});
 
 				if (hasInvalidCoords) {

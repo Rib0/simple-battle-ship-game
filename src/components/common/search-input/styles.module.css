@@ -1,3 +1,11 @@
 .input {
-	width: 220px;
+	width: 140px;
+
+	@media (--md-viewport) {
+		width: 180px;
+	}
+
+	@media (--lg-viewport) {
+		width: 220px;
+	}
 }

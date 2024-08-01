@@ -6,7 +6,7 @@ import { Timer } from './timer';
 import { findSocketBySocketId, getPlayerId } from './utils';
 import { ServerState } from '../server-state';
 
-export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: string) => {
+export const changeTurn = async (io: ServerIo, roomId: string, reconnectedPlayerId?: string) => {
 	const roomData = ServerState.getRoomData(roomId);
 
 	if (!roomData?.players) {
@@ -15,17 +15,19 @@ export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: s
 
 	const [player1, player2] = Object.values(roomData?.players);
 
-	const playersSockets = [player1?.socketId, player2?.socketId].map((socketId) =>
-		findSocketBySocketId({ io, socketId }),
-	);
-
-	const [player1Socket, player2Socket] = playersSockets;
+	const player1Socket = await findSocketBySocketId({ io, socketId: player1?.socketId });
+	const player2Socket = await findSocketBySocketId({ io, socketId: player2?.socketId });
 
 	if (!player1Socket || !player2Socket) {
 		return;
 	}
 
-	const isInRoom = player1Socket?.data.roomId === player2Socket?.data.roomId;
+	const playersSockets = [player1Socket, player2Socket];
+
+	const isInRoom =
+		player1Socket?.data.roomId &&
+		player2Socket?.data.roomId &&
+		player1Socket?.data.roomId === player2Socket?.data.roomId;
 	const hasDisconnected = playersSockets.some((socket) => socket?.disconnected);
 
 	if (hasDisconnected || !isInRoom) {
@@ -99,7 +101,7 @@ export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: s
 		}
 	}
 
-	const callback = () => {
+	const callback = async () => {
 		const isStaleTurnId = ServerState.getRoomData(roomId)?.turnId !== turnId;
 		const hasDisconnectedActual = playersSockets.some((socket) => socket?.disconnected);
 		const isInRoomActual = player1Socket?.data.roomId === player2Socket?.data.roomId;
@@ -108,7 +110,7 @@ export const changeTurn = (io: ServerIo, roomId: string, reconnectedPlayerId?: s
 			return;
 		}
 
-		changeTurn(io, roomId);
+		await changeTurn(io, roomId);
 	};
 
 	Timer.addCallback(callback, changeTurnCallbackDelay);

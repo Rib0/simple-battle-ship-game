@@ -7,15 +7,21 @@ import styles from './styles.module.css';
 type Props = {
 	onClick: VoidFunction;
 	type: 'rotate_ship' | 'shuffle_ships' | 'start_battle' | 'cancel';
+	disabled?: boolean;
 	className?: string;
 };
 
 export const Button = observer<PropsWithChildren<Props>>(
-	({ children, onClick, type, className }) => (
+	({ children, onClick, type, disabled, className }) => (
 		<button
 			type="button"
 			onClick={onClick}
-			className={cx(styles.button, styles[`type_${type}`], className)}
+			className={cx(
+				styles.button,
+				styles[`type_${type}`],
+				disabled && styles.disabled,
+				className,
+			)}
 		>
 			{children}
 		</button>

@@ -8,12 +8,25 @@ import { LocaleStorage } from '@/utils/locale-storage';
 export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 	const rootStore = useStoreContext();
 
-	const { gameStore, gameFieldStore } = rootStore;
+	const { gameStore, gameFieldStore, shipsStore } = rootStore;
 
 	useEffect(() => {
 		if (!socket) {
 			return;
 		}
+
+		socket.on(SocketEvents.ERROR, (message) => {
+			gameStore.addNotification({ message, type: 'error' });
+		});
+
+		socket.on(SocketEvents.WARNING, (message) => {
+			gameStore.addNotification({ message, type: 'warning' });
+		});
+
+		socket.on(SocketEvents.SET_AUTH_DATA, (playerId) => {
+			LocaleStorage.set('player_id_battle_ship_game', playerId);
+			gameStore.setGameValue('playerId', playerId);
+		});
 
 		socket.on(SocketEvents.SET_AUTH_DATA, (playerId) => {
 			LocaleStorage.set('player_id_battle_ship_game', playerId);
@@ -27,28 +40,23 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 		});
 
 		socket.on(SocketEvents.INVITE_BY_ID, (id) => {
-			if (gameStore.invitedByPlayer) {
-				return;
-			}
+			gameStore.setGameValue('invitedByPlayerId', id);
 
-			gameStore.setGameValue('invitedByPlayer', id);
+			setTimeout(() => {
+				gameStore.setGameValue('invitedByPlayerId', null);
+			}, 10_000);
 		});
 
-		socket.on(SocketEvents.REJECT_INVITATION, () => {
-			gameStore.addNotification({
-				message: 'Пользователь отказался от игры',
-				type: 'warning',
-			});
-		});
-
-		socket.on(SocketEvents.NO_PLAYER_TO_INVITE, () => {
-			gameStore.addNotification({ message: 'Такого игрока не существует', type: 'error' });
+		socket.on(SocketEvents.INVITATION_FAILED, () => {
+			gameStore.setGameValue('isAwaitingInvitationResponse', false);
 		});
 
 		socket.on(SocketEvents.JOINED_ROOM, (roomId, callback) => {
 			const { getField, ships } = gameFieldStore;
 			const { setGameValue } = gameStore;
+			const { setActiveSize } = shipsStore;
 
+			setActiveSize(null);
 			setGameValue('isStarted', true);
 			setGameValue('isEnemyOnline', true);
 			LocaleStorage.set('room_id_battle_ship_game', roomId);
@@ -110,5 +118,5 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 			gameStore.setGameValue('isPaused', true);
 			gameStore.addNotification({ message, type }, rootStore.resetAllStores);
 		});
-	}, [socket, gameStore, gameFieldStore, rootStore]);
+	}, [socket, gameStore, gameFieldStore, shipsStore, rootStore]);
 };

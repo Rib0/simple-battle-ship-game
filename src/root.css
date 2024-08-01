@@ -30,11 +30,7 @@
 }
 
 html {
-	font-size: 8px;
-
-	@media (--md-viewport) {
-		font-size: 11px;
-	}
+	font-size: 11px;
 
 	@media (--lg-viewport) {
 		font-size: 14px;

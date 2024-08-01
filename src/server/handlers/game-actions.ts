@@ -39,7 +39,7 @@ export const gameActionsHandler = (io: ServerIo, socket: ServerSocket) => {
 		socket.to(roomId).emit(eventType, coords, true);
 
 		if (isDamaged) {
-			const enemySocket = findSocketBySocketId({ io, socketId: enemySocketId });
+			const enemySocket = await findSocketBySocketId({ io, socketId: enemySocketId });
 
 			if (!enemySocket) {
 				return;
@@ -64,7 +64,7 @@ export const gameActionsHandler = (io: ServerIo, socket: ServerSocket) => {
 				enemySocket.data = {};
 			}
 		} else {
-			changeTurn(io, roomId);
+			await changeTurn(io, roomId);
 		}
 	});
 };

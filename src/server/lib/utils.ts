@@ -3,14 +3,26 @@ import { ServerIo, ServerSocket } from '@/types/socket';
 export const getPlayerId = (socket: ServerSocket) =>
 	socket.handshake.auth?.playerId as string | undefined;
 
-export const findSocketBySocketId = ({ io, socketId }: { io: ServerIo; socketId?: string }) => {
-	const sockets = Array.from(io.sockets.sockets.values());
+export const findSocketBySocketId = async ({
+	io,
+	socketId,
+}: {
+	io: ServerIo;
+	socketId?: string;
+}) => {
+	const sockets = (await io.fetchSockets()) as unknown as ServerSocket[];
 
 	return sockets.find((playerSocket) => playerSocket.id === socketId);
 };
 
-export const findSocketByPlayerId = ({ io, playerId }: { io: ServerIo; playerId: string }) => {
-	const sockets = Array.from(io.sockets.sockets.values());
+export const findSocketByPlayerId = async ({
+	io,
+	playerId,
+}: {
+	io: ServerIo;
+	playerId: string;
+}) => {
+	const sockets = (await io.fetchSockets()) as unknown as ServerSocket[];
 
 	return sockets.find((playerSocket) => getPlayerId(playerSocket) === playerId);
 };

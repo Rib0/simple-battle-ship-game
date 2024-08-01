@@ -53,8 +53,9 @@ export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 			killedShipsInitialCoords,
 			enemyKilledShips,
 		} as GameState;
-		const isEnemyPlayerSocketConnected =
-			findSocketBySocketId({ io, socketId: enemySocketId })?.connected || false;
+
+		const enemyPlayerSocket = await findSocketBySocketId({ io, socketId: enemySocketId });
+		const isEnemyPlayerSocketConnected = enemyPlayerSocket?.connected || false;
 
 		socket.to(roomId).emit(SocketEvents.ENEMY_RECONNECTED_TO_ROOM);
 		socket.emit(
@@ -63,6 +64,6 @@ export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 			enemyField as Field,
 			isEnemyPlayerSocketConnected,
 		);
-		changeTurn(io, roomId, playerId);
+		await changeTurn(io, roomId, playerId);
 	});
 };
