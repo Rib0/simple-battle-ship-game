@@ -5,7 +5,7 @@ import { ShipRotation, ShipSize } from '@/types/ship';
 import { ServerSocket, SocketEvents } from '@/types/socket';
 import { Nullable } from '@/types/utils';
 import { delay, getPlayerId } from './utils';
-import { ServerState } from '../server-state';
+import { ServerState } from '../models/server-state';
 
 type Data = {
 	field: Field;

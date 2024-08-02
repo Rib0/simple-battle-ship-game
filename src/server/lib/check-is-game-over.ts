@@ -1,5 +1,5 @@
 import { CellType } from '@/types/game-field';
-import { ServerState } from '../server-state';
+import { ServerState } from '../models/server-state';
 
 export const checkIsGameOver = (roomId: string) => {
 	const roomData = ServerState.getRoomData(roomId);

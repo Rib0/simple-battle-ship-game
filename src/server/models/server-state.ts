@@ -1,5 +1,5 @@
 import { PlayersOnline, Rooms, ServerIo, ServerSocket, SetPlayerData } from '@/types/socket';
-import { initiateGameWithPlayers } from './lib/initiate-game-with-players';
+import { initiateGameWithPlayers } from '../lib/initiate-game-with-players';
 
 export class ServerState {
 	private static searchingGamePlayers: ServerSocket[] = [];

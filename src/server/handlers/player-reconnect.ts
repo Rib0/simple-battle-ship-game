@@ -6,7 +6,7 @@ import {
 	getPlayerId,
 } from '../lib/utils';
 import { changeTurn } from '../lib/change-turn';
-import { ServerState } from '../server-state';
+import { ServerState } from '../models/server-state';
 
 export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.FIND_GAME_TO_RECONNECT, async (roomId) => {

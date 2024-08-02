@@ -2,7 +2,7 @@ import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { TURN_DURATION } from '@/constants/game';
 import { Timer } from '../lib/timer';
 import { getPlayerId } from '../lib/utils';
-import { ServerState } from '../server-state';
+import { ServerState } from '../models/server-state';
 
 export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on('disconnect', () => {

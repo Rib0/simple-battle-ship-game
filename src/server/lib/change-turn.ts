@@ -4,7 +4,7 @@ import { ServerIo, SocketEvents } from '@/types/socket';
 import { TURN_DURATION } from '@/constants/game';
 import { Timer } from './timer';
 import { findSocketBySocketId, getPlayerId } from './utils';
-import { ServerState } from '../server-state';
+import { ServerState } from '../models/server-state';
 
 export const changeTurn = async (io: ServerIo, roomId: string, reconnectedPlayerId?: string) => {
 	const roomData = ServerState.getRoomData(roomId);
@@ -104,7 +104,10 @@ export const changeTurn = async (io: ServerIo, roomId: string, reconnectedPlayer
 	const callback = async () => {
 		const isStaleTurnId = ServerState.getRoomData(roomId)?.turnId !== turnId;
 		const hasDisconnectedActual = playersSockets.some((socket) => socket?.disconnected);
-		const isInRoomActual = player1Socket?.data.roomId === player2Socket?.data.roomId;
+		const isInRoomActual =
+			player1Socket?.data.roomId &&
+			player2Socket?.data.roomId &&
+			player1Socket?.data.roomId === player2Socket?.data.roomId;
 
 		if (isStaleTurnId || hasDisconnectedActual || !isInRoomActual) {
 			return;

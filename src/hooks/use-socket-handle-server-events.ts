@@ -53,23 +53,18 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 
 		socket.on(SocketEvents.JOINED_ROOM, (roomId, callback) => {
 			const { getField, ships } = gameFieldStore;
-			const { setGameValue } = gameStore;
-			const { setActiveSize } = shipsStore;
 
-			setActiveSize(null);
-			setGameValue('isStarted', true);
-			setGameValue('isEnemyOnline', true);
+			shipsStore.setActiveSize(null);
+			gameStore.setGameValue('isStarted', true);
+			gameStore.setGameValue('isEnemyOnline', true);
 			LocaleStorage.set('room_id_battle_ship_game', roomId);
 			callback({ field: getField, ships });
 		});
 
 		socket.on(SocketEvents.RECONNECTED_TO_ROOM, (myGameState, enemyField, isEnemyOnline) => {
-			const { setGameValue } = gameStore;
-			const { installGameState } = gameFieldStore;
-
-			setGameValue('isStarted', true);
-			installGameState(myGameState, enemyField);
-			setGameValue('isEnemyOnline', isEnemyOnline);
+			gameStore.setGameValue('isStarted', true);
+			gameFieldStore.installGameState(myGameState, enemyField);
+			gameStore.setGameValue('isEnemyOnline', isEnemyOnline);
 		});
 
 		socket.on(SocketEvents.ENEMY_RECONNECTED_TO_ROOM, () => {

@@ -1,5 +1,5 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
-import { ServerState } from '../server-state';
+import { ServerState } from '../models/server-state';
 
 let isSearching: NodeJS.Timeout | undefined;
 

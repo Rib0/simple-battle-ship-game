@@ -9,7 +9,7 @@ type Props = {
 };
 
 export const Spin = observer<Props>(({ visible, tip }) => (
-	<SpinAntd size="small" spinning={visible} tip={tip}>
+	<SpinAntd spinning={visible} tip={tip}>
 		<div className={styles.content} />
 	</SpinAntd>
 ));

@@ -1,6 +1,6 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { findSocketBySocketId, getPlayerId } from '../lib/utils';
-import { ServerState } from '../server-state';
+import { ServerState } from '../models/server-state';
 
 export const playerLeaveGameHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.PLAYER_LEAVE_GAME, async () => {

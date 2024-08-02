@@ -4,7 +4,7 @@ import { changeTurn } from '../lib/change-turn';
 import { handleDestroyedShip } from '../lib/handle-destroyed-ship';
 import { findSocketBySocketId, getPlayerId } from '../lib/utils';
 import { checkIsGameOver } from '../lib/check-is-game-over';
-import { ServerState } from '../server-state';
+import { ServerState } from '../models/server-state';
 
 export const gameActionsHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.ATTACK, async (coords, roomId) => {
