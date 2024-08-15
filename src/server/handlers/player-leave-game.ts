@@ -1,27 +1,29 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
-import { findSocketBySocketId, getPlayerId } from '../lib/utils';
-import { ServerState } from '../models/server-state';
+import { roomStore } from '../stores/rooms-store';
+import { Utils } from '../lib/utils';
 
 export const playerLeaveGameHandler = (io: ServerIo, socket: ServerSocket) => {
-	socket.on(SocketEvents.PLAYER_LEAVE_GAME, async () => {
+	socket.on(SocketEvents.PLAYER_LEAVE_GAME, () => {
 		const { roomId } = socket.data;
-		const playerId = getPlayerId(socket);
-
-		if (!roomId || !playerId) {
+		if (!roomId) {
 			return;
 		}
 
-		const playersData = ServerState.getPlayersData({ roomId, playerId });
-		if (!playersData) {
+		const room = roomStore.getRoom(roomId);
+		const playerId = Utils.getPlayerId(socket);
+
+		if (!room || !playerId) {
 			return;
 		}
 
-		const { enemySocketId } = playersData;
-		if (!enemySocketId) {
+		const player = room.getPlayer(playerId);
+
+		if (!player) {
 			return;
 		}
 
-		const enemyPlayerSocket = await findSocketBySocketId({ io, socketId: enemySocketId });
+		const { enemyPlayerId } = player;
+		const enemyPlayerSocket = Utils.findSocketByPlayerId(enemyPlayerId);
 
 		if (enemyPlayerSocket) {
 			enemyPlayerSocket.data = {};
@@ -31,6 +33,6 @@ export const playerLeaveGameHandler = (io: ServerIo, socket: ServerSocket) => {
 
 		socket.to(roomId).emit(SocketEvents.PLAYER_LEAVE_GAME);
 		io.socketsLeave(roomId);
-		ServerState.deleteRoom(roomId);
+		roomStore.deleteRoom(roomId);
 	});
 };

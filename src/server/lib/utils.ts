@@ -1,48 +1,50 @@
-import { ServerIo, ServerSocket } from '@/types/socket';
+import { ServerSocket } from '@/types/socket';
+import { IoConnection } from './io-connection';
 
-export const getPlayerId = (socket: ServerSocket) =>
-	socket.handshake.auth?.playerId as string | undefined;
+// TODO: поменять на UTILS везде где используются функкции отсюда
 
-export const findSocketBySocketId = async ({
-	io,
-	socketId,
-}: {
-	io: ServerIo;
-	socketId?: string;
-}) => {
-	const sockets = (await io.fetchSockets()) as unknown as ServerSocket[];
+export class Utils {
+	private static ioConnection = IoConnection.getInstance().connection;
 
-	return sockets.find((playerSocket) => playerSocket.id === socketId);
-};
+	static get getAllRooms() {
+		return this.ioConnection.of('/').adapter.rooms;
+	}
 
-export const findSocketByPlayerId = async ({
-	io,
-	playerId,
-}: {
-	io: ServerIo;
-	playerId: string;
-}) => {
-	const sockets = (await io.fetchSockets()) as unknown as ServerSocket[];
+	static getPlayerId(socket: ServerSocket) {
+		return socket.handshake.auth?.playerId as string | undefined;
+	}
 
-	return sockets.find((playerSocket) => getPlayerId(playerSocket) === playerId);
-};
-
-export const checkIsAllPlayersConnectedBySocketIds = ({
-	io,
-	socketIds,
-}: {
-	io: ServerIo;
-	socketIds: (string | undefined)[];
-}) =>
-	socketIds.every((id) => {
-		if (!id) {
-			return false;
+	static findSocketBySocketId(socketId: string) {
+		// TODO: посмотреть зачем
+		if (!socketId) {
+			return null;
 		}
 
-		return io.sockets.sockets.get(id)?.connected;
-	});
+		return this.ioConnection.of('/').sockets.get(socketId);
+	}
 
-export const delay = (ms: number) =>
-	new Promise((resolve) => {
-		setTimeout(resolve, ms);
-	});
+	static findSocketByPlayerId(playerId: string) {
+		const sockets = this.ioConnection.of('/').sockets.values();
+
+		// eslint-disable-next-line no-restricted-syntax
+		for (const socket of sockets) {
+			if (this.getPlayerId(socket) === playerId) {
+				return socket;
+			}
+		}
+
+		return null;
+	}
+
+	static checkIfSocketsAlreadyInRoom(players: ServerSocket[]) {
+		const isAlreadyInRoom = players.some((player) => player.rooms.size > 1); // TODO: проверить, было 2
+
+		return isAlreadyInRoom;
+	}
+
+	static delay(ms: number) {
+		return new Promise((resolve) => {
+			setTimeout(resolve, ms);
+		});
+	}
+}

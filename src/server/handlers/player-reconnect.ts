@@ -1,69 +1,52 @@
-import { GameState, ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
-import { Field } from '@/types/game-field';
-import {
-	checkIsAllPlayersConnectedBySocketIds,
-	findSocketBySocketId,
-	getPlayerId,
-} from '../lib/utils';
-import { changeTurn } from '../lib/change-turn';
-import { ServerState } from '../models/server-state';
+import { ServerSocket, SocketEvents } from '@/types/socket';
+import { Utils } from '../lib/utils';
+import { roomStore } from '../stores/rooms-store';
 
-export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
+export const playerReconnectHandler = (socket: ServerSocket) => {
 	socket.on(SocketEvents.FIND_GAME_TO_RECONNECT, async (roomId) => {
-		const playerId = getPlayerId(socket);
+		const room = roomStore.getRoom(roomId);
+		if (!room) {
+			return;
+		}
 
+		const playerId = Utils.getPlayerId(socket);
 		if (!playerId) {
 			return;
 		}
 
-		const playersData = ServerState.getPlayersData({ roomId, playerId });
-		if (!playersData) {
+		const player = room.getPlayer(playerId);
+		if (!player) {
 			return;
 		}
 
-		const {
-			enemySocketId,
-			enemyField,
-			socketId,
-			field,
-			ships,
-			killedShipsInitialCoords,
-			enemyKilledShips,
-		} = playersData;
+		player.socketId = socket.id;
 
-		const isAllPlayerConnected = checkIsAllPlayersConnectedBySocketIds({
-			io,
-			socketIds: [socketId, enemySocketId],
-		});
-
-		if (isAllPlayerConnected) {
+		const enemyPlayer = room.getEnemyToPlayer(playerId);
+		if (!enemyPlayer) {
 			return;
 		}
 
 		socket.data.roomId = roomId;
-
-		const playerData = { socketId: socket.id };
-		ServerState.setPlayerData({ roomId, playerId, playerData });
-
 		await socket.join(roomId);
 
+		const { field, ships, killedShipsInitialCoords, enemyKilledShips } = player;
 		const playerGameState = {
 			field,
 			ships,
 			killedShipsInitialCoords,
 			enemyKilledShips,
-		} as GameState;
-
-		const enemyPlayerSocket = await findSocketBySocketId({ io, socketId: enemySocketId });
+		};
+		const enemyPlayerSocket = Utils.findSocketBySocketId(enemyPlayer.socketId);
 		const isEnemyPlayerSocketConnected = enemyPlayerSocket?.connected || false;
 
 		socket.to(roomId).emit(SocketEvents.ENEMY_RECONNECTED_TO_ROOM);
 		socket.emit(
 			SocketEvents.RECONNECTED_TO_ROOM,
 			playerGameState,
-			enemyField as Field,
+			enemyPlayer.field,
 			isEnemyPlayerSocketConnected,
 		);
-		await changeTurn(io, roomId, playerId);
+
+		room.changeTurn(playerId);
 	});
 };

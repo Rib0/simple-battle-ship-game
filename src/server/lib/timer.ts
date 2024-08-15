@@ -55,8 +55,4 @@ export class Timer {
 
 		callbacks.forEach((callback) => callback());
 	}
-
-	static get getTimerId() {
-		return Timer.timerId;
-	}
 }

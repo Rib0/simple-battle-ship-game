@@ -28,11 +28,6 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 			gameStore.setGameValue('playerId', playerId);
 		});
 
-		socket.on(SocketEvents.SET_AUTH_DATA, (playerId) => {
-			LocaleStorage.set('player_id_battle_ship_game', playerId);
-			gameStore.setGameValue('playerId', playerId);
-		});
-
 		socket.on(SocketEvents.TIMER_TICK, () => {
 			if (gameStore.isEnemyOnline && !gameStore.isPaused) {
 				gameStore.decreaseTimeRemain();
@@ -85,6 +80,8 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 		});
 
 		socket.on(SocketEvents.CHANGE_TURN, (isMyTurn, timeRemain) => {
+			console.log(timeRemain);
+
 			gameStore.setGameValue('isMyTurn', isMyTurn);
 			gameStore.setGameValue('timeRemain', timeRemain);
 		});

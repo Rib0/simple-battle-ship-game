@@ -8,11 +8,11 @@ import { setAuthDataHandler } from './set-auth-data';
 import { playerLeaveGameHandler } from './player-leave-game';
 
 export const registerHandlers = (io: ServerIo, socket: ServerSocket) => {
-	gameActionsHandler(io, socket);
-	inviteByIdHandler(io, socket);
+	gameActionsHandler(socket);
+	inviteByIdHandler(socket);
 	playerDisconnectHandler(io, socket);
 	playerLeaveGameHandler(io, socket);
-	playerReconnectHandler(io, socket);
-	searchingGameHandler(io, socket);
-	setAuthDataHandler(io, socket);
+	playerReconnectHandler(socket);
+	searchingGameHandler(socket);
+	setAuthDataHandler(socket);
 };

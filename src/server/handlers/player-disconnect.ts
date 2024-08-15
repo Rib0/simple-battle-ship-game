@@ -1,52 +1,63 @@
 import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { TURN_DURATION } from '@/constants/game';
 import { Timer } from '../lib/timer';
-import { getPlayerId } from '../lib/utils';
-import { ServerState } from '../models/server-state';
+import { Utils } from '../lib/utils';
+import { roomStore } from '../stores/rooms-store';
+import { appStore } from '../stores/app-store';
 
 export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on('disconnect', () => {
 		const { roomId } = socket.data;
-		const playerId = getPlayerId(socket);
+		if (!roomId) {
+			return;
+		}
 
-		ServerState.removeSearchingGamePlayers([socket]);
+		appStore.removeSearchingGamePlayers([socket]);
 
-		if (!roomId || !playerId) {
+		const room = roomStore.getRoom(roomId);
+		const playerId = Utils.getPlayerId(socket);
+
+		if (!room || !playerId) {
+			return;
+		}
+
+		const player = room.getPlayer(playerId);
+
+		if (!player) {
 			return;
 		}
 
 		const disconnectedTime = Timer.getTime;
-		const { timeRemain = TURN_DURATION } =
-			ServerState.getPlayersData({ roomId, playerId }) || {};
-		const { turnStartTime = disconnectedTime } = ServerState.getRoomData(roomId) || {};
-
+		const { timeRemain = TURN_DURATION } = player;
+		const { turnStartTime = disconnectedTime } = room;
 		const nextTimeRemain = timeRemain - (disconnectedTime - turnStartTime);
 
-		const playerData = {
-			disconnectedTime,
-			timeRemain: nextTimeRemain < 0 ? 0 : nextTimeRemain,
-		};
-
-		ServerState.setPlayerData({
-			roomId,
-			playerId,
-			playerData,
-		});
+		player.disconnectedTime = disconnectedTime;
+		player.timeRemain = nextTimeRemain < 0 ? 0 : nextTimeRemain;
 
 		socket.to(roomId).emit(SocketEvents.ENEMY_DISCONNECTED);
 
-		const { rooms } = io.of('/').adapter;
+		const rooms = Utils.getAllRooms;
 		const roomSocketSize = rooms.get(roomId)?.size;
 
 		if (!roomSocketSize) {
 			Timer.addCallback(() => {
-				const { rooms: actualRooms } = io.of('/').adapter;
+				const actualRooms = Utils.getAllRooms;
 				const actualRoomSocketSize = actualRooms.get(roomId)?.size;
 
+				const { enemyPlayerId } = player;
+				const enemyPlayerSocket = Utils.findSocketByPlayerId(enemyPlayerId);
+
+				if (enemyPlayerSocket) {
+					enemyPlayerSocket.data = {};
+				}
+
+				socket.data = {};
+
 				if (!actualRoomSocketSize) {
-					socket.to(roomId).emit(SocketEvents.PLAYER_LEAVE_GAME);
+					io.to(roomId).emit(SocketEvents.PLAYER_LEAVE_GAME);
 					io.socketsLeave(roomId);
-					ServerState.deleteRoom(roomId);
+					roomStore.deleteRoom(roomId);
 				}
 			}, 60);
 		}

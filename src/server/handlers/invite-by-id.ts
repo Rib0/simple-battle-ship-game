@@ -1,12 +1,12 @@
-import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
-import { initiateGameWithPlayers } from '../lib/initiate-game-with-players';
-import { findSocketByPlayerId, getPlayerId } from '../lib/utils';
+import { ServerSocket, SocketEvents } from '@/types/socket';
 import { Timer } from '../lib/timer';
+import { Utils } from '../lib/utils';
+import { roomStore } from '../stores/rooms-store';
 
-export const inviteByIdHandler = (io: ServerIo, socket: ServerSocket) => {
-	socket.on(SocketEvents.INVITE_BY_ID, async (invitedPlayerId) => {
-		const invitedPlayer = await findSocketByPlayerId({ io, playerId: invitedPlayerId });
-		const inviterId = getPlayerId(socket);
+export const inviteByIdHandler = (socket: ServerSocket) => {
+	socket.on(SocketEvents.INVITE_BY_ID, (invitedPlayerId) => {
+		const invitedPlayer = Utils.findSocketByPlayerId(invitedPlayerId);
+		const inviterId = Utils.getPlayerId(socket);
 
 		if (!invitedPlayer || !inviterId) {
 			socket.emit(SocketEvents.INVITATION_FAILED);
@@ -51,14 +51,14 @@ export const inviteByIdHandler = (io: ServerIo, socket: ServerSocket) => {
 	});
 
 	socket.on(SocketEvents.ACCEPT_INVITATION, async () => {
-		const invitedPlayerId = getPlayerId(socket);
+		const invitedPlayerId = Utils.getPlayerId(socket);
 		const { playerInviterId } = socket.data;
 
 		if (!playerInviterId || !invitedPlayerId) {
 			return;
 		}
 
-		const playerInviter = await findSocketByPlayerId({ io, playerId: playerInviterId });
+		const playerInviter = Utils.findSocketByPlayerId(playerInviterId);
 
 		if (!playerInviter) {
 			socket.emit(SocketEvents.ERROR, 'Не удалось начать игру. Пользователь вышел из игры');
@@ -81,18 +81,24 @@ export const inviteByIdHandler = (io: ServerIo, socket: ServerSocket) => {
 
 		const players = [playerInviter, socket];
 
-		await initiateGameWithPlayers(players, io);
+		try {
+			await roomStore.createRoomWithPlayers(players);
+		} catch {
+			players.forEach((player) =>
+				player.emit(SocketEvents.ERROR, 'Ошибка при подключении к игре'),
+			);
+		}
 	});
 
-	socket.on(SocketEvents.REJECT_INVITATION, async () => {
-		const invitedPlayerId = getPlayerId(socket);
+	socket.on(SocketEvents.REJECT_INVITATION, () => {
+		const invitedPlayerId = Utils.getPlayerId(socket);
 		const { playerInviterId } = socket.data;
 
 		if (!playerInviterId || !invitedPlayerId) {
 			return;
 		}
 
-		const playerInviter = await findSocketByPlayerId({ io, playerId: playerInviterId });
+		const playerInviter = Utils.findSocketByPlayerId(playerInviterId);
 
 		if (!playerInviter) {
 			return;

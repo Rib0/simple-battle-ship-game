@@ -1,7 +1,8 @@
 import { Server, Socket } from 'socket.io';
 import { Socket as ClientSocketDefault } from 'socket.io-client';
+
 import { Field, GameFieldShips } from './game-field';
-import { DeepPartial, Nullable } from './utils';
+import { Nullable } from './utils';
 
 export enum SocketEvents {
 	ERROR = 'ERROR',
@@ -82,38 +83,3 @@ export type SocketData = Partial<{
 export type ServerIo = Server<ClientToServerEvents, ServerToClientEvents, object, SocketData>;
 export type ServerSocket = Socket<ClientToServerEvents, ServerToClientEvents, object, SocketData>;
 export type ClientSocket = ClientSocketDefault<ServerToClientEvents, ClientToServerEvents>;
-
-export type PlayerData = {
-	disconnectedTime: number;
-	timeRemain: number;
-	enemyPlayerId: string;
-	socketId: Socket['id'];
-	field: Field;
-	ships: GameFieldShips;
-	killedShipsInitialCoords: string[];
-	enemyKilledShips: GameFieldShips;
-};
-
-export type SetPlayerData = Omit<PlayerData, 'killedShipsInitialCoords'> & {
-	killedShipsInitialCoords: string;
-};
-
-export type PlayersOnline = Record<
-	string, // playerId
-	{
-		isPlaying: boolean;
-	}
->;
-
-type RoomData = {
-	turnStartTime: number;
-	turnPlayerId: string;
-	turnId: string;
-	players: {
-		[playerId: string]: PlayerData;
-	};
-};
-
-export type Rooms = DeepPartial<{
-	[roomId: string]: RoomData;
-}>;

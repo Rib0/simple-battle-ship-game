@@ -1,18 +1,10 @@
-import { nanoid } from 'nanoid';
+import { ServerSocket, SocketEvents } from '@/types/socket';
+import { Utils } from '../lib/utils';
 
-import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
-import { findSocketByPlayerId, getPlayerId } from '../lib/utils';
+export const setAuthDataHandler = (socket: ServerSocket) => {
+	const playerId = Utils.getPlayerId(socket);
 
-export const setAuthDataHandler = (io: ServerIo, socket: ServerSocket) => {
-	socket.on(SocketEvents.SET_AUTH_DATA, async () => {
-		const playerId = getPlayerId(socket) || '';
-
-		const socketWithEqualPlayerId = await findSocketByPlayerId({ io, playerId });
-
-		if ((socketWithEqualPlayerId && socketWithEqualPlayerId !== socket) || !playerId) {
-			const newPlayerId = nanoid();
-			socket.handshake.auth.playerId = newPlayerId;
-			socket.emit(SocketEvents.SET_AUTH_DATA, newPlayerId);
-		}
-	});
+	if (playerId) {
+		socket.emit(SocketEvents.SET_AUTH_DATA, playerId);
+	}
 };

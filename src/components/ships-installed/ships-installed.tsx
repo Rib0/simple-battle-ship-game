@@ -68,6 +68,7 @@ export const ShipsInstalled = observer(() => {
 			isSearching,
 			isAwaitingInvitationResponse,
 			activeInstalledShipCoords,
+			killedShipsInitialCoords.length,
 			setActiveInstalledShip,
 			isMatchesMdViewport,
 			isMatchesLgViewport,

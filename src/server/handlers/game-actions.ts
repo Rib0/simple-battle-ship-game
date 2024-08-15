@@ -1,70 +1,40 @@
-import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
-import { CellType, Field, GameFieldShips } from '@/types/game-field';
-import { changeTurn } from '../lib/change-turn';
-import { handleDestroyedShip } from '../lib/handle-destroyed-ship';
-import { findSocketBySocketId, getPlayerId } from '../lib/utils';
-import { checkIsGameOver } from '../lib/check-is-game-over';
-import { ServerState } from '../models/server-state';
+import { ServerSocket, SocketEvents } from '@/types/socket';
+import { roomStore } from '../stores/rooms-store';
+import { Utils } from '../lib/utils';
 
-export const gameActionsHandler = (io: ServerIo, socket: ServerSocket) => {
+export const gameActionsHandler = (socket: ServerSocket) => {
 	socket.on(SocketEvents.ATTACK, async (coords, roomId) => {
-		const turnPlayerId = ServerState.getTurnPlayerId(roomId);
-		const playerId = getPlayerId(socket);
-
-		if (turnPlayerId !== playerId || !playerId) {
+		const room = roomStore.getRoom(roomId);
+		if (!room) {
 			return;
 		}
 
-		const playersData = ServerState.getPlayersData({ roomId, playerId });
-		if (!playersData) {
+		const playerId = Utils.getPlayerId(socket);
+		if (!room.isValidTurn(playerId)) {
 			return;
 		}
 
-		const { socketId, enemySocketId, enemyField, enemyShips } = playersData;
+		const player = room.getPlayer(playerId);
+		const enemyPlayer = room.getEnemyToPlayer(playerId);
 
-		if (!enemyField || !socketId || !enemySocketId) {
+		if (!player || !enemyPlayer) {
 			return;
 		}
 
-		if ([CellType.BOMB, CellType.DAMAGED].includes(enemyField[coords] as CellType)) {
+		if (enemyPlayer.isInactiveCoords(coords)) {
 			return;
 		}
 
-		const isDamaged = enemyField[coords] === CellType.SHIP;
-		const eventType = isDamaged ? SocketEvents.DAMAGED : SocketEvents.MISSED;
-
-		enemyField[coords] = isDamaged ? CellType.DAMAGED : CellType.BOMB;
-
-		socket.emit(eventType, coords, false);
-		socket.to(roomId).emit(eventType, coords, true);
+		const isDamaged = player.attack(enemyPlayer, coords);
 
 		if (isDamaged) {
-			const enemySocket = await findSocketBySocketId({ io, socketId: enemySocketId });
-
-			if (!enemySocket) {
-				return;
-			}
-
-			await handleDestroyedShip({
-				field: enemyField as Field,
-				ships: enemyShips as GameFieldShips,
-				damagedCoords: coords,
-				socket,
-				enemySocket,
-				roomId,
-			});
-
-			if (checkIsGameOver(roomId)) {
-				socket.emit(SocketEvents.PLAYER_WON, true);
-				socket.to(roomId).emit(SocketEvents.PLAYER_WON, false);
-				io.socketsLeave(roomId);
-				ServerState.deleteRoom(roomId);
-
-				socket.data = {};
-				enemySocket.data = {};
-			}
+			room.handleGameOver();
+			await room.handleDestroyedShip(coords);
 		} else {
-			await changeTurn(io, roomId);
+			room.changeTurn();
 		}
+
+		console.log(player.field);
+		console.log(enemyPlayer.field);
 	});
 };

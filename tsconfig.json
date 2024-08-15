@@ -27,7 +27,6 @@
 		// "noUnusedLocals": true,
 		"noFallthroughCasesInSwitch": true,
 		"types": ["node", "vite/client", "preact"],
-		"plugins": [{ "name": "typescript-plugin-css-modules" }],
 	},
 	"include": ["src/**/*"],
 	"references": [{ "path": "./tsconfig.node.json" }],
