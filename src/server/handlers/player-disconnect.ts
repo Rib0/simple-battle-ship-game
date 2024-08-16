@@ -7,12 +7,12 @@ import { appStore } from '../stores/app-store';
 
 export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on('disconnect', () => {
+		appStore.removeSearchingGamePlayersIds([socket]);
+
 		const { roomId } = socket.data;
 		if (!roomId) {
 			return;
 		}
-
-		appStore.removeSearchingGamePlayers([socket]);
 
 		const room = roomStore.getRoom(roomId);
 		const playerId = Utils.getPlayerId(socket);
@@ -28,12 +28,11 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 		}
 
 		const disconnectedTime = Timer.getTime;
-		const { timeRemain = TURN_DURATION } = player;
-		const { turnStartTime = disconnectedTime } = room;
+		const { turnStartTime = disconnectedTime, timeRemain = TURN_DURATION } = room;
 		const nextTimeRemain = timeRemain - (disconnectedTime - turnStartTime);
 
+		room.timeRemain = nextTimeRemain < 0 ? 0 : nextTimeRemain;
 		player.disconnectedTime = disconnectedTime;
-		player.timeRemain = nextTimeRemain < 0 ? 0 : nextTimeRemain;
 
 		socket.to(roomId).emit(SocketEvents.ENEMY_DISCONNECTED);
 
@@ -45,19 +44,19 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 				const actualRooms = Utils.getAllRooms;
 				const actualRoomSocketSize = actualRooms.get(roomId)?.size;
 
-				const { enemyPlayerId } = player;
-				const enemyPlayerSocket = Utils.findSocketByPlayerId(enemyPlayerId);
-
-				if (enemyPlayerSocket) {
-					enemyPlayerSocket.data = {};
-				}
-
-				socket.data = {};
-
 				if (!actualRoomSocketSize) {
 					io.to(roomId).emit(SocketEvents.PLAYER_LEAVE_GAME);
 					io.socketsLeave(roomId);
 					roomStore.deleteRoom(roomId);
+
+					const { enemyPlayerId } = player;
+					const enemyPlayerSocket = Utils.findSocketByPlayerId(enemyPlayerId);
+
+					if (enemyPlayerSocket) {
+						enemyPlayerSocket.data = {};
+					}
+
+					socket.data = {};
 				}
 			}, 60);
 		}

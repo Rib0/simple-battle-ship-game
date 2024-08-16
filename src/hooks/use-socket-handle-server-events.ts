@@ -80,8 +80,6 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 		});
 
 		socket.on(SocketEvents.CHANGE_TURN, (isMyTurn, timeRemain) => {
-			console.log(timeRemain);
-
 			gameStore.setGameValue('isMyTurn', isMyTurn);
 			gameStore.setGameValue('timeRemain', timeRemain);
 		});

@@ -1,23 +1,36 @@
 import { ServerSocket, SocketEvents } from '@/types/socket';
 import { roomStore } from './rooms-store';
+import { Utils } from '../lib/utils';
 
 class AppStore {
-	private searchingGamePlayers: Set<ServerSocket> = new Set();
+	private searchingGamePlayersIds: Set<string> = new Set();
 
 	private hasUsersSearchingForGame?: NodeJS.Timeout = undefined;
 
-	removeSearchingGamePlayers(sockets: ServerSocket[]) {
-		sockets.forEach((socket) => this.searchingGamePlayers.delete(socket));
+	removeSearchingGamePlayersIds(sockets: ServerSocket[]) {
+		sockets.forEach((socket) => {
+			const playerId = Utils.getPlayerId(socket);
+
+			if (playerId) {
+				this.searchingGamePlayersIds.delete(playerId);
+			}
+		});
 	}
 
-	addSearchingGamePlayer(socket: ServerSocket) {
-		const isAlreadySearching = this.searchingGamePlayers.has(socket);
+	addSearchingGamePlayerId(socket: ServerSocket) {
+		const playerId = Utils.getPlayerId(socket);
+
+		if (!playerId) {
+			return;
+		}
+
+		const isAlreadySearching = this.searchingGamePlayersIds.has(playerId);
 
 		if (socket.data.invitedPlayerId || isAlreadySearching) {
 			return;
 		}
 
-		this.searchingGamePlayers.add(socket);
+		this.searchingGamePlayersIds.add(playerId);
 
 		if (!this.hasUsersSearchingForGame) {
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -26,7 +39,10 @@ class AppStore {
 	}
 
 	private get getPlayersForGame() {
-		const players = [...this.searchingGamePlayers].slice(0, 2);
+		const playersId = [...this.searchingGamePlayersIds].slice(0, 2);
+		const players = playersId
+			.map((playerId) => Utils.findSocketByPlayerId(playerId))
+			.filter((player): player is ServerSocket => Boolean(player));
 
 		return players;
 	}
@@ -44,7 +60,7 @@ class AppStore {
 
 		try {
 			await roomStore.createRoomWithPlayers(players);
-			this.removeSearchingGamePlayers(players);
+			this.removeSearchingGamePlayersIds(players);
 		} catch {
 			players.forEach((player) =>
 				player.emit(SocketEvents.ERROR, 'Ошибка при подключении к игре'),

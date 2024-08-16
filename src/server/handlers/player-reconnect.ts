@@ -36,8 +36,7 @@ export const playerReconnectHandler = (socket: ServerSocket) => {
 			killedShipsInitialCoords,
 			enemyKilledShips,
 		};
-		const enemyPlayerSocket = Utils.findSocketBySocketId(enemyPlayer.socketId);
-		const isEnemyPlayerSocketConnected = enemyPlayerSocket?.connected || false;
+		const isEnemyPlayerSocketConnected = enemyPlayer.socket?.connected || false;
 
 		socket.to(roomId).emit(SocketEvents.ENEMY_RECONNECTED_TO_ROOM);
 		socket.emit(

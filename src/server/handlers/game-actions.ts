@@ -33,8 +33,5 @@ export const gameActionsHandler = (socket: ServerSocket) => {
 		} else {
 			room.changeTurn();
 		}
-
-		console.log(player.field);
-		console.log(enemyPlayer.field);
 	});
 };

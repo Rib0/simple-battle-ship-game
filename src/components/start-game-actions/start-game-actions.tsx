@@ -11,6 +11,8 @@ import { useStoreContext } from '@/context/store-context';
 
 import { getSpinText } from './utils';
 
+import styles from './styles.module.css';
+
 export const StartGameActions = observer(() => {
 	const [idToInvite, setIdToInvite] = useState('');
 	const { shipsStore, gameStore, gameFieldStore } = useStoreContext();
@@ -58,7 +60,7 @@ export const StartGameActions = observer(() => {
 
 	return (
 		<Flex vertical gap="small">
-			<Spin visible={isSearchingGame} tip={spinText} />
+			<Spin className={styles.spin} visible={isSearchingGame} tip={spinText} />
 			<Flex gap="small">
 				{isSearching ? (
 					<Button type="cancel" onClick={cancelSearchGame} />

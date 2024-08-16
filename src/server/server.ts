@@ -16,7 +16,7 @@ export class Server {
 
 			if ((socketWithEqualPlayerId && socketWithEqualPlayerId !== socket) || !playerId) {
 				const newPlayerId = nanoid();
-				socket.handshake.auth.playerId = newPlayerId;
+				Utils.setPlayerId(socket, newPlayerId);
 			}
 
 			next();

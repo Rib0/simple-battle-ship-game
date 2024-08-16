@@ -1,8 +1,6 @@
 import { ServerSocket } from '@/types/socket';
 import { IoConnection } from './io-connection';
 
-// TODO: поменять на UTILS везде где используются функкции отсюда
-
 export class Utils {
 	private static ioConnection = IoConnection.getInstance().connection;
 
@@ -14,8 +12,11 @@ export class Utils {
 		return socket.handshake.auth?.playerId as string | undefined;
 	}
 
+	static setPlayerId(socket: ServerSocket, playerId: string) {
+		socket.handshake.auth.playerId = playerId;
+	}
+
 	static findSocketBySocketId(socketId: string) {
-		// TODO: посмотреть зачем
 		if (!socketId) {
 			return null;
 		}
@@ -37,7 +38,7 @@ export class Utils {
 	}
 
 	static checkIfSocketsAlreadyInRoom(players: ServerSocket[]) {
-		const isAlreadyInRoom = players.some((player) => player.rooms.size > 1); // TODO: проверить, было 2
+		const isAlreadyInRoom = players.some((player) => player.rooms.size > 1);
 
 		return isAlreadyInRoom;
 	}

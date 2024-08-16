@@ -3,7 +3,6 @@ import { Server } from 'socket.io';
 import { ServerIo } from '@/types/socket';
 
 export class IoConnection {
-	// TODO переделать на static class
 	// eslint-disable-next-line no-use-before-define
 	private static instance: IoConnection;
 

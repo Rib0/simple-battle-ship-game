@@ -13,11 +13,6 @@ import { IoConnection } from '../lib/io-connection';
 import { roomStore } from '../stores/rooms-store';
 import { Utils } from '../lib/utils';
 
-/* 
-	TODO:
-	1. Проверить на обязательность всех полей в классах
-*/
-
 export class Room {
 	private ioConnection = IoConnection.getInstance().connection;
 
@@ -25,11 +20,13 @@ export class Room {
 
 	turnStartTime?: number;
 
-	turnPlayerId?: string;
+	private turnPlayerId?: string;
 
-	turnId?: string; // TODO: мб сделать private
+	private turnId?: string;
 
-	players: Map<string, Player> = new Map();
+	timeRemain?: number;
+
+	private players: Map<string, Player> = new Map();
 
 	constructor() {
 		const roomId = nanoid();
@@ -66,7 +63,7 @@ export class Room {
 		});
 	}
 
-	changeTurn(reconnectedPlayerId?: string) {
+	changeTurn(reconnectedPlayerId?: string, firstTurn?: boolean) {
 		// TODO: мб отрефакторить в будущем
 		const [player1, player2] = [...this.players.values()];
 
@@ -85,9 +82,12 @@ export class Room {
 
 		const prevTurnPlayerId = this.turnPlayerId;
 		const isPlayer1PrevTurn = prevTurnPlayerId === player1.id;
+		const randomPlayerId = Math.random() > 0.4 ? player1.id : player2.id;
+		const nextPlayerId = isPlayer1PrevTurn ? player2.id : player1.id;
+
 		const nextTurn = {
 			id: nanoid(),
-			playerId: isPlayer1PrevTurn ? player2.id : player1.id,
+			playerId: firstTurn ? randomPlayerId : nextPlayerId,
 			startTime: Timer.getTime,
 		};
 
@@ -109,7 +109,7 @@ export class Room {
 				return;
 			}
 
-			player.timeRemain = timeRemain;
+			this.timeRemain = timeRemain;
 
 			if (keepTurn) {
 				changeTurnCallbackDelay = timeRemain;
@@ -117,12 +117,22 @@ export class Room {
 
 			player1.socket?.emit(
 				SocketEvents.CHANGE_TURN,
-				keepTurn ? isPlayer1PrevTurn : !isPlayer1PrevTurn,
+				// eslint-disable-next-line no-nested-ternary
+				firstTurn
+					? nextTurn.playerId === player1.id
+					: keepTurn
+						? isPlayer1PrevTurn
+						: !isPlayer1PrevTurn,
 				timeRemain,
 			);
 			player2.socket?.emit(
 				SocketEvents.CHANGE_TURN,
-				keepTurn ? !isPlayer1PrevTurn : isPlayer1PrevTurn,
+				// eslint-disable-next-line no-nested-ternary
+				firstTurn
+					? nextTurn.playerId === player2.id
+					: keepTurn
+						? !isPlayer1PrevTurn
+						: isPlayer1PrevTurn,
 				timeRemain,
 			);
 		};
@@ -139,7 +149,7 @@ export class Room {
 					return;
 				}
 
-				const { timeRemain = TURN_DURATION } = player;
+				const timeRemain = this.timeRemain || TURN_DURATION;
 
 				if (timeRemain <= 0) {
 					changeTurnWithTime(TURN_DURATION);
@@ -250,7 +260,7 @@ export class Room {
 		// eslint-disable-next-line no-restricted-syntax
 		for (const coordAround of coordsAroundKilledShipForDestroy) {
 			// eslint-disable-next-line no-await-in-loop
-			await Utils.delay(150);
+			await Utils.delay(100);
 			attacker.socket?.emit(SocketEvents.DAMAGED, coordAround, false);
 			awaiter.socket?.emit(SocketEvents.DAMAGED, coordAround, true);
 		}

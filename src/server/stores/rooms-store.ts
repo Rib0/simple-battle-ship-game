@@ -10,6 +10,11 @@ class RoomsStore {
 
 	async createRoomWithPlayers(players: ServerSocket[]) {
 		const isAlreadyInRoom = Utils.checkIfSocketsAlreadyInRoom(players);
+
+		setTimeout(() => {
+			Utils.checkIfSocketsAlreadyInRoom(players);
+		}, 5000);
+
 		if (isAlreadyInRoom) {
 			throw new Error();
 		}
@@ -57,7 +62,7 @@ class RoomsStore {
 			const playersData = [player1Data, player2Data];
 
 			room.addPlayers(playersData);
-			room.changeTurn();
+			room.changeTurn(undefined, true);
 		} catch (e) {
 			this.ioConnection.socketsLeave(room.id);
 			this.deleteRoom(room.id);
