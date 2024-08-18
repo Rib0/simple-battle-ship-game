@@ -26,12 +26,14 @@ export const playerLeaveGameHandler = (io: ServerIo, socket: ServerSocket) => {
 		const enemyPlayerSocket = Utils.findSocketByPlayerId(enemyPlayerId);
 
 		if (enemyPlayerSocket) {
-			enemyPlayerSocket.data = {};
+			enemyPlayerSocket.data.roomId = null;
 		}
 
-		socket.data = {};
+		socket.data.roomId = null;
 
 		socket.to(roomId).emit(SocketEvents.PLAYER_LEAVE_GAME);
+		io.emit(SocketEvents.USER_JOINED, playerId);
+		io.emit(SocketEvents.USER_JOINED, enemyPlayerId);
 		io.socketsLeave(roomId);
 		roomStore.deleteRoom(roomId);
 	});

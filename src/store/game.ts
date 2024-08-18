@@ -8,6 +8,7 @@ import { TURN_DURATION } from '@/constants/game';
 import { Nullable } from '@/types/utils';
 
 export class GameStore {
+	// TODO: вынести notifications и time в отдельные обьекты и включить их сюда
 	isStarted = false;
 
 	isPaused = false;

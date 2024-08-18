@@ -26,7 +26,7 @@ class AppStore {
 
 		const isAlreadySearching = this.searchingGamePlayersIds.has(playerId);
 
-		if (socket.data.invitedPlayerId || isAlreadySearching) {
+		if (isAlreadySearching) {
 			return;
 		}
 
@@ -60,7 +60,6 @@ class AppStore {
 
 		try {
 			await roomStore.createRoomWithPlayers(players);
-			this.removeSearchingGamePlayersIds(players);
 		} catch {
 			players.forEach((player) =>
 				player.emit(SocketEvents.ERROR, 'Ошибка при подключении к игре'),

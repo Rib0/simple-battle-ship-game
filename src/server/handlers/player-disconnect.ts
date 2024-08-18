@@ -7,7 +7,15 @@ import { appStore } from '../stores/app-store';
 
 export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on('disconnect', () => {
+		Utils.deletePlayersIdsFromInvitationStates([socket]);
 		appStore.removeSearchingGamePlayersIds([socket]);
+
+		const playerId = Utils.getPlayerId(socket);
+		if (!playerId) {
+			return;
+		}
+
+		socket.broadcast.emit(SocketEvents.USER_EXIT, playerId);
 
 		const { roomId } = socket.data;
 		if (!roomId) {
@@ -15,14 +23,11 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 		}
 
 		const room = roomStore.getRoom(roomId);
-		const playerId = Utils.getPlayerId(socket);
-
-		if (!room || !playerId) {
+		if (!room) {
 			return;
 		}
 
 		const player = room.getPlayer(playerId);
-
 		if (!player) {
 			return;
 		}
@@ -53,10 +58,10 @@ export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 					const enemyPlayerSocket = Utils.findSocketByPlayerId(enemyPlayerId);
 
 					if (enemyPlayerSocket) {
-						enemyPlayerSocket.data = {};
+						enemyPlayerSocket.data.roomId = null;
 					}
 
-					socket.data = {};
+					socket.data.roomId = null;
 				}
 			}, 60);
 		}

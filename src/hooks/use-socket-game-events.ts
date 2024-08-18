@@ -11,6 +11,10 @@ export const useSocketGameEvents = () => {
 
 	const { gameStore } = rootStore;
 
+	const getUsersOnline = useCallback(() => {
+		socket?.emit(SocketEvents.GET_USERS_ONLINE);
+	}, [socket]);
+
 	const setAuthData = useCallback(() => {
 		socket?.emit(SocketEvents.SET_AUTH_DATA);
 	}, [socket]);
@@ -27,16 +31,25 @@ export const useSocketGameEvents = () => {
 
 	const inviteById = (id: string) => {
 		socket?.emit(SocketEvents.INVITE_BY_ID, id);
-		gameStore.setGameValue('isAwaitingInvitationResponse', true);
 	};
 
 	const acceptInvitation = () => {
-		socket?.emit(SocketEvents.ACCEPT_INVITATION);
+		const { invitedByPlayerId } = gameStore;
+		if (!invitedByPlayerId) {
+			return;
+		}
+
+		socket?.emit(SocketEvents.ACCEPT_INVITATION, invitedByPlayerId);
 		gameStore.setGameValue('invitedByPlayerId', null);
 	};
 
 	const rejectInvitation = () => {
-		socket?.emit(SocketEvents.REJECT_INVITATION);
+		const { invitedByPlayerId } = gameStore;
+		if (!invitedByPlayerId) {
+			return;
+		}
+
+		socket?.emit(SocketEvents.REJECT_INVITATION, invitedByPlayerId);
 		gameStore.setGameValue('invitedByPlayerId', null);
 	};
 
@@ -53,7 +66,7 @@ export const useSocketGameEvents = () => {
 	const leaveGame = () => {
 		socket?.emit(SocketEvents.PLAYER_LEAVE_GAME);
 		LocaleStorage.remove('room_id_battle_ship_game');
-		rootStore.resetAllStores();
+		rootStore.resetAllGameStores();
 	};
 
 	const attack = (coords: string) => {
@@ -68,6 +81,7 @@ export const useSocketGameEvents = () => {
 
 	return {
 		setAuthData,
+		getUsersOnline,
 		searchGame,
 		cancelSearchGame,
 		inviteById,

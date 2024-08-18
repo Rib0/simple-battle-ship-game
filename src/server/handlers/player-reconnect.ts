@@ -1,16 +1,16 @@
-import { ServerSocket, SocketEvents } from '@/types/socket';
+import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { Utils } from '../lib/utils';
 import { roomStore } from '../stores/rooms-store';
 
-export const playerReconnectHandler = (socket: ServerSocket) => {
+export const playerReconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on(SocketEvents.FIND_GAME_TO_RECONNECT, async (roomId) => {
-		const room = roomStore.getRoom(roomId);
-		if (!room) {
+		const playerId = Utils.getPlayerId(socket);
+		if (!playerId) {
 			return;
 		}
 
-		const playerId = Utils.getPlayerId(socket);
-		if (!playerId) {
+		const room = roomStore.getRoom(roomId);
+		if (!room) {
 			return;
 		}
 
@@ -45,6 +45,7 @@ export const playerReconnectHandler = (socket: ServerSocket) => {
 			enemyPlayer.field,
 			isEnemyPlayerSocketConnected,
 		);
+		io.emit(SocketEvents.USER_JOINED, playerId, true);
 
 		room.changeTurn(playerId);
 	});

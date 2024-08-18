@@ -2,6 +2,7 @@ import { ServerSocket, SocketEvents } from '@/types/socket';
 import { Room } from '../models/room';
 import { IoConnection } from '../lib/io-connection';
 import { Utils } from '../lib/utils';
+import { appStore } from './app-store';
 
 class RoomsStore {
 	private ioConnection = IoConnection.getInstance().connection;
@@ -43,6 +44,10 @@ class RoomsStore {
 				return;
 			}
 
+			players.forEach((player) =>
+				this.ioConnection.emit(SocketEvents.USER_JOINED, Utils.getPlayerId(player)!, true),
+			);
+
 			const player1Data = {
 				id: player1Id,
 				data: {
@@ -63,7 +68,13 @@ class RoomsStore {
 
 			room.addPlayers(playersData);
 			room.changeTurn(undefined, true);
+
+			appStore.removeSearchingGamePlayersIds(players);
+			Utils.deletePlayersIdsFromInvitationStates(players);
 		} catch (e) {
+			players.forEach((player) =>
+				this.ioConnection.emit(SocketEvents.USER_JOINED, Utils.getPlayerId(player)!),
+			);
 			this.ioConnection.socketsLeave(room.id);
 			this.deleteRoom(room.id);
 

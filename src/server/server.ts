@@ -19,6 +19,9 @@ export class Server {
 				Utils.setPlayerId(socket, newPlayerId);
 			}
 
+			socket.data.invitedPlayerIds = new Set();
+			socket.data.playerInviterIds = new Set();
+
 			next();
 		});
 	}

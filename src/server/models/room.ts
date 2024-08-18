@@ -14,7 +14,7 @@ import { roomStore } from '../stores/rooms-store';
 import { Utils } from '../lib/utils';
 
 export class Room {
-	private ioConnection = IoConnection.getInstance().connection;
+	private static ioConnection = IoConnection.getInstance().connection;
 
 	readonly id: string;
 
@@ -290,14 +290,24 @@ export class Room {
 			looser?.socket?.emit(SocketEvents.PLAYER_WON, false);
 
 			if (winner?.socket?.data) {
-				winner.socket.data = {};
+				const winnerId = Utils.getPlayerId(winner.socket);
+				if (winnerId) {
+					Room.ioConnection.emit(SocketEvents.USER_JOINED, winnerId);
+				}
+
+				winner.socket.data.roomId = null;
 			}
 
 			if (looser?.socket?.data) {
-				looser.socket.data = {};
+				const looserId = Utils.getPlayerId(looser.socket);
+				if (looserId) {
+					Room.ioConnection.emit(SocketEvents.USER_JOINED, looserId);
+				}
+
+				looser.socket.data.roomId = null;
 			}
 
-			this.ioConnection.socketsLeave(this.id);
+			Room.ioConnection.socketsLeave(this.id);
 			roomStore.deleteRoom(this.id);
 		}
 	}

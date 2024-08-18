@@ -1,3 +1,12 @@
 .header {
 	padding: 20px 0 0 20px;
 }
+
+.playersCount {
+	color: #52c41a;
+	font-size: 1.5rem;
+}
+
+.title {
+	padding-left: 20px;
+}

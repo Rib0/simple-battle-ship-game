@@ -1,9 +1,5 @@
 .root {
-	padding: 60px 0 30px;
-
-	@media (--md-viewport) {
-		padding-top: 65px;
-	}
+	padding: 65px 0 25px;
 
 	@media (--lg-viewport) {
 		padding-top: 70px;

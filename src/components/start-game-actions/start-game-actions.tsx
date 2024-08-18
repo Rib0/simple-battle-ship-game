@@ -1,8 +1,6 @@
-import { useState } from 'preact/compat';
 import { observer } from 'mobx-react-lite';
 import { Flex } from 'antd';
 
-import { SearchInput } from '@/components/common/search-input';
 import { Button } from '@/components/common/button';
 import { Spin } from '@/components/common/spin';
 
@@ -14,11 +12,10 @@ import { getSpinText } from './utils';
 import styles from './styles.module.css';
 
 export const StartGameActions = observer(() => {
-	const [idToInvite, setIdToInvite] = useState('');
 	const { shipsStore, gameStore, gameFieldStore } = useStoreContext();
-	const { searchGame, cancelSearchGame, inviteById } = useSocketGameEvents();
+	const { searchGame, cancelSearchGame } = useSocketGameEvents();
 
-	const { isSearching, isAwaitingInvitationResponse, playerId } = gameStore;
+	const { isSearching, isAwaitingInvitationResponse } = gameStore;
 	const { activeSize, rotateActiveShip, setActiveSize, isAllShipsInstalled } = shipsStore;
 	const {
 		activeInstalledShipCoords,
@@ -37,25 +34,13 @@ export const StartGameActions = observer(() => {
 		}
 	};
 
-	const handleChangeIdToInvite = (value: string) => {
-		setIdToInvite(value);
-	};
-
-	const handleGoToBattleClick = () => {
+	const handleSearchGame = () => {
 		setActiveSize(null);
-		const trimmedId = idToInvite.trim();
 
-		if (trimmedId) {
-			inviteById(trimmedId);
-		} else {
-			searchGame();
-		}
+		searchGame();
 	};
 
-	const isEqualInvitedPlayerId = playerId === idToInvite.trim();
 	const spinText = getSpinText({ isSearching, isAwaitingInvitationResponse });
-	const isSearchButtonDisabled =
-		!isAllShipsInstalled || isAwaitingInvitationResponse || isEqualInvitedPlayerId;
 	const isSearchingGame = isSearching || isAwaitingInvitationResponse;
 
 	return (
@@ -66,9 +51,9 @@ export const StartGameActions = observer(() => {
 					<Button type="cancel" onClick={cancelSearchGame} />
 				) : (
 					<Button
-						disabled={isSearchButtonDisabled}
+						disabled={!isAllShipsInstalled}
 						type="start_battle"
-						onClick={handleGoToBattleClick}
+						onClick={handleSearchGame}
 					/>
 				)}
 				{!isSearchingGame && (
@@ -83,7 +68,6 @@ export const StartGameActions = observer(() => {
 					</>
 				)}
 			</Flex>
-			<SearchInput onChange={handleChangeIdToInvite} value={idToInvite} />
 		</Flex>
 	);
 });

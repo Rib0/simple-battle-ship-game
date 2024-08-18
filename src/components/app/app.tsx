@@ -11,7 +11,7 @@ import { useSocketContext } from '@/context/socket-context';
 
 export const App = observer(() => {
 	const { socket, connectSocket } = useSocketContext();
-	const { setAuthData, findGameToReconnect } = useSocketGameEvents();
+	const { setAuthData, findGameToReconnect, getUsersOnline } = useSocketGameEvents();
 
 	useSocketHandleServerEvents(socket);
 	const isNeedChangeOrientation = useOrientation();
@@ -24,8 +24,9 @@ export const App = observer(() => {
 		if (socket) {
 			setAuthData();
 			findGameToReconnect();
+			getUsersOnline();
 		}
-	}, [socket, setAuthData, findGameToReconnect]);
+	}, [socket, setAuthData, findGameToReconnect, getUsersOnline]);
 
 	if (isNeedChangeOrientation) {
 		return null;

@@ -4,6 +4,7 @@ import { injectStores } from '@mobx-devtools/tools';
 import { GameFieldStore } from './game-field';
 import { ShipsStore } from './ships';
 import { GameStore } from './game';
+import { UsersStore } from './users';
 
 class RootStore {
 	gameFieldStore: GameFieldStore;
@@ -12,18 +13,21 @@ class RootStore {
 
 	gameStore: GameStore;
 
+	usersStore: UsersStore;
+
 	constructor() {
 		makeAutoObservable(this);
 
 		this.gameFieldStore = new GameFieldStore(this);
 		this.shipsStore = new ShipsStore(this);
 		this.gameStore = new GameStore();
+		this.usersStore = new UsersStore(this);
 	}
 
-	resetAllStores = () => {
+	resetAllGameStores = () => {
+		this.gameFieldStore.resetStore();
 		this.shipsStore.resetStore();
 		this.gameStore.resetStore();
-		this.gameFieldStore.resetStore();
 	};
 }
 
