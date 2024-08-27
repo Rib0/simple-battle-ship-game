@@ -2,6 +2,7 @@ import { ServerSocket, SocketEvents } from '@/types/socket';
 import { Room } from '../models/room';
 import { IoConnection } from '../lib/io-connection';
 import { Utils } from '../lib/utils';
+import { InvitationUtils } from '../lib/invitation-utils';
 import { appStore } from './app-store';
 
 class RoomsStore {
@@ -11,11 +12,6 @@ class RoomsStore {
 
 	async createRoomWithPlayers(players: ServerSocket[]) {
 		const isAlreadyInRoom = Utils.checkIfSocketsAlreadyInRoom(players);
-
-		setTimeout(() => {
-			Utils.checkIfSocketsAlreadyInRoom(players);
-		}, 5000);
-
 		if (isAlreadyInRoom) {
 			throw new Error();
 		}
@@ -70,7 +66,7 @@ class RoomsStore {
 			room.changeTurn(undefined, true);
 
 			appStore.removeSearchingGamePlayersIds(players);
-			Utils.deletePlayersIdsFromInvitationStates(players);
+			InvitationUtils.deletePlayersIdsFromInvitationStates(players);
 		} catch (e) {
 			players.forEach((player) =>
 				this.ioConnection.emit(SocketEvents.USER_JOINED, Utils.getPlayerId(player)!),

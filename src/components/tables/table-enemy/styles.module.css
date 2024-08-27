@@ -1,7 +1,9 @@
 .canAttack {
-	&:hover {
-		background: url('@/assets/explosion.png') center no-repeat;
-		background-size: cover;
+	@media (hover: hover) {
+		&:hover {
+			background: url('@/assets/explosion.png') center no-repeat;
+			background-size: cover;
+		}
 	}
 }
 

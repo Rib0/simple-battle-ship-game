@@ -53,13 +53,18 @@ export type GameState = {
 	enemyKilledShips?: GameFieldShips;
 };
 
+export type UserOnline = {
+	playerId: string;
+	isInGame: boolean;
+};
+
 export type UsersOnline = {
-	users: Map<string /* playerId */, { playerId: string; isInGame: boolean }>;
+	users: Map<string /* playerId */, UserOnline>;
 	inGameAmount: number;
 };
 
 export type UserOnlineFromServer = {
-	users: { [key: string]: { playerId: string; isInGame: boolean } };
+	users: { [key: string]: UserOnline };
 	inGameAmount: UsersOnline['inGameAmount'];
 };
 

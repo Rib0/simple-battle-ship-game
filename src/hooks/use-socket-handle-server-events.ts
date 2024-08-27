@@ -16,11 +16,11 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 		}
 
 		socket.on(SocketEvents.ERROR, (message) => {
-			gameStore.addNotification({ message, type: 'error' });
+			gameStore.notitications.addNotification({ message, type: 'error' });
 		});
 
 		socket.on(SocketEvents.WARNING, (message) => {
-			gameStore.addNotification({ message, type: 'warning' });
+			gameStore.notitications.addNotification({ message, type: 'warning' });
 		});
 
 		socket.on(SocketEvents.SET_AUTH_DATA, (playerId) => {
@@ -46,7 +46,7 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 
 		socket.on(SocketEvents.TIMER_TICK, () => {
 			if (gameStore.isEnemyOnline && !gameStore.isPaused) {
-				gameStore.decreaseTimeRemain();
+				gameStore.time.decreaseTimeRemain();
 			}
 		});
 
@@ -85,7 +85,7 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 		socket.on(SocketEvents.PLAYER_LEAVE_GAME, () => {
 			gameStore.setGameValue('isEnemyOnline', false);
 			LocaleStorage.remove('room_id_battle_ship_game');
-			gameStore.addNotification(
+			gameStore.notitications.addNotification(
 				{ message: 'Противник покинул игру', type: 'warning' },
 				rootStore.resetAllGameStores,
 			);
@@ -93,7 +93,7 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 
 		socket.on(SocketEvents.CHANGE_TURN, (isMyTurn, timeRemain) => {
 			gameStore.setGameValue('isMyTurn', isMyTurn);
-			gameStore.setGameValue('timeRemain', timeRemain);
+			gameStore.time.setTimeRemain(timeRemain);
 		});
 
 		socket.on(SocketEvents.DAMAGED, (coords, isMe) => {
@@ -118,7 +118,10 @@ export const useSocketHandleServerEvents = (socket?: ClientSocket) => {
 
 			LocaleStorage.remove('room_id_battle_ship_game');
 			gameStore.setGameValue('isPaused', true);
-			gameStore.addNotification({ message, type }, rootStore.resetAllGameStores);
+			gameStore.notitications.addNotification(
+				{ message, type },
+				rootStore.resetAllGameStores,
+			);
 		});
 	}, [socket, gameStore, gameFieldStore, shipsStore, usersStore, rootStore]);
 };

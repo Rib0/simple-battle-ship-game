@@ -1,9 +1,12 @@
-import { ServerSocket, SocketEvents } from '@/types/socket';
+import { ServerSocket } from '@/types/socket';
 import { Nullable } from '@/types/utils';
+import { customAlphabet } from 'nanoid';
 import { IoConnection } from './io-connection';
 
 export class Utils {
 	private static ioConnection = IoConnection.getInstance().connection;
+
+	private static nanoid = customAlphabet('1234567890', 5);
 
 	static get getAllRooms() {
 		return this.ioConnection.of('/').adapter.rooms;
@@ -52,75 +55,13 @@ export class Utils {
 		return isAlreadyInRoom;
 	}
 
-	static sendInvitationIfExist(socket: ServerSocket) {
-		if (!socket.data.playerInviterIds || !socket.data.playerInviterIds.size) {
-			return;
-		}
-
-		const invitedPlayerId = Utils.getPlayerId(socket);
-		if (!invitedPlayerId) {
-			return;
-		}
-
-		const playerInviterIds = socket.data.playerInviterIds.values();
-		let [firstPlayerInviterId] = playerInviterIds;
-
-		while (firstPlayerInviterId) {
-			const playerInviter = Utils.findSocketByPlayerId(firstPlayerInviterId);
-
-			if (!playerInviter) {
-				socket.data.playerInviterIds.delete(firstPlayerInviterId);
-				[firstPlayerInviterId] = playerInviterIds;
-				// eslint-disable-next-line no-continue
-				continue;
-			}
-
-			if (
-				!playerInviter.data.invitedPlayerIds ||
-				!playerInviter.data.invitedPlayerIds.size ||
-				!playerInviter.data.invitedPlayerIds.has(invitedPlayerId)
-			) {
-				socket.data.playerInviterIds.delete(firstPlayerInviterId);
-				[firstPlayerInviterId] = playerInviterIds;
-				// eslint-disable-next-line no-continue
-				continue;
-			}
-
-			if (!socket.data.playerInviterIds?.size) {
-				socket.emit(SocketEvents.INVITE_BY_ID, firstPlayerInviterId);
-				return;
-			}
-		}
-	}
-
-	static updateAwaitingInvitationResponseStatus(socket: ServerSocket) {
-		const invitedPlayerIdsSize = socket.data.invitedPlayerIds?.size;
-
-		socket.emit(
-			SocketEvents.UPDATE_AWAITING_INVITATION_RESPONSE_STATUS,
-			!!invitedPlayerIdsSize,
-		);
-	}
-
-	static deletePlayersIdsFromInvitationStates(sockets: ServerSocket[]) {
-		sockets.forEach((socket) => {
-			socket.data.playerInviterIds?.forEach((playerInviterId) => {
-				const playerInviter = Utils.findSocketByPlayerId(playerInviterId);
-
-				if (playerInviter) {
-					const invitedPlayerIdToDelete = Utils.getPlayerId(socket) || '';
-					playerInviter.data.invitedPlayerIds?.delete(invitedPlayerIdToDelete);
-					Utils.updateAwaitingInvitationResponseStatus(playerInviter);
-				}
-			});
-			socket.data.playerInviterIds?.clear();
-			socket.data.invitedPlayerIds?.clear();
-		});
-	}
-
 	static delay(ms: number) {
 		return new Promise((resolve) => {
 			setTimeout(resolve, ms);
 		});
+	}
+
+	static nanoidDigits() {
+		return this.nanoid();
 	}
 }

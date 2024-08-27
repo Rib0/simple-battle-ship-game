@@ -1,19 +1,27 @@
-import { useStoreContext } from '@/context/store-context';
-import { List } from 'antd';
 import { observer } from 'mobx-react-lite';
+import { List } from 'antd';
 
-import { UsersListItem } from './user-list-item';
+import { useStoreContext } from '@/context/store-context';
+import { UsersListItem } from './users-list-item';
 
-export const UsersList = observer(() => {
+type Props = {
+	searchUsername: string;
+};
+
+export const UsersList = observer<Props>(({ searchUsername }) => {
 	const { usersStore } = useStoreContext();
 
-	const data = usersStore.getAllUsers;
+	const usersListData = usersStore.getAllUsers(searchUsername);
 
 	return (
 		<List
-			dataSource={data}
+			dataSource={usersListData}
 			itemLayout="horizontal"
 			renderItem={(item) => <UsersListItem id={item.playerId} isInGame={item.isInGame} />}
+			pagination={{
+				hideOnSinglePage: true,
+				total: usersListData.length,
+			}}
 		/>
 	);
 });

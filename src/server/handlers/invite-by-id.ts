@@ -1,6 +1,7 @@
 import { ServerSocket, SocketEvents } from '@/types/socket';
 import { Nullable } from '@/types/utils';
 import { Utils } from '../lib/utils';
+import { InvitationUtils } from '../lib/invitation-utils';
 import { roomStore } from '../stores/rooms-store';
 
 export const inviteByIdHandler = (socket: ServerSocket) => {
@@ -8,13 +9,16 @@ export const inviteByIdHandler = (socket: ServerSocket) => {
 		const invitedPlayer = Utils.findSocketByPlayerId(invitedPlayerId);
 		const inviterId = Utils.getPlayerId(socket);
 
-		if (!invitedPlayer || !inviterId) {
-			socket.emit(SocketEvents.ERROR, 'Игрока с таким id не существует');
+		if (Utils.isInGame(socket)) {
 			return;
 		}
 
 		if (inviterId === invitedPlayerId) {
-			socket.emit(SocketEvents.ERROR, 'Нельзя пригласить себя');
+			return;
+		}
+
+		if (!invitedPlayer || !inviterId) {
+			socket.emit(SocketEvents.ERROR, 'Игрока с таким id не существует');
 			return;
 		}
 
@@ -30,7 +34,7 @@ export const inviteByIdHandler = (socket: ServerSocket) => {
 		socket.data.invitedPlayerIds?.add(invitedPlayerId);
 		invitedPlayer.data.playerInviterIds?.add(inviterId);
 
-		Utils.updateAwaitingInvitationResponseStatus(socket);
+		InvitationUtils.updateAwaitingInvitationResponseStatus(socket);
 	});
 
 	socket.on(SocketEvents.ACCEPT_INVITATION, async (playerInviterId) => {
@@ -75,13 +79,13 @@ export const inviteByIdHandler = (socket: ServerSocket) => {
 						playerInviter.data.invitedPlayerIds.delete(invitedPlayerId);
 						throw new Error();
 					} finally {
-						Utils.updateAwaitingInvitationResponseStatus(socket);
-						Utils.updateAwaitingInvitationResponseStatus(playerInviter);
+						InvitationUtils.updateAwaitingInvitationResponseStatus(socket);
+						InvitationUtils.updateAwaitingInvitationResponseStatus(playerInviter);
 					}
 				}
 			}
 		} catch {
-			Utils.sendInvitationIfExist(socket);
+			InvitationUtils.sendInvitationIfExist(socket);
 		}
 	});
 
@@ -95,11 +99,11 @@ export const inviteByIdHandler = (socket: ServerSocket) => {
 			playerInviter.data.invitedPlayerIds?.has(invitedPlayerId)
 		) {
 			playerInviter.data.invitedPlayerIds?.delete(invitedPlayerId);
-			Utils.updateAwaitingInvitationResponseStatus(playerInviter);
+			InvitationUtils.updateAwaitingInvitationResponseStatus(playerInviter);
 			playerInviter.emit(SocketEvents.WARNING, 'Пользователь отказался от игры');
 		}
 
 		socket.data.playerInviterIds?.delete(playerInviterId);
-		Utils.sendInvitationIfExist(socket);
+		InvitationUtils.sendInvitationIfExist(socket);
 	});
 };

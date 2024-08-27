@@ -15,7 +15,7 @@ export class UsersStore {
 		this.store = store;
 	}
 
-	get getAllUsers() {
+	getAllUsers(searchUsername: string) {
 		const users = [...this.list.values()];
 		const { playerId } = this.store.gameStore;
 
@@ -36,6 +36,12 @@ export class UsersStore {
 
 			return 0;
 		});
+
+		if (searchUsername) {
+			return users.filter((user) =>
+				user.playerId.toLowerCase().includes(searchUsername.toLowerCase()),
+			);
+		}
 
 		return users;
 	}

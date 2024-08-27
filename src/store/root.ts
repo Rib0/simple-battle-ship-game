@@ -3,7 +3,7 @@ import { injectStores } from '@mobx-devtools/tools';
 
 import { GameFieldStore } from './game-field';
 import { ShipsStore } from './ships';
-import { GameStore } from './game';
+import { GameStore } from './game/game';
 import { UsersStore } from './users';
 
 class RootStore {

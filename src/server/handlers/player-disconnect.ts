@@ -2,12 +2,13 @@ import { ServerIo, ServerSocket, SocketEvents } from '@/types/socket';
 import { TURN_DURATION } from '@/constants/game';
 import { Timer } from '../lib/timer';
 import { Utils } from '../lib/utils';
+import { InvitationUtils } from '../lib/invitation-utils';
 import { roomStore } from '../stores/rooms-store';
 import { appStore } from '../stores/app-store';
 
 export const playerDisconnectHandler = (io: ServerIo, socket: ServerSocket) => {
 	socket.on('disconnect', () => {
-		Utils.deletePlayersIdsFromInvitationStates([socket]);
+		InvitationUtils.deletePlayersIdsFromInvitationStates([socket]);
 		appStore.removeSearchingGamePlayersIds([socket]);
 
 		const playerId = Utils.getPlayerId(socket);

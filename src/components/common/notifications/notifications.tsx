@@ -9,7 +9,7 @@ export const Notifications = observer(() => {
 	const [api, contextHolder] = notification.useNotification({ placement: 'top' });
 	const { gameStore } = useStoreContext();
 
-	const { lastNotitication, removeNotitification } = gameStore;
+	const { lastNotitication, removeNotitification } = gameStore.notitications;
 
 	useEffect(() => {
 		if (!lastNotitication) {

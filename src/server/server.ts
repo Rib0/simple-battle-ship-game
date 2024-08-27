@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import { IoConnection } from './lib/io-connection';
 import { Timer } from './lib/timer';
 import { Utils } from './lib/utils';
@@ -15,7 +14,12 @@ export class Server {
 			const socketWithEqualPlayerId = Utils.findSocketByPlayerId(playerId);
 
 			if ((socketWithEqualPlayerId && socketWithEqualPlayerId !== socket) || !playerId) {
-				const newPlayerId = nanoid();
+				let newPlayerId = `player ${Utils.nanoidDigits()}`;
+
+				while (Utils.findSocketByPlayerId(newPlayerId)) {
+					newPlayerId = `player ${Utils.nanoidDigits()}`;
+				}
+
 				Utils.setPlayerId(socket, newPlayerId);
 			}
 
